@@ -1,0 +1,22 @@
+# Entorno / dependencias locales
+venv/
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# VS Code
+.vscode/
+.history/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Datos pesados opcionales (evita subirlos si no es necesario)
+Datasets/
+Datasets_csv/
+*.xlsx
+*.csv
+.gitattributes
