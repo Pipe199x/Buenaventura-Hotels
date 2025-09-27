@@ -1,6 +1,7 @@
 # Entorno / dependencias locales
 venv/
 .env
+.venv/     
 
 # Python
 __pycache__/
