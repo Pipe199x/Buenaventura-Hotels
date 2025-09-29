@@ -12,13 +12,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 CONN_STR = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-CONTAINER = os.getenv("AZURE_CONTAINER_NAME", "datasets-raw")
+CONTAINER = os.getenv("AZURE_CONTAINER_NAME", "datasets")
 
 PROJ_ROOT = Path(__file__).resolve().parents[1]
 LOCAL_DATA = PROJ_ROOT / "Datasets"
 
 DATE_PREFIX = datetime.utcnow().strftime("%Y-%m-%d")
-BLOB_PREFIX = f"raw/{DATE_PREFIX}/"   # pon "" si no quieres subcarpeta
+BLOB_PREFIX = "bronze/"   # pon "" si no quieres subcarpeta
 
 ALLOWED_EXT = {".xlsx", ".xls"}       # agrega ".csv" si quieres
 
