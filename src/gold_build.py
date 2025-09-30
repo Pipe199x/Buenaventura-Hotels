@@ -55,10 +55,11 @@ def list_silver_hotels() -> list[str]:
 def choose_text(df: pd.DataFrame) -> pd.Series:
     """
     Elige el texto a puntuar: 'text' si existe/no vacío; si no, 'textTranslated'.
+    Devuelve una Serie alineada al índice de df.
     """
     t1 = df.get("text", pd.Series(index=df.index, dtype=object)).fillna("").astype(str).str.strip()
     t2 = df.get("textTranslated", pd.Series(index=df.index, dtype=object)).fillna("").astype(str).str.strip()
-    return np.where(t1 != "", t1, t2)
+    return t1.where(t1 != "", t2)
 
 def batched(seq: List[str], n: int = 25):
     for i in range(0, len(seq), n):
@@ -68,21 +69,30 @@ def batched(seq: List[str], n: int = 25):
 def enrich_with_azure(df_silver: pd.DataFrame, *, language: Optional[str] = "es") -> pd.DataFrame:
     """
     Enriquecer SILVER con: sentimiento + opinion mining, key phrases, entidades, PII, linked entities.
-    language="es" recomendado; usa None para autodetectar (algo más lento).
-    Asignación SIEMPRE segura por índice (evita errores de broadcast).
+    - Fecha: solo 2020-01-01 .. 2025-08-21 (UTC)
+    - Procesa TODO texto con longitud >= 1. Texto vacío → se deja NaN en métricas.
+    - Asignación segura por índice (evita errores de broadcast).
     """
     ta = get_ta_client()
     df = df_silver.copy()
 
+    # --- FECHAS: convertir SIEMPRE a datetime UTC y filtrar rango ---
+    df["publishedAtDate"] = pd.to_datetime(df["publishedAtDate"], errors="coerce", utc=True)
+    start = pd.Timestamp("2020-01-01", tz="UTC")
+    end   = pd.Timestamp("2025-08-21 23:59:59", tz="UTC")
+    df = df.loc[df["publishedAtDate"].between(start, end, inclusive="both")].copy()
+
     # Texto a usar
     df["text_used"] = choose_text(df)
-    mask = df["text_used"].fillna("").str.len() > 3
-    idx  = df.index[mask].tolist()
+
+    # --- PROCESAR TODOS LOS TEXTOS (>=1 char). Vacíos quedan con NaN en sentimiento ---
+    mask_proc = df["text_used"].fillna("").str.len() >= 1
+    idx  = df.index[mask_proc].tolist()
     texts = df.loc[idx, "text_used"].tolist()
 
     # Inicializa columnas destino
     add_cols = dict(
-        detected_language=(language or "auto"),
+        detected_language=("auto" if language is None else language),
         sentiment_label=None, positive_score=np.nan, neutral_score=np.nan, negative_score=np.nan,
         sentiment_score=np.nan, sentences_count=0, aspects=None,
         key_phrases=None,
@@ -92,12 +102,15 @@ def enrich_with_azure(df_silver: pd.DataFrame, *, language: Optional[str] = "es"
     for k, v in add_cols.items():
         df[k] = v
 
+    # Parámetro de idioma para el SDK (None = autodetect)
+    lang_param = None if (language is None) else language
+
     # ---------- 1) Sentiment + Opinion Mining ----------
     sent_rows = []
     for batch in batched(texts):
         for attempt in range(4):
             try:
-                resp = ta.analyze_sentiment(batch, language=(language or "en"), show_opinion_mining=True)
+                resp = ta.analyze_sentiment(batch, language=lang_param, show_opinion_mining=True)
                 sent_rows.extend(resp); break
             except Exception:
                 time.sleep(1.5 * (attempt + 1))
@@ -140,7 +153,7 @@ def enrich_with_azure(df_silver: pd.DataFrame, *, language: Optional[str] = "es"
     for batch in batched(texts):
         for attempt in range(3):
             try:
-                kp_rows.extend(ta.extract_key_phrases(batch, language=(language or "en"))); break
+                kp_rows.extend(ta.extract_key_phrases(batch, language=lang_param)); break
             except Exception:
                 time.sleep(1.2 * (attempt + 1))
     kp_idx = idx[:len(kp_rows)]
@@ -152,7 +165,7 @@ def enrich_with_azure(df_silver: pd.DataFrame, *, language: Optional[str] = "es"
     for batch in batched(texts):
         for attempt in range(3):
             try:
-                ent_rows.extend(ta.recognize_entities(batch, language=(language or "en"))); break
+                ent_rows.extend(ta.recognize_entities(batch, language=lang_param)); break
             except Exception:
                 time.sleep(1.2 * (attempt + 1))
     ent_idx = idx[:len(ent_rows)]
@@ -167,7 +180,7 @@ def enrich_with_azure(df_silver: pd.DataFrame, *, language: Optional[str] = "es"
     for batch in batched(texts):
         for attempt in range(3):
             try:
-                pii_rows.extend(ta.recognize_pii_entities(batch, language=(language or "en"))); break
+                pii_rows.extend(ta.recognize_pii_entities(batch, language=lang_param)); break
             except Exception:
                 time.sleep(1.2 * (attempt + 1))
     pii_idx = idx[:len(pii_rows)]
@@ -182,7 +195,7 @@ def enrich_with_azure(df_silver: pd.DataFrame, *, language: Optional[str] = "es"
     for batch in batched(texts):
         for attempt in range(3):
             try:
-                link_rows.extend(ta.recognize_linked_entities(batch, language=(language or "en"))); break
+                link_rows.extend(ta.recognize_linked_entities(batch, language=lang_param)); break
             except Exception:
                 time.sleep(1.2 * (attempt + 1))
     link_idx = idx[:len(link_rows)]
