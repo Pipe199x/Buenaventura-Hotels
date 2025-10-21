@@ -220,6 +220,7 @@ def enrich_with_azure(df_silver: pd.DataFrame, *, language: Optional[str] = "es"
 
 # ===================== Guardar GOLD =====================
 def save_gold(df_gold: pd.DataFrame, hotel: str, mode: str = "cloud"):
+    clean_name = hotel.replace("_silver", "")
     file_name = f"{hotel}_GOLD.parquet"
     if mode == "local":
         out_dir = Path("data/gold")
