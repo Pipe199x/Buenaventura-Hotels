@@ -51,6 +51,21 @@ def make_silver(df: pd.DataFrame, hotel_id: str) -> pd.DataFrame:
         if sort_keys:
             df = df.sort_values(sort_keys).drop_duplicates(subset=["reviewId"], keep="last")
 
+    # --- 🔹 NUEVO: Filtro 1 - solo reseñas de Google ---
+    before_origin = len(df)
+    df = df[df["reviewOrigin"].fillna("").str.lower() == "google"]
+    after_origin = len(df)
+    print(f"🧩 Filtradas por origen Google: {before_origin} → {after_origin}")
+
+    # --- 🔹 NUEVO: Filtro 2 - rango de fechas 2018–actual ---
+    if "publishedAtDate" in df.columns:
+        start = pd.Timestamp("2018-01-01", tz="UTC")
+        end = pd.Timestamp.now(tz="UTC")
+        before_date = len(df)
+        df = df.loc[df["publishedAtDate"].between(start, end, inclusive="both")].copy()
+        after_date = len(df)
+        print(f"🕓 Filtradas por fecha: {before_date} → {after_date} (rango {start.date()} a {end.date()})")
+
     # Derivados útiles
     if "publishedAtDate" in df.columns:
         df["year_month"] = df["publishedAtDate"].dt.to_period("M").astype(str)
@@ -74,19 +89,20 @@ def make_silver(df: pd.DataFrame, hotel_id: str) -> pd.DataFrame:
         "review_length","scrapedAt","categoryName"
     ]
     ordered = [c for c in preferred if c in df.columns] + [c for c in df.columns if c not in preferred]
+
+    print(f"✅ Silver final para '{hotel_id}': {len(df)} reseñas Google válidas dentro del rango de fechas.")
     return df[ordered]
 
-# ---------- 2) SUBIDA A AZURE: silver/... en Parquet ----------
 
+# ---------- 2) SUBIDA A AZURE: silver/... en Parquet ----------
 def upload_silver_parquet(df_silver: pd.DataFrame, hotel_id: str):
     from .utils import df_to_parquet_bytes, ensure_container
     container = ensure_container()
-
-    blob_path = f"silver/{hotel_id}.parquet"      # << simple
+    blob_path = f"silver/{hotel_id}_silver.parquet"
     container.upload_blob(name=blob_path,
                           data=df_to_parquet_bytes(df_silver),
                           overwrite=True)
-    print(f"✅ Subido Silver: {blob_path} ({len(df_silver)} filas)")
+    print(f"☁️ Subido Silver: {blob_path} ({len(df_silver)} filas)")
 
 
 # ---------- 3) PUNTO DE ENTRADA: lee Excels locales y procesa ----------
@@ -94,11 +110,10 @@ def run_for_hotel(excel_path: Path, hotel_id: str, sheet_name="Data"):
     print(f"→ Leyendo {excel_path.name} (sheet={sheet_name})")
     df = pd.read_excel(excel_path, sheet_name=sheet_name)
     df_silver = make_silver(df, hotel_id=hotel_id)
-    print("Silver shape:", df_silver.shape)
+    print("📊 Silver shape:", df_silver.shape)
     upload_silver_parquet(df_silver, hotel_id)
 
 def main():
-    # Mapea archivo → hotel_id (ajústalo a tus archivos)
     mapping = {
         "Hotel_Torre_Mar.xlsx":          "torre_mar",
         "Hotel_Steven_Buenaventura.xlsx":"steven_buenaventura",
