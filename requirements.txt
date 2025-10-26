@@ -17,3 +17,6 @@ spacy
 spacy-spanish-lemmatizer
 supabase
 psycopg2-binary
+psycopg
+psycopg-binary
+sqlalchemy
