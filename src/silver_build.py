@@ -59,8 +59,8 @@ def make_silver(df: pd.DataFrame, hotel_id: str) -> pd.DataFrame:
 
     # --- 🔹 NUEVO: Filtro 2 - rango de fechas 2018–actual ---
     if "publishedAtDate" in df.columns:
-        start = pd.Timestamp("2018-01-01", tz="UTC")
-        end = pd.Timestamp.now(tz="UTC")
+        start = pd.Timestamp("2020-01-01", tz="UTC")
+        end = pd.Timestamp("2025-08-21", tz="UTC")
         before_date = len(df)
         df = df.loc[df["publishedAtDate"].between(start, end, inclusive="both")].copy()
         after_date = len(df)
