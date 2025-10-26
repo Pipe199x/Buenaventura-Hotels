@@ -1,130 +1,278 @@
-# src/nashor_to_supabase.py
-import os
+# scripts/union_upsert_pooler_autoschema.py
+from __future__ import annotations
+
+import io, os, sys, time, argparse, socket, math
+from typing import List, Sequence, Dict, Tuple
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
+
 import numpy as np
 import pandas as pd
-from io import BytesIO
 from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient
-from supabase import create_client, Client
+import psycopg
+from psycopg import sql
 
+# ==================== ENV ====================
 load_dotenv()
+AZ_CONN      = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+AZ_CONTAINER = os.getenv("AZURE_CONTAINER", "datasets")
+AZ_PREFIX    = os.getenv("AZURE_PREFIX", "gold/")
+DB_URL       = os.getenv("SUPABASE_DB_URL")
+TABLE        = os.getenv("DEST_TABLE", "public.hotels_gold")
 
-# ---------- CONFIGURACIÓN ----------
-AZURE_CONN_STR = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-AZURE_CONTAINER = os.getenv("AZURE_CONTAINER_NAME", "datasets")
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+if not AZ_CONN: raise SystemExit("Falta AZURE_STORAGE_CONNECTION_STRING")
+if not DB_URL:  raise SystemExit("Falta SUPABASE_DB_URL (URI del POOLER)")
 
+# ==================== Pooler URL check ====================
+def ensure_pooler_url(url: str) -> str:
+    if not (url.startswith("postgresql://") or url.startswith("postgres://")):
+        raise SystemExit("SUPABASE_DB_URL debe iniciar con postgresql://")
+    p = urlparse(url); host = p.hostname or ""; port = p.port or 6543
+    try: socket.getaddrinfo(host, port, proto=socket.IPPROTO_TCP)
+    except Exception as e: raise SystemExit(f"No se pudo resolver '{host}:{port}': {e}")
+    q = dict(parse_qsl(p.query, keep_blank_values=True))
+    if q.get("sslmode") is None: q["sslmode"] = "require"
+    return urlunparse(p._replace(query=urlencode(q)))
+DB_URL = ensure_pooler_url(DB_URL)
 
-# ---------- CONEXIÓN ----------
-def get_supabase() -> Client:
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        raise SystemExit("❌ Faltan SUPABASE_URL o SUPABASE_KEY en .env")
-    return create_client(SUPABASE_URL, SUPABASE_KEY)
+# ==================== Azure helpers ====================
+def get_container():
+    return BlobServiceClient.from_connection_string(AZ_CONN).get_container_client(AZ_CONTAINER)
 
+def list_parquets(container, prefix: str) -> list[str]:
+    return [b.name for b in container.list_blobs(name_starts_with=prefix) if b.name.lower().endswith(".parquet")]
 
-# ---------- CARGAR GOLDs DESDE AZURE ----------
-def load_all_gold_from_azure() -> pd.DataFrame:
-    print("📥 Cargando GOLDs desde Azure...")
-    blob_service = BlobServiceClient.from_connection_string(AZURE_CONN_STR)
-    container = blob_service.get_container_client(AZURE_CONTAINER)
+def read_parquet(container, blob_name: str) -> pd.DataFrame:
+    data = container.download_blob(blob_name).readall()
+    return pd.read_parquet(io.BytesIO(data))
 
-    blobs = [b.name for b in container.list_blobs(name_starts_with="gold/") if b.name.endswith(".parquet")]
-    if not blobs:
-        raise SystemExit("❌ No se encontraron archivos GOLD en Azure.")
+# ==================== Dataset columns (fuente) ====================
+DATA_COLS: List[str] = [
+  "hotel_id","reviewId","placeId","title","text","textTranslated","originalLanguage","reviewOrigin",
+  "publishedAtDate","year_month","stars","totalScore","reviewsCount","hotelStars","price","isLocalGuide",
+  "reviewerNumberOfReviews","likesCount","responseFromOwnerText","responseFromOwnerDate","response_delay_days",
+  "review_length","scrapedAt","categoryName","reviewUrl","url",
+  "reviewContext/Food & drinks","reviewContext/Hotel highlights","reviewContext/Nearby activities",
+  "reviewContext/Noteworthy details","reviewContext/Rooms","reviewContext/Safety","reviewContext/Travel group",
+  "reviewContext/Trip type","reviewContext/Walkability",
+  "reviewDetailedRating/Location","reviewDetailedRating/Rooms","reviewDetailedRating/Service",
+  "text_used","sentiment_label","positive_score","neutral_score","negative_score","sentiment_score",
+  "sentences_count","aspects","key_phrases","entities","pii_entities","linked_entities","scored_at","hotel_name"
+]
+
+# ==================== Normalización ====================
+def to_utc_iso(series: pd.Series) -> pd.Series:
+    if series.isna().all(): return series
+    s = pd.to_datetime(series, errors="coerce", utc=True)
+    return s.dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    for col in df.select_dtypes(include=["int64"]).columns:
+        if df[col].isna().any(): df[col] = df[col].astype("Int64")
+    for col in df.columns:
+        if str(df[col].dtype).startswith("datetime64"): df[col] = to_utc_iso(df[col])
+    for col in df.select_dtypes(include=["bool"]).columns:
+        df[col] = df[col].astype("boolean")
+    for c in DATA_COLS:
+        if c not in df.columns: df[c] = pd.NA
+    for c in {
+        "stars","totalScore","reviewsCount","hotelStars","price",
+        "reviewerNumberOfReviews","likesCount","response_delay_days",
+        "reviewDetailedRating/Location","reviewDetailedRating/Rooms","reviewDetailedRating/Service",
+        "positive_score","neutral_score","negative_score","sentiment_score"
+    }:
+        if c in df.columns: df[c] = pd.to_numeric(df[c], errors="coerce")
+    for c in {"review_length","sentences_count"}:
+        if c in df.columns: df[c] = pd.to_numeric(df[c], errors="coerce").astype("Int64")
+    return df[DATA_COLS]
+
+# ==================== Unión + dedup ====================
+def union_and_dedup(dfs: list[pd.DataFrame]) -> pd.DataFrame:
+    df = pd.concat(dfs, ignore_index=True)
+    if "hotel_name" not in df.columns:
+        df["hotel_name"] = pd.NA
+    if "reviewId" not in df.columns:
+        raise SystemExit("El dataset no contiene 'reviewId' para deduplicar.")
+    if "scrapedAt" in df.columns:
+        order = pd.to_datetime(df["scrapedAt"], errors="coerce", utc=True)
+        df = df.loc[order.sort_values(kind="stable").index].drop_duplicates(subset=["reviewId"], keep="last")
+    else:
+        df = df.drop_duplicates(subset=["reviewId"], keep="first")
+    return df.reset_index(drop=True)
+
+# ==================== Schema introspection ====================
+def get_table_schema(conn: psycopg.Connection, table: str) -> Tuple[List[str], str]:
+    # table en formato schema.table
+    schema, name = table.split(".") if "." in table else ("public", table)
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema=%s AND table_name=%s
+            ORDER BY ordinal_position;
+        """, (schema, name))
+        cols = [r[0] for r in cur.fetchall()]
+
+        cur.execute("""
+            SELECT a.attname
+            FROM pg_index i
+            JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+            WHERE i.indrelid = %s::regclass AND i.indisprimary;
+        """, (f"{schema}.{name}",))
+        pk_cols = [r[0] for r in cur.fetchall()]
+    if not cols:
+        raise SystemExit(f"No encontré columnas para {table}. ¿La tabla existe?")
+    if not pk_cols:
+        raise SystemExit(f"La tabla {table} no tiene PK. Define una PK (esperada: reviewid).")
+    if len(pk_cols) != 1:
+        raise SystemExit(f"PK compuesta no soportada automáticamente: {pk_cols}")
+    return cols, pk_cols[0]
+
+def build_column_mapping(real_cols: List[str]) -> Dict[str, str]:
+    # Mapea cada DATA_COL a una columna real existente
+    real_set = set(real_cols)
+    mapping: Dict[str, str] = {}
+    missing: List[str] = []
+    for c in DATA_COLS:
+        # preferencia: exacto → slash exacto → lower()
+        if c in real_set:
+            mapping[c] = c
+        elif "/" in c:
+            # columnas con slash suelen estar definidas con comillas tal cual
+            if c in real_set:
+                mapping[c] = c
+            elif c.lower() in real_set:
+                mapping[c] = c.lower()
+            else:
+                missing.append(c)
+        else:
+            lc = c.lower()
+            if lc in real_set:
+                mapping[c] = lc
+            else:
+                missing.append(c)
+    if missing:
+        print("⚠️ Columnas del dataset que NO existen en la tabla y se ignorarán:")
+        for m in missing: print("   -", m)
+    return mapping
+
+# ==================== SQL build ====================
+def q(name: str): return sql.Identifier(name)
+
+def build_stmt(table: str, mapping: Dict[str, str], pk_col: str) -> Tuple[sql.Composed, List[str], List[str]]:
+    # Orden: seguimos DATA_COLS pero solo las que tienen mapping
+    data_cols = [c for c in DATA_COLS if c in mapping]
+    db_cols   = [mapping[c] for c in data_cols]
+    cols_ident = [q(c) for c in db_cols]
+    placeholders = sql.SQL(", ").join(sql.Placeholder() for _ in db_cols)
+
+    insert_head = sql.SQL("INSERT INTO {t} ({cols}) VALUES ({vals})").format(
+        t=sql.SQL(table), cols=sql.SQL(", ").join(cols_ident), vals=placeholders
+    )
+    update_cols = [c for c in db_cols if c != pk_col]
+    set_pairs = sql.SQL(", ").join(sql.SQL("{c} = EXCLUDED.{c}").format(c=q(c)) for c in update_cols)
+
+    stmt = insert_head + sql.SQL(" ON CONFLICT ({pk}) DO UPDATE SET {setp}").format(pk=q(pk_col), setp=set_pairs)
+    return stmt, data_cols, db_cols
+
+# ==================== Convertidores ====================
+def to_python_scalar(v):
+    if v is None or v is pd.NA or v is pd.NaT: return None
+    if isinstance(v, float):
+        if math.isnan(v) or math.isinf(v): return None
+        return v
+    if isinstance(v, (np.floating,)):
+        fv = float(v)
+        return None if (math.isnan(fv) or math.isinf(fv)) else fv
+    if isinstance(v, (np.integer,)): return int(v)
+    if isinstance(v, (np.bool_,)):   return bool(v)
+    return v
+
+def df_rows_to_tuples(df: pd.DataFrame, data_cols: List[str]) -> list[tuple]:
+    out = []
+    for _, row in df.iterrows():
+        out.append(tuple(to_python_scalar(row[c]) for c in data_cols))
+    return out
+
+def batched(iterable, size: int):
+    batch = []
+    for x in iterable:
+        batch.append(x)
+        if len(batch) >= size:
+            yield batch; batch = []
+    if batch: yield batch
+
+# ==================== Upsert por lotes (pooler) ====================
+def upsert_batches(conn: psycopg.Connection, df: pd.DataFrame, stmt: sql.Composed, data_cols: List[str], *, batch_size: int = 200, retries: int = 3):
+    if df.empty: 
+        print("Nada que insertar."); 
+        return
+    total = len(df); done = 0
+    for i, idxs in enumerate(batched(range(total), batch_size), 1):
+        chunk = df.iloc[list(idxs)]
+        values = df_rows_to_tuples(chunk, data_cols)
+        for att in range(retries):
+            try:
+                with conn.transaction():
+                    with conn.cursor() as cur:
+                        cur.executemany(stmt, values)
+                done += len(values)
+                print(f"   ✓ Lote {i}: {len(values)} filas (acum {done}/{total})")
+                break
+            except Exception as e:
+                transient = any(t in str(e).lower() for t in ("timeout","too many","cancel","deadlock","connection","pool"))
+                if att < retries - 1 and transient:
+                    time.sleep(1.2 * (att + 1)); continue
+                print(f"   ✗ Lote {i} error: {e}")
+                break
+
+# ==================== main ====================
+def main():
+    # Conexión rápida al pooler
+    p = urlparse(DB_URL); host, port, db = p.hostname, p.port or 6543, p.path.lstrip("/") or "postgres"
+    print(f"🔌 Pooler: {host}:{port}/{db}")
+    with psycopg.connect(DB_URL, connect_timeout=10) as conn:
+        with conn.cursor() as cur: cur.execute("select 1;"); cur.fetchone()
+    print("✅ Conexión pooler OK.")
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--only", help="Procesar un solo parquet (nombre exacto)")
+    ap.add_argument("--batch", type=int, default=int(os.getenv("BATCH_SIZE", "200")))
+    args = ap.parse_args()
+
+    # Lee archivos y une
+    container = get_container()
+    blobs = [f"{AZ_PREFIX}{args.only}"] if args.only else list_parquets(container, AZ_PREFIX)
+    if not blobs: raise SystemExit("No se encontraron .parquet en el prefijo indicado.")
+    print(f"📦 Archivos detectados: {len(blobs)}")
 
     dfs = []
     for blob in blobs:
-        print(f"  → Leyendo {blob} ...")
-        data = container.download_blob(blob).readall()
-        df = pd.read_parquet(BytesIO(data))
-        df["hotel_name"] = blob.split("/")[-1].replace("_GOLD.parquet", "").replace("_silver", "")
+        df = read_parquet(container, blob)
+        if "hotel_name" not in df.columns:
+            df["hotel_name"] = os.path.basename(blob).replace("_GOLD.parquet", "").replace("_silver", "")
         dfs.append(df)
 
-    df_all = pd.concat(dfs, ignore_index=True)
-    print(f"✅ Total filas combinadas: {len(df_all)}")
-    return df_all
+    print("🧭 Uniendo y deduplicando por reviewId ...")
+    df_all = union_and_dedup(dfs)
+    print(f"   - Filas únicas: {len(df_all)}")
 
+    df_all = normalize_df(df_all)
 
-# ---------- DETECCIÓN DE VALORES PROBLEMÁTICOS ----------
-def detect_invalid_values(df: pd.DataFrame):
-    invalid_cols = []
-    for col in df.columns:
-        if df[col].dtype in [float, np.float64, np.float32]:
-            bad_vals = df[col][~np.isfinite(df[col].fillna(0))].count()
-            if bad_vals > 0:
-                invalid_cols.append((col, bad_vals))
-        elif df[col].dtype.name.startswith("datetime"):
-            nulls = df[col].isna().sum()
-            if nulls > 0:
-                invalid_cols.append((col, nulls))
-    if invalid_cols:
-        print("\n⚠️ Columnas con valores no válidos detectadas:")
-        for c, n in invalid_cols:
-            print(f"   • {c}: {n} valores problemáticos")
-    else:
-        print("✅ No se detectaron valores no serializables.")
+    # Introspección de esquema y mapeo dinámico
+    with psycopg.connect(DB_URL, autocommit=True) as conn:
+        real_cols, pk_col = get_table_schema(conn, TABLE)
+        print(f"🔎 PK detectada: {pk_col}")
+        mapping = build_column_mapping(real_cols)
+        if "reviewId" in mapping and mapping["reviewId"] != pk_col:
+            print(f"⚠️ La PK real es '{pk_col}', pero el dataset usa 'reviewId'→'{mapping['reviewId']}'. Se usará ON CONFLICT ({pk_col}).")
+        stmt, data_cols, db_cols = build_stmt(TABLE, mapping, pk_col)
+        print(f"🧩 Columnas insertadas ({len(db_cols)}): {', '.join(db_cols)}")
+        upsert_batches(conn, df_all, stmt, data_cols, batch_size=args.batch)
 
-
-# ---------- SANITIZAR ANTES DE SUBIR ----------
-def sanitize_for_json(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-
-    # Convertir fechas a ISO8601
-    for col in df.select_dtypes(include=["datetime64[ns, UTC]", "datetime64[ns]", "datetimetz"]).columns:
-        df[col] = df[col].apply(lambda x: x.isoformat() if pd.notna(x) else None)
-
-    # Reemplazar infinitos por NaN y luego NaN por None
-    df.replace([np.inf, -np.inf], np.nan, inplace=True)
-    df = df.where(pd.notnull(df), None)
-
-    # Convertir floats fuera de rango a None
-    for col in df.select_dtypes(include=[float]).columns:
-        df[col] = df[col].apply(
-            lambda x: None if (x is None or not np.isfinite(x) or abs(x) > 1e308) else float(x)
-        )
-
-    # 🔹 Convertir cualquier tipo "object" con números ilegales
-    for col in df.columns:
-        df[col] = df[col].apply(
-            lambda x: None if isinstance(x, str) and x.lower() in ["nan", "inf", "-inf"] else x
-        )
-
-    return df
-
-
-
-# ---------- SUBIR A SUPABASE ----------
-def upload_to_supabase(df: pd.DataFrame):
-    sb = get_supabase()
-    print("☁️ Subiendo a Supabase (tabla: hotels_gold)...")
-
-    detect_invalid_values(df)
-    df = sanitize_for_json(df)
-    records = df.to_dict(orient="records")
-
-    batch_size = 500
-    uploaded = 0
-
-    for i in range(0, len(records), batch_size):
-        batch = records[i:i + batch_size]
-        print(f"🧾 Subiendo batch {i//batch_size + 1} ({len(batch)} filas)...")
-        try:
-            sb.table("hotels_gold").insert(batch).execute()
-            uploaded += len(batch)
-        except Exception as e:
-            print(f"⚠️ Error en batch {i//batch_size + 1}: {e}")
-            continue
-
-    print(f"✅ Subida completada: {uploaded}/{len(df)} filas insertadas.")
-
-
-# ---------- MAIN ----------
-def main():
-    df_all = load_all_gold_from_azure()
-    upload_to_supabase(df_all)
-    print("\n🎉 Nashor → Supabase completado sin errores JSON.")
-
+    print("🎉 Carga unificada completada.")
 
 if __name__ == "__main__":
-    main()
+    try: main()
+    except Exception as e: print(f"Error fatal: {e}", file=sys.stderr); sys.exit(1)
