@@ -1,6 +1,6 @@
 # 🏨 Buenaventura Hotels – Sentiment Analysis Pipeline
 
-![Pipeline Overview](<img src="https://raw.githubusercontent.com/Pipe199x/Buenaventura-Hotels/main/docs/images/pipeline_overview.png" alt="Pipeline Overview" width="500">)
+<img src="https://raw.githubusercontent.com/Pipe199x/Buenaventura-Hotels/main/docs/images/pipeline_overview.png" alt="Pipeline Overview" width="500">
 
 > **End-to-end sentiment analysis system for hotel reviews in Buenaventura (Colombia)**
 > Built with **Azure**, **Supabase**, and **Power BI** — transforming raw Google Maps data into analytical insights for tourism development.
@@ -207,7 +207,7 @@ SUPABASE_SERVICE_ROLE_KEY=<your_service_role_key>
 
 ## 🖼️ Visual Architecture
 
-![Data Flow Diagram]<img src="https://raw.githubusercontent.com/Pipe199x/Buenaventura-Hotels/main/docs/images/dataflow_diagram.png" alt="Data Flow" width="300">
+<img src="https://raw.githubusercontent.com/Pipe199x/Buenaventura-Hotels/main/docs/images/dataflow_diagram.png" alt="Data Flow" width="500">
 
 ---
 
