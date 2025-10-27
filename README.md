@@ -205,15 +205,6 @@ SUPABASE_SERVICE_ROLE_KEY=<your_service_role_key>
 
 ---
 
-## 📚 Academic Context
-
-**University of Manizales – School of Data Analytics Engineering**
-📘 *Capstone Project: “Sentiment Analysis in Hotel Reviews from Buenaventura Using Text Mining”*
-👨‍🎓 Student: **Andrés Felipe Duque Caicedo**
-👨‍🎓 Advisor: **Juan Alejandro Trujillo**
-
----
-
 ## 🖼️ Visual Architecture
 
 ![Data Flow Diagram](https://raw.githubusercontent.com/Pipe199x/Buenaventura-Hotels/main/docs/images/dataflow_diagram.png)
@@ -226,15 +217,8 @@ SUPABASE_SERVICE_ROLE_KEY=<your_service_role_key>
 
 ---
 
-## 🧳 License
-
-This project is open-source under the [MIT License](LICENSE).
-
----
-
 ## 💬 Contact
 
-👤 **Andrés Felipe Duque Caicedo**
 📧 [duqueandres800@gmail.com](mailto:duqueandres800@gmail.com)
 🐙 [GitHub: Pipe199x](https://github.com/Pipe199x)
 
