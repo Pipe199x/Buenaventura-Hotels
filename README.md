@@ -207,7 +207,7 @@ SUPABASE_SERVICE_ROLE_KEY=<your_service_role_key>
 
 ## 🖼️ Visual Architecture
 
-![Data Flow Diagram](<img src="https://raw.githubusercontent.com/Pipe199x/Buenaventura-Hotels/main/docs/images/dataflow_diagram.png" alt="Data Flow" width="300">)
+![Data Flow Diagram]<img src="https://raw.githubusercontent.com/Pipe199x/Buenaventura-Hotels/main/docs/images/dataflow_diagram.png" alt="Data Flow" width="300">
 
 ---
 
