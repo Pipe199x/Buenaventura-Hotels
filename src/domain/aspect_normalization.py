@@ -268,7 +268,9 @@ def validate_thematic_normalization(df: pd.DataFrame, theme_col: str = "aspect_t
 
 def create_thematic_table(df: pd.DataFrame, 
                          theme_col: str = "aspect_theme",
-                         year_col: Optional[str] = "year_month") -> pd.DataFrame:
+                         year_col: Optional[str] = "year_month",
+                         sentiment_col: Optional[str] = None,
+                         sentiment_filter: Optional[str] = None) -> pd.DataFrame:
     """
     Create analytical table with themes as rows and years as columns.
     
@@ -276,10 +278,17 @@ def create_thematic_table(df: pd.DataFrame,
     
     THEME | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | TOTAL
     
+    IMPORTANT: Explodes theme combinations so each theme appears on its own row.
+    If a review has "bathrooms_cleanliness; service_quality", it counts as:
+    - 1 for bathrooms_cleanliness
+    - 1 for service_quality
+    
     Args:
         df: DataFrame with normalized aspects
         theme_col: Name of thematic aspects column
         year_col: Name of year column (optional, if None uses all data)
+        sentiment_col: Name of sentiment column (e.g., "sentiment_label")
+        sentiment_filter: Filter by sentiment ("positive", "negative", "neutral")
         
     Returns:
         Pivot table with themes as rows and years as columns
@@ -287,20 +296,42 @@ def create_thematic_table(df: pd.DataFrame,
     if theme_col not in df.columns:
         raise ValueError(f"Column '{theme_col}' not found in DataFrame")
     
+    # Filter by sentiment if requested
+    df_filtered = df.copy()
+    if sentiment_col and sentiment_filter and sentiment_col in df.columns:
+        df_filtered = df_filtered[df_filtered[sentiment_col].str.lower() == sentiment_filter.lower()]
+    
+    # Extract year if year_col exists
+    if year_col and year_col in df_filtered.columns:
+        # Handle year_month format (e.g., "2020-01") or datetime
+        if df_filtered[year_col].dtype == 'object':
+            df_filtered['year'] = df_filtered[year_col].astype(str).str[:4]
+        else:
+            df_filtered['year'] = pd.to_datetime(df_filtered[year_col], errors='coerce').dt.year.astype(str)
+    else:
+        df_filtered['year'] = 'all'
+    
     # Expand semicolon-separated themes into separate rows
+    # Each theme combination is exploded so individual themes are counted
     expanded_rows = []
-    for idx, row in df.iterrows():
+    for idx, row in df_filtered.iterrows():
         themes_str = row[theme_col]
         if pd.isna(themes_str) or not themes_str:
             continue
         
-        themes = [t.strip() for t in str(themes_str).split(";")]
-        year = row.get(year_col, "all") if year_col and year_col in df.columns else "all"
+        # Split by semicolon and strip whitespace
+        themes = [t.strip() for t in str(themes_str).split(";") if t.strip()]
         
+        if not themes:
+            continue
+        
+        year = str(row['year']) if pd.notna(row['year']) else 'all'
+        
+        # Each theme gets its own row (explode combinations)
         for theme in themes:
             expanded_rows.append({
                 "theme": theme,
-                "year": str(year)[:4] if year != "all" else "all",  # Extract year from year_month
+                "year": year,
                 "count": 1,
             })
     
@@ -318,12 +349,21 @@ def create_thematic_table(df: pd.DataFrame,
             aggfunc="sum",
             fill_value=0
         )
+        # Add total column
         pivot["total"] = pivot.sum(axis=1)
+        # Add total row
+        pivot.loc["total"] = pivot.sum()
     else:
         # No year column, just count by theme
         pivot = expanded_df.groupby("theme")["count"].sum().to_frame("total")
+        pivot = pivot.sort_values("total", ascending=False)
     
-    # Sort by total descending
-    pivot = pivot.sort_values("total", ascending=False)
+    # Sort by total descending (excluding total row)
+    if "total" in pivot.index:
+        total_row = pivot.loc["total"].copy()
+        pivot = pivot.drop("total").sort_values("total", ascending=False)
+        pivot.loc["total"] = total_row
+    else:
+        pivot = pivot.sort_values("total", ascending=False)
     
     return pivot
