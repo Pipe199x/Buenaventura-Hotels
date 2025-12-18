@@ -18,15 +18,15 @@ PROJ_ROOT = Path(__file__).resolve().parents[1]
 LOCAL_DATA = PROJ_ROOT / "Datasets"
 
 DATE_PREFIX = datetime.utcnow().strftime("%Y-%m-%d")
-BLOB_PREFIX = "bronze/"   # pon "" si no quieres subcarpeta
+BLOB_PREFIX = "bronze/"   # set to "" if you don't want a subfolder
 
-ALLOWED_EXT = {".xlsx", ".xls"}       # agrega ".csv" si quieres
+ALLOWED_EXT = {".xlsx", ".xls"}       # add ".csv" if needed
 
 def ensure_env():
     if not CONN_STR:
-        raise SystemExit("❌ Falta AZURE_STORAGE_CONNECTION_STRING en .env")
+        raise SystemExit("❌ Missing AZURE_STORAGE_CONNECTION_STRING in .env")
     if not LOCAL_DATA.exists():
-        raise SystemExit(f"❌ No existe la carpeta local {LOCAL_DATA}")
+        raise SystemExit(f"❌ Local folder does not exist: {LOCAL_DATA}")
 
 def guess_content_type(path: Path) -> ContentSettings:
     ext = path.suffix.lower()
@@ -50,7 +50,7 @@ def main():
 
     try:
         container.create_container()
-        print(f"🆕 Contenedor creado: {CONTAINER}")
+        print(f"🆕 Container created: {CONTAINER}")
     except ResourceExistsError:
         pass
 
@@ -65,12 +65,12 @@ def main():
                 content_settings=guess_content_type(path),
             )
         uploaded += 1
-        print(f"✅ Subido: {path.name}  →  {blob_name}")
+        print(f"✅ Uploaded: {path.name}  →  {blob_name}")
 
     if uploaded == 0:
-        print("ℹ️ No encontré archivos .xlsx/.xls en Datasets/")
+        print("ℹ️ No .xlsx/.xls files found in Datasets/")
     else:
-        print(f"🎉 Listo. Archivos subidos: {uploaded}")
+        print(f"🎉 Done. Files uploaded: {uploaded}")
 
 if __name__ == "__main__":
     main()
