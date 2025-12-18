@@ -6,108 +6,27 @@ from datetime import timezone
 import pandas as pd
 import numpy as np
 
-from .config import LOCAL_RAW_DIR, SILVER_PREFIX
-from .utils import ensure_container, iter_files, df_to_parquet_bytes
+from .infrastructure.config import LOCAL_RAW_DIR, SILVER_PREFIX
+from .infrastructure.blob_storage import ensure_container, df_to_parquet_bytes
+from .domain.transformations import make_silver
 
-# ---------- 1) TRANSFORMACIÓN: construir Silver ----------
-def make_silver(df: pd.DataFrame, hotel_id: str) -> pd.DataFrame:
-    df = df.copy()
+# Re-export for backward compatibility
+__all__ = ["make_silver", "upload_silver_parquet", "run_for_hotel", "main"]
 
-    base = [
-        "reviewId","placeId","title","text","textTranslated","originalLanguage","reviewOrigin",
-        "publishedAtDate","stars",
-        "totalScore","reviewsCount","hotelStars","price",
-        "isLocalGuide","reviewerNumberOfReviews","likesCount",
-        "responseFromOwnerText","responseFromOwnerDate",
-        "scrapedAt","categoryName","reviewUrl","url","source"
-    ]
-    ctx = [c for c in df.columns if c.startswith("reviewContext/")]
-    det = [c for c in df.columns if c.startswith("reviewDetailedRating/")]
-    keep = [c for c in base if c in df.columns] + sorted(ctx) + sorted(det)
-    df = df.loc[:, keep].copy()
-
-    # Fechas a UTC
-    for c in ["publishedAtDate","responseFromOwnerDate","scrapedAt"]:
-        if c in df.columns:
-            df[c] = pd.to_datetime(df[c], errors="coerce", utc=True)
-
-    # Numéricos
-    for c in ["stars","reviewsCount","hotelStars","reviewerNumberOfReviews","likesCount"]:
-        if c in df.columns:
-            df[c] = pd.to_numeric(df[c], errors="coerce")
-
-    for c in det:
-        df[c] = pd.to_numeric(df[c], errors="coerce")
-
-    # Booleano consistente
-    if "isLocalGuide" in df.columns:
-        df["isLocalGuide"] = df["isLocalGuide"].map(
-            {True: True, False: False, "true": True, "false": False, "True": True, "False": False}
-        )
-
-    # Dedupe por reviewId (quedarse con el más reciente)
-    if "reviewId" in df.columns:
-        sort_keys = [c for c in ["scrapedAt","publishedAtDate"] if c in df.columns]
-        if sort_keys:
-            df = df.sort_values(sort_keys).drop_duplicates(subset=["reviewId"], keep="last")
-
-    # --- 🔹 NUEVO: Filtro 1 - solo reseñas de Google ---
-    before_origin = len(df)
-    df = df[df["reviewOrigin"].fillna("").str.lower() == "google"]
-    after_origin = len(df)
-    print(f"🧩 Filtradas por origen Google: {before_origin} → {after_origin}")
-
-    # --- 🔹 NUEVO: Filtro 2 - rango de fechas 2018–actual ---
-    if "publishedAtDate" in df.columns:
-        start = pd.Timestamp("2020-01-01", tz="UTC")
-        end = pd.Timestamp("2025-08-21", tz="UTC")
-        before_date = len(df)
-        df = df.loc[df["publishedAtDate"].between(start, end, inclusive="both")].copy()
-        after_date = len(df)
-        print(f"🕓 Filtradas por fecha: {before_date} → {after_date} (rango {start.date()} a {end.date()})")
-
-    # Derivados útiles
-    if "publishedAtDate" in df.columns:
-        df["year_month"] = df["publishedAtDate"].dt.to_period("M").astype(str)
-    else:
-        df["year_month"] = pd.NA
-
-    if "text" in df.columns:
-        df["review_length"] = df["text"].fillna("").astype(str).str.len()
-
-    if {"publishedAtDate","responseFromOwnerDate"}.issubset(df.columns):
-        delay = (df["responseFromOwnerDate"] - df["publishedAtDate"]).dt.days
-        df["response_delay_days"] = delay.where(delay >= 0)
-
-    df["hotel_id"] = hotel_id
-
-    preferred = [
-        "hotel_id","reviewId","placeId","title","text","textTranslated","originalLanguage","reviewOrigin",
-        "publishedAtDate","year_month","stars","totalScore","reviewsCount","hotelStars","price",
-        "isLocalGuide","reviewerNumberOfReviews","likesCount",
-        "responseFromOwnerText","responseFromOwnerDate","response_delay_days",
-        "review_length","scrapedAt","categoryName"
-    ]
-    ordered = [c for c in preferred if c in df.columns] + [c for c in df.columns if c not in preferred]
-
-    print(f"✅ Silver final para '{hotel_id}': {len(df)} reseñas Google válidas dentro del rango de fechas.")
-    return df[ordered]
-
-
-# ---------- 2) SUBIDA A AZURE: silver/... en Parquet ----------
+# ---------- 2) UPLOAD TO AZURE: silver/... as Parquet ----------
 def upload_silver_parquet(df_silver: pd.DataFrame, hotel_id: str):
-    from .utils import df_to_parquet_bytes, ensure_container
     container = ensure_container()
     blob_path = f"silver/{hotel_id}_silver.parquet"
     container.upload_blob(name=blob_path,
                           data=df_to_parquet_bytes(df_silver),
                           overwrite=True)
-    print(f"☁️ Subido Silver: {blob_path} ({len(df_silver)} filas)")
+    print(f"☁️ Uploaded Silver: {blob_path} ({len(df_silver)} rows)")
 
 
-# ---------- 3) PUNTO DE ENTRADA: lee Excels locales y procesa ----------
+# ---------- 3) ENTRY POINT: read local Excel files and process ----------
 def run_for_hotel(excel_path: Path, hotel_id: str, sheet_name="Data"):
-    print(f"→ Leyendo {excel_path.name} (sheet={sheet_name})")
+    """Process a single hotel's Excel file and upload to Silver layer."""
+    print(f"→ Reading {excel_path.name} (sheet={sheet_name})")
     df = pd.read_excel(excel_path, sheet_name=sheet_name)
     df_silver = make_silver(df, hotel_id=hotel_id)
     print("📊 Silver shape:", df_silver.shape)
@@ -127,7 +46,7 @@ def main():
         if excel.exists():
             run_for_hotel(excel, hotel_id)
         else:
-            print(f"⚠ No encontré {excel}")
+            print(f"⚠ Not found: {excel}")
 
 if __name__ == "__main__":
     main()
