@@ -99,7 +99,6 @@ def enrich_with_azure(df_silver: pd.DataFrame, *, language: Optional[str] = "es"
 
     print(f"🧠 Procesando {len(texts)} reseñas válidas con Azure Language Service...")
 
-    # --- fuerza tipo de columnas (para evitar FutureWarning) ---
     for col in ["sentiment_label", "aspects", "key_phrases"]:
         if col in df.columns:
             df[col] = df[col].astype(object)
@@ -213,6 +212,17 @@ def enrich_with_azure(df_silver: pd.DataFrame, *, language: Optional[str] = "es"
 
     # --- metadatos ---
     df["scored_at"] = datetime.now(timezone.utc)
+
+    # ============================================================
+    # 🔹 NUEVO: eliminar reseñas con sentimiento “Mixed”
+    # ============================================================
+    if "sentiment_label" in df.columns:
+        before = len(df)
+        df = df[df["sentiment_label"].str.lower() != "mixed"].copy()
+        after = len(df)
+        print(f"🧹 Filtradas reseñas con sentimiento 'Mixed': {before - after} de {before}")
+    else:
+        print("⚠️ No se encontró la columna 'sentiment_label'; no se aplicó filtro 'Mixed'.")
 
     print(f"✅ Enriquecimiento completo: {len(valid_idx)} reseñas analizadas con Azure.")
     return df
