@@ -11,7 +11,7 @@ This playbook turns the Buenaventura hotel insights dashboard into a public site
 
 ## Quick Start Checklist
 - [ ] Confirm you have: Cloudflare domain access, Supabase URL, Supabase anon key, and names of the SQL views you want to expose.
-- [ ] Create or reuse a `frontend/` folder with the Vite + React app.
+- [ ] Use the repo’s bundled `frontend/` Vite + React app (already configured for Supabase anon reads).
 - [ ] Add environment variables locally and in Cloudflare Pages.
 - [ ] Deploy via Cloudflare Pages and wire the domain CNAME.
 - [ ] Smoke-test charts against Supabase views.
