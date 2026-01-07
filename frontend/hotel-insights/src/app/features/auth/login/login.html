@@ -1,0 +1,16 @@
+<h2>Iniciar sesión</h2>
+
+<button (click)="loginGoogle()">Continuar con Google</button>
+
+<hr />
+
+<label>Email</label>
+<input [(ngModel)]="email" type="email" />
+
+<label>Password</label>
+<input [(ngModel)]="password" type="password" />
+
+<div style="margin-top: 12px;">
+  <button (click)="loginEmail()">Entrar</button>
+  <a routerLink="/register" style="margin-left: 12px;">Crear cuenta</a>
+</div>

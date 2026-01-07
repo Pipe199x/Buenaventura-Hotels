@@ -1,0 +1,15 @@
+<h2>Crear cuenta</h2>
+
+<label>Email</label>
+<input [(ngModel)]="email" type="email" />
+
+<label>Password</label>
+<input [(ngModel)]="password" type="password" />
+
+<label>Confirmar password</label>
+<input [(ngModel)]="confirmPassword" type="password" />
+
+<div style="margin-top: 12px;">
+  <button (click)="register()">Crear cuenta</button>
+  <a routerLink="/login" style="margin-left: 12px;">Ya tengo cuenta</a>
+</div>
