@@ -14,6 +14,9 @@ export class Login {
   email = '';
   password = '';
 
+  // ✅ ADD THIS
+  showPassword = false;
+
   constructor(private auth: AuthService, private router: Router) {}
 
   async loginGoogle() {
