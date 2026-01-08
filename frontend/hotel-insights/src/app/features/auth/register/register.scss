@@ -1,0 +1,146 @@
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 36px 16px;
+  background: radial-gradient(1200px 600px at 50% 0%, #eef6ff 0%, #ffffff 60%);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 18px;
+
+  h1 {
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    color: #3b82f6;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: #64748b;
+  }
+}
+
+.card {
+  width: min(440px, 100%);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+
+  h2 {
+    margin: 0 0 18px;
+    text-align: center;
+    font-size: 24px;
+  }
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  color: #334155;
+  margin: 12px 0 8px;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+
+  input {
+    border: 0;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+  }
+}
+
+.icon {
+  width: 24px;
+  text-align: center;
+  opacity: 0.75;
+}
+
+.icon-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn.primary {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.btn.ghost {
+  background: #fff;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 6px;
+  color: #94a3b8;
+
+  &::before,
+  &::after {
+    content: '';
+    height: 1px;
+    background: #e5e7eb;
+    flex: 1;
+  }
+
+  span {
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+.foot {
+  margin: 14px 0 0;
+  text-align: center;
+  color: #64748b;
+
+  a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 700;
+  }
+}
+
+.btn.google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.btn.google:hover {
+  background: #f8fafc;
+}
