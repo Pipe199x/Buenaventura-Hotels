@@ -15,6 +15,9 @@ export class Register {
   password = '';
   confirmPassword = '';
 
+  // ✅ ADD THIS
+  showPassword = false;
+
   constructor(private auth: AuthService, private router: Router) {}
 
   async register() {
@@ -32,4 +35,11 @@ export class Register {
     alert('Cuenta creada. Revisa tu correo si se requiere confirmación.');
     this.router.navigateByUrl('/login');
   }
+
+  // ✅ ADD THIS (so register.html can call it)
+  async registerGoogle() {
+    const { error } = await this.auth.signInWithGoogle();
+    if (error) alert(error.message);
+  }
 }
+
