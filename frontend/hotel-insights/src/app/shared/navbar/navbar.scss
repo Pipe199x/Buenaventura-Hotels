@@ -1,0 +1,56 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: red !important;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.nav__left, .nav__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand {
+  font-weight: 700;
+  text-decoration: none;
+  color: #111;
+  margin-right: 8px;
+}
+
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+.active {
+  font-weight: 600;
+}
+
+.user {
+  color: #444;
+  font-size: 14px;
+}
+
+.btn {
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.btn.link {
+  border: none;
+}

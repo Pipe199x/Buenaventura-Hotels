@@ -1,0 +1,19 @@
+<nav class="nav">
+  <div class="nav__left">
+    <a routerLink="/" class="brand">Opinión Hotelera Buenaventura</a>
+
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a routerLink="/about" routerLinkActive="active">About</a>
+    <a routerLink="/hotels" routerLinkActive="active">Hoteles</a>
+  </div>
+
+  <div class="nav__right" *ngIf="(session$ | async) as session; else loggedOut">
+    <span class="user">{{ session?.user?.email }}</span>
+    <button class="btn" (click)="logout()">Logout</button>
+  </div>
+
+  <ng-template #loggedOut>
+    <a routerLink="/login" class="btn link">Login</a>
+    <a routerLink="/register" class="btn primary">Register</a>
+  </ng-template>
+</nav>
