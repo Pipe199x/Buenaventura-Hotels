@@ -1,32 +1,45 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../core/auth.service';
+import { Router, RouterLink } from '@angular/router';
+
+import { TranslateModule } from '@ngx-translate/core';
+
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
 export class Login {
   email = '';
   password = '';
-
-  // ✅ ADD THIS
   showPassword = false;
+  loading = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   async loginGoogle() {
-    const { error } = await this.auth.signInWithGoogle();
-    if (error) alert(error.message);
+    try {
+      this.loading = true;
+      const { error } = await this.auth.signInWithGoogle();
+      if (error) alert(error.message);
+    } finally {
+      this.loading = false;
+    }
   }
 
   async loginEmail() {
-    const { error } = await this.auth.signIn(this.email, this.password);
-    if (error) alert(error.message);
-    else this.router.navigateByUrl('/');
+    try {
+      this.loading = true;
+      const { error } = await this.auth.signIn(this.email, this.password);
+      if (error) alert(error.message);
+      else this.router.navigateByUrl('/');
+    } finally {
+      this.loading = false;
+    }
   }
 }
