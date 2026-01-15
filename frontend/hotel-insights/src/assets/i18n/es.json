@@ -1,0 +1,28 @@
+{
+  "APP": {
+    "TITLE": "Opinión Hotelera Buenaventura"
+  },
+  "NAV": {
+    "HOME": "Inicio",
+    "ABOUT": "Acerca de",
+    "HOTELS": "Hoteles",
+    "LOGIN": "Iniciar sesión",
+    "REGISTER": "Crear cuenta",
+    "LOGOUT": "Salir"
+  },
+  "AUTH": {
+    "LOGIN_TITLE": "Iniciar Sesión",
+    "EMAIL": "Correo electrónico",
+    "PASSWORD": "Contraseña",
+    "LOGIN_BUTTON": "Iniciar Sesión",
+    "OR": "O",
+    "CONTINUE_GOOGLE": "Continuar con Google",
+    "NO_ACCOUNT": "¿No tienes cuenta?",
+    "SIGN_UP": "Regístrate",
+    "REGISTER_TITLE": "Crear Cuenta",
+    "REGISTER_BUTTON": "Registrarse",
+    "CONFIRM_PASSWORD": "Confirmar contraseña",
+    "HAVE_ACCOUNT": "¿Ya tienes cuenta?",
+    "SIGN_IN": "Inicia sesión"
+  }
+}

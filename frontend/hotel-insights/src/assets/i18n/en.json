@@ -1,0 +1,28 @@
+{
+  "APP": {
+    "TITLE": "Buenaventura Hotel Reviews"
+  },
+  "NAV": {
+    "HOME": "Home",
+    "ABOUT": "About",
+    "HOTELS": "Hotels",
+    "LOGIN": "Login",
+    "REGISTER": "Sign up",
+    "LOGOUT": "Logout"
+  },
+  "AUTH": {
+    "LOGIN_TITLE": "Sign In",
+    "EMAIL": "Email",
+    "PASSWORD": "Password",
+    "LOGIN_BUTTON": "Sign In",
+    "OR": "OR",
+    "CONTINUE_GOOGLE": "Continue with Google",
+    "NO_ACCOUNT": "No account?",
+    "SIGN_UP": "Sign up",
+    "REGISTER_TITLE": "Create Account",
+    "REGISTER_BUTTON": "Create Account",
+    "CONFIRM_PASSWORD": "Confirm password",
+    "HAVE_ACCOUNT": "Already have an account?",
+    "SIGN_IN": "Sign in"
+  }
+}
