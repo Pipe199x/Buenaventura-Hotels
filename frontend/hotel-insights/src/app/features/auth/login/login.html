@@ -1,62 +1,41 @@
 <div class="auth-page">
   <header class="auth-header">
-    <h1>{{ 'APP.TITLE' | translate }}</h1>
-    <p>{{ 'APP.SUBTITLE' | translate }}</p>
+    <h1>Opinión Hotelera Buenaventura</h1>
+    <p>Accede a tu análisis de opiniones hoteleras</p>
   </header>
 
   <section class="card">
-    <h2>{{ 'AUTH.LOGIN_TITLE' | translate }}</h2>
+    <h2>Iniciar Sesión</h2>
 
-    <label class="label">{{ 'AUTH.EMAIL' | translate }}</label>
+    <label class="label">Correo electrónico</label>
     <div class="input-wrap">
-      <span class="icon">✉</span>
-      <input
-        [(ngModel)]="email"
-        type="email"
-        [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
-        autocomplete="email"
-      />
+      <input [(ngModel)]="email" type="email" placeholder="ejemplo@correo.com" />
     </div>
 
-    <label class="label">{{ 'AUTH.PASSWORD' | translate }}</label>
+    <label class="label">Contraseña</label>
     <div class="input-wrap">
-      <span class="icon">🔒</span>
       <input
         [(ngModel)]="password"
         [type]="showPassword ? 'text' : 'password'"
-        [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
-        autocomplete="current-password"
+        placeholder="••••••••"
       />
-      <button
-        type="button"
-        class="icon-btn"
-        (click)="showPassword = !showPassword"
-        [attr.aria-label]="'AUTH.TOGGLE_PASSWORD' | translate"
-      >
+      <button type="button" class="icon-btn" (click)="showPassword = !showPassword">
         {{ showPassword ? '🙈' : '👁' }}
       </button>
     </div>
 
-    <button class="btn primary" (click)="loginEmail()" [disabled]="loading">
-      {{ loading ? ('AUTH.WAIT' | translate) : ('AUTH.LOGIN_BUTTON' | translate) }}
-    </button>
+    <button class="btn primary" (click)="loginEmail()">Iniciar sesión</button>
 
-    <div class="divider">
-      <span>{{ 'AUTH.OR' | translate }}</span>
-    </div>
+    <div class="divider"><span>o</span></div>
 
-    <button class="btn ghost google" (click)="loginGoogle()" [disabled]="loading">
-      <img
-        class="google-icon"
-        src="assets/icons/google.svg"
-        alt="Google"
-      />
-      <span>{{ 'AUTH.CONTINUE_GOOGLE' | translate }}</span>
+    <button class="btn ghost google" (click)="loginGoogle()">
+      <img class="google-icon" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
+      <span>Registrarse con Google</span>
     </button>
 
     <p class="foot">
-      {{ 'AUTH.NO_ACCOUNT' | translate }}
-      <a routerLink="/register">{{ 'AUTH.SIGN_UP' | translate }}</a>
+      ¿No tienes cuenta?
+      <a routerLink="/register">Regístrate</a>
     </p>
   </section>
 </div>
