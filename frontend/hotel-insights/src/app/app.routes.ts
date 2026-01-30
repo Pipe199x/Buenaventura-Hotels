@@ -8,6 +8,7 @@ import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '', component: Home },
   { path: 'about', component: About },
   { path: 'hotels', component: Hotels },
