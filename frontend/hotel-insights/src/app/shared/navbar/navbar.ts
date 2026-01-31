@@ -1,32 +1,21 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
 import { AuthService } from '../../core/auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, TranslateModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.scss',
+  styleUrl: './navbar.scss', // o navbar.scss si usas scss
 })
 export class Navbar {
-  // safer: define after constructor runs
-  get currentLang() {
-    return this.translate.currentLang || 'es';
-  }
+  session$: Observable<any>;
 
-  constructor(
-    private auth: AuthService,
-    private router: Router,
-    private translate: TranslateService
-  ) {}
-
-  setLang(lang: 'es' | 'en') {
-    localStorage.setItem('lang', lang);
-    this.translate.use(lang);
+  constructor(private auth: AuthService, private router: Router) {
+    this.session$ = this.auth.session$;
   }
 
   async logout() {

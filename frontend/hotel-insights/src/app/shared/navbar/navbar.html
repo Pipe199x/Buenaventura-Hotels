@@ -1,16 +1,19 @@
 <nav class="nav">
-  <a routerLink="/" routerLinkActive="active">{{ 'NAV.HOME' | translate }}</a>
-  <a routerLink="/hotels" routerLinkActive="active">{{ 'NAV.HOTELS' | translate }}</a>
-  <a routerLink="/about" routerLinkActive="active">{{ 'NAV.ABOUT' | translate }}</a>
+  <div class="left">
+    <a class="brand" routerLink="/">Opinión Hotelera</a>
 
-  <div class="spacer"></div>
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+    <a routerLink="/hotels" routerLinkActive="active">Hoteles</a>
+    <a routerLink="/about" routerLinkActive="active">Acerca de</a>
+  </div>
 
-  <select [value]="currentLang" (change)="setLang(($any($event.target).value))">
-    <option value="es">Español</option>
-    <option value="en">English</option>
-  </select>
+  <div class="right">
+    <ng-container *ngIf="(session$ | async) as session; else loggedOut">
+      <button class="btn" (click)="logout()">Salir</button>
+    </ng-container>
 
-  <button class="logout" (click)="logout()">
-    {{ 'NAV.LOGOUT' | translate }}
-  </button>
+    <ng-template #loggedOut>
+      <a class="btn" routerLink="/login">Iniciar sesión</a>
+    </ng-template>
+  </div>
 </nav>
