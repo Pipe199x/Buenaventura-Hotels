@@ -1,63 +1,123 @@
-<section class="page">
-  <header class="header">
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="hero-content">
     <h1>Inicio</h1>
-    <p>Resumen general del análisis de opiniones hoteleras</p>
-  </header>
+    <p class="muted">
+      Resumen general del análisis de opiniones hoteleras en Buenaventura
+    </p>
 
-  <div class="kpis">
-    <div class="kpi-card">
-      <span class="kpi-label">Total reseñas</span>
-      <div class="kpi-value skeleton"></div>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-label">Puntuación promedio</span>
-      <div class="kpi-value skeleton"></div>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-label">Tasa de satisfacción</span>
-      <div class="kpi-value skeleton"></div>
+    <div class="hero-actions">
+      <a class="btn primary" routerLink="/hotels">Explorar hoteles</a>
+      <a class="btn ghost" routerLink="/about">Acerca del proyecto</a>
     </div>
   </div>
+</section>
 
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Distribución de sentimientos por hotel</h2>
-      <span class="hint">Placeholder (conectaremos Supabase luego)</span>
-    </div>
-    <div class="chart-placeholder skeleton"></div>
-  </section>
+<!-- ================= KPIs ================= -->
+<section class="kpis">
+  <ng-container *ngIf="loading">
+    <article class="kpi skeleton"></article>
+    <article class="kpi skeleton"></article>
+    <article class="kpi skeleton"></article>
+  </ng-container>
 
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Hoteles analizados</h2>
-      <a routerLink="/hotels" class="link">Ver detalle</a>
-    </div>
+  <ng-container *ngIf="!loading && kpis">
+    <article class="kpi">
+      <div class="kpi-title">Reseñas analizadas</div>
+      <div class="kpi-value">
+        {{ kpis.total_reviews | number }}
+      </div>
+    </article>
 
-    <div class="hotels-grid">
-      <article class="hotel-card" *ngFor="let _ of hotelsMock">
-        <div class="hotel-top">
-          <div class="hotel-name skeleton"></div>
-          <div class="badge skeleton"></div>
-        </div>
+    <article class="kpi">
+      <div class="kpi-title">Puntuación promedio</div>
+      <div class="kpi-value">
+        {{ kpis.avg_star_rating | number:'1.2-2' }}
+      </div>
+    </article>
 
-        <div class="hotel-row">
-          <span class="muted">Reseñas</span>
-          <span class="skeleton small"></span>
-        </div>
+    <article class="kpi">
+      <div class="kpi-title">Tasa de satisfacción</div>
+      <div class="kpi-value">
+        {{ kpis.tasa_satisfaccion_pct | number:'1.2-2' }}%
+      </div>
+    </article>
+  </ng-container>
 
-        <div class="hotel-row">
-          <span class="muted">Satisfacción</span>
-          <span class="skeleton small"></span>
-        </div>
+  <div *ngIf="!loading && errorMsg" class="error">
+    {{ errorMsg }}
+  </div>
+</section>
 
-        <div class="tags">
-          <span class="tag skeleton"></span>
-          <span class="tag skeleton"></span>
-          <span class="tag skeleton"></span>
-        </div>
-      </article>
-    </div>
-  </section>
+<!-- ================= SENTIMENT CHART ================= -->
+<section class="card">
+  <header class="card-header">
+    <h2>Distribución de sentimientos por hotel</h2>
+    <span class="hint">
+      Próximo paso · gráfico de barras apiladas
+    </span>
+  </header>
+
+  <!-- Placeholder visual -->
+  <div class="chart-placeholder">
+    <span>Gráfica en construcción</span>
+  </div>
+</section>
+
+<!-- ================= HOTELS SUMMARY ================= -->
+<section class="card">
+  <header class="card-header">
+    <h2>Hoteles analizados</h2>
+    <a class="link" routerLink="/hotels">Ver detalle →</a>
+  </header>
+
+  <div class="hotels-grid">
+    <!-- Card 1 -->
+    <article class="hotel-card clickable" routerLink="/hotels">
+      <div class="hotel-name">Hotel (placeholder)</div>
+
+      <div class="hotel-meta">
+        <span>Reseñas: —</span>
+        <span>Satisfacción: —</span>
+      </div>
+
+      <div class="tags">
+        <span class="tag">habitaciones</span>
+        <span class="tag">servicio</span>
+        <span class="tag">ubicación</span>
+      </div>
+    </article>
+
+    <!-- Card 2 -->
+    <article class="hotel-card clickable" routerLink="/hotels">
+      <div class="hotel-name">Hotel (placeholder)</div>
+
+      <div class="hotel-meta">
+        <span>Reseñas: —</span>
+        <span>Satisfacción: —</span>
+      </div>
+
+      <div class="tags">
+        <span class="tag">limpieza</span>
+        <span class="tag">personal</span>
+        <span class="tag">comodidad</span>
+      </div>
+    </article>
+
+    <!-- Card 3 -->
+    <article class="hotel-card clickable" routerLink="/hotels">
+      <div class="hotel-name">Hotel (placeholder)</div>
+
+      <div class="hotel-meta">
+        <span>Reseñas: —</span>
+        <span>Satisfacción: —</span>
+      </div>
+
+      <div class="tags">
+        <span class="tag">precio</span>
+        <span class="tag">vista</span>
+        <span class="tag">desayuno</span>
+      </div>
+    </article>
+  </div>
 </section>
