@@ -1,19 +1,15 @@
-<nav class="nav">
-  <div class="left">
-    <a class="brand" routerLink="/">Opinión Hotelera</a>
+<header class="nav">
+  <div class="nav-left">
+    <a class="brand" routerLink="/home">Opinión Hotelera</a>
 
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
-    <a routerLink="/hotels" routerLinkActive="active">Hoteles</a>
-    <a routerLink="/about" routerLinkActive="active">Acerca de</a>
+    <nav class="links">
+      <a routerLink="/home" routerLinkActive="active">Inicio</a>
+      <a routerLink="/hotels" routerLinkActive="active">Hoteles</a>
+      <a routerLink="/about" routerLinkActive="active">Acerca de</a>
+    </nav>
   </div>
 
-  <div class="right">
-    <ng-container *ngIf="(session$ | async) as session; else loggedOut">
-      <button class="btn" (click)="logout()">Salir</button>
-    </ng-container>
-
-    <ng-template #loggedOut>
-      <a class="btn" routerLink="/login">Iniciar sesión</a>
-    </ng-template>
+  <div class="nav-right">
+    <button class="btn ghost" (click)="logout()">Salir</button>
   </div>
-</nav>
+</header>
