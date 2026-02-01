@@ -1,24 +1,32 @@
 import { Routes } from '@angular/router';
+import { ShellComponent } from './shared/shell/shell';
 
+// Auth
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
+
+// Pages
 import { Home } from './features/home/home';
-import { Hotels } from './features/hotels/hotels'; // o el nombre real: HotelWorks
+import { Hotels } from './features/hotels/hotels';
 import { About } from './features/about/about';
 
 export const routes: Routes = [
-  // public
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
+
+  // Auth
   { path: 'login', component: Login },
   { path: 'register', component: Register },
 
-  // home
-  { path: '', component: Home },         // ✅ Home principal
-  { path: 'home', redirectTo: '', pathMatch: 'full' },  // ✅ alias /home
+  // App (con navbar)
+  {
+    path: '',
+    component: ShellComponent,
+    children: [
+      { path: 'home', component: Home },
+      { path: 'hotels', component: Hotels },
+      { path: 'about', component: About },
+    ],
+  },
 
-  // pages
-  { path: 'hotels', component: Hotels },
-  { path: 'about', component: About },
-
-  // fallback
-  { path: '**', redirectTo: '' },
+  { path: '**', redirectTo: 'home' },
 ];
