@@ -1,14 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { HomeDataService, HomeOverviewGlobal } from '../../core/data/home-data.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home {
-  hotelsMock = Array.from({ length: 5 });
+export class Home implements OnInit {
+  loading = true;
+  errorMsg = '';
+  kpis: HomeOverviewGlobal | null = null;
+
+  constructor(private homeData: HomeDataService) {}
+
+  async ngOnInit() {
+    try {
+      this.kpis = await this.homeData.getHomeOverviewGlobal();
+    } catch (e: any) {
+      this.errorMsg = e?.message ?? 'Error cargando KPIs';
+    } finally {
+      this.loading = false;
+    }
+  }
 }
