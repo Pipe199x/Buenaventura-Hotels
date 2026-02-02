@@ -13,7 +13,6 @@ import { AuthService } from '../../core/auth.service';
 export class Navbar {
   constructor(private auth: AuthService, private router: Router) {}
 
-  // evita "used before initialization"
   get session$() {
     return this.auth.session$;
   }
