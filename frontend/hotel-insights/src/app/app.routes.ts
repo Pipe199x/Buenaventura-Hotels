@@ -13,7 +13,7 @@ import { About } from './features/about/about';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
 
-  // Auth
+  // Auth (sin shell)
   { path: 'login', component: Login },
   { path: 'register', component: Register },
 
