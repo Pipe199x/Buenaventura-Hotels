@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthService } from './core/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -8,10 +7,4 @@ import { AuthService } from './core/auth.service';
   imports: [RouterOutlet],
   template: `<router-outlet></router-outlet>`,
 })
-export class AppComponent implements OnInit {
-  constructor(private auth: AuthService) {}
-
-  ngOnInit(): void {
-    this.auth.init();
-  }
-}
+export class AppComponent {}
