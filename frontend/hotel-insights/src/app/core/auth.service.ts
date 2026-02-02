@@ -6,12 +6,19 @@ import { supabase } from './supabase/supabase.client';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private _session$ = new BehaviorSubject<Session | null>(null);
-  session$ = this._session$.asObservable();
+  readonly session$ = this._session$.asObservable();
 
-  async init() {
+  // ✅ evita inicializar más de una vez
+  private initialized = false;
+
+  async init(): Promise<void> {
+    if (this.initialized) return;
+    this.initialized = true;
+
     const { data, error } = await supabase.auth.getSession();
     if (error) console.error('getSession error:', error.message);
-    this._session$.next(data.session);
+
+    this._session$.next(data.session ?? null);
 
     supabase.auth.onAuthStateChange(
       (_event: AuthChangeEvent, session: Session | null) => {
@@ -23,7 +30,7 @@ export class AuthService {
   signInWithGoogle() {
     return supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin }
+      options: { redirectTo: window.location.origin },
     });
   }
 
