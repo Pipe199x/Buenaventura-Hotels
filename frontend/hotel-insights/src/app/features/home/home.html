@@ -1,123 +1,140 @@
-<!-- ================= HERO ================= -->
-<section class="hero">
-  <div class="hero-content">
-    <h1>Inicio</h1>
-    <p class="muted">
-      Resumen general del análisis de opiniones hoteleras en Buenaventura
-    </p>
-
-    <div class="hero-actions">
-      <a class="btn primary" routerLink="/hotels">Explorar hoteles</a>
-      <a class="btn ghost" routerLink="/about">Acerca del proyecto</a>
+<div class="home-page">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-left">
+      <h1 class="title">Opiniones Hoteleras</h1>
+      <p class="subtitle">Dashboard de análisis de reseñas (2020–2025)</p>
     </div>
-  </div>
-</section>
-
-<!-- ================= KPIs ================= -->
-<section class="kpis">
-  <ng-container *ngIf="loading">
-    <article class="kpi skeleton"></article>
-    <article class="kpi skeleton"></article>
-    <article class="kpi skeleton"></article>
-  </ng-container>
-
-  <ng-container *ngIf="!loading && kpis">
-    <article class="kpi">
-      <div class="kpi-title">Reseñas analizadas</div>
-      <div class="kpi-value">
-        {{ kpis.total_reviews | number }}
-      </div>
-    </article>
-
-    <article class="kpi">
-      <div class="kpi-title">Puntuación promedio</div>
-      <div class="kpi-value">
-        {{ kpis.avg_star_rating | number:'1.2-2' }}
-      </div>
-    </article>
-
-    <article class="kpi">
-      <div class="kpi-title">Tasa de satisfacción</div>
-      <div class="kpi-value">
-        {{ kpis.tasa_satisfaccion_pct | number:'1.2-2' }}%
-      </div>
-    </article>
-  </ng-container>
-
-  <div *ngIf="!loading && errorMsg" class="error">
-    {{ errorMsg }}
-  </div>
-</section>
-
-<!-- ================= SENTIMENT CHART ================= -->
-<section class="card">
-  <header class="card-header">
-    <h2>Distribución de sentimientos por hotel</h2>
-    <span class="hint">
-      Próximo paso · gráfico de barras apiladas
-    </span>
   </header>
 
-  <!-- Placeholder visual -->
-  <div class="chart-placeholder">
-    <span>Gráfica en construcción</span>
+  <!-- Estados globales -->
+  <div *ngIf="loading" class="state">
+    <div class="spinner"></div>
+    <span>Cargando datos…</span>
   </div>
-</section>
 
-<!-- ================= HOTELS SUMMARY ================= -->
-<section class="card">
-  <header class="card-header">
-    <h2>Hoteles analizados</h2>
-    <a class="link" routerLink="/hotels">Ver detalle →</a>
-  </header>
-
-  <div class="hotels-grid">
-    <!-- Card 1 -->
-    <article class="hotel-card clickable" routerLink="/hotels">
-      <div class="hotel-name">Hotel (placeholder)</div>
-
-      <div class="hotel-meta">
-        <span>Reseñas: —</span>
-        <span>Satisfacción: —</span>
-      </div>
-
-      <div class="tags">
-        <span class="tag">habitaciones</span>
-        <span class="tag">servicio</span>
-        <span class="tag">ubicación</span>
-      </div>
-    </article>
-
-    <!-- Card 2 -->
-    <article class="hotel-card clickable" routerLink="/hotels">
-      <div class="hotel-name">Hotel (placeholder)</div>
-
-      <div class="hotel-meta">
-        <span>Reseñas: —</span>
-        <span>Satisfacción: —</span>
-      </div>
-
-      <div class="tags">
-        <span class="tag">limpieza</span>
-        <span class="tag">personal</span>
-        <span class="tag">comodidad</span>
-      </div>
-    </article>
-
-    <!-- Card 3 -->
-    <article class="hotel-card clickable" routerLink="/hotels">
-      <div class="hotel-name">Hotel (placeholder)</div>
-
-      <div class="hotel-meta">
-        <span>Reseñas: —</span>
-        <span>Satisfacción: —</span>
-      </div>
-
-      <div class="tags">
-        <span class="tag">precio</span>
-        <span class="tag">vista</span>
-        <span class="tag">desayuno</span>
-      </div>
-    </article>
+  <div *ngIf="!loading && errorMsg" class="state error">
+    <strong>Error:</strong> {{ errorMsg }}
   </div>
-</section>
+
+  <!-- Contenido -->
+  <ng-container *ngIf="!loading && !errorMsg">
+    <!-- KPIs -->
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Resumen global</h2>
+          <p class="muted">KPIs calculados desde la vista global</p>
+        </div>
+      </div>
+
+      <div class="kpi-grid" *ngIf="kpis">
+        <article class="kpi-card">
+          <div class="kpi-label">Reseñas analizadas</div>
+          <div class="kpi-value">{{ kpis.total_reviews | number }}</div>
+          <div class="kpi-foot muted">Total de reseñas del proyecto</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-label">Puntuación promedio</div>
+          <div class="kpi-value">{{ kpis.avg_star_rating | number:'1.2-2' }} ★</div>
+          <div class="kpi-foot muted">Promedio global</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-label">Tasa de satisfacción</div>
+          <div class="kpi-value">{{ kpis.tasa_satisfaccion_pct | number:'1.2-2' }}%</div>
+          <div class="kpi-foot muted">Positivas / etiquetadas</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- CHART -->
+    <section class="section">
+      <div class="section-head chart-head">
+        <div>
+          <h2>Distribución de sentimientos por hotel</h2>
+          <p class="muted">Barras agrupadas: positivo / neutral / negativo</p>
+        </div>
+
+        <div class="legend-mini">
+          <span class="item"><span class="dot positive"></span> Positivo</span>
+          <span class="item"><span class="dot neutral"></span> Neutral</span>
+          <span class="item"><span class="dot negative"></span> Negativo</span>
+        </div>
+      </div>
+
+      <div class="chart-box">
+        <div *ngIf="chartLoading" class="state">
+          <div class="spinner"></div>
+          <span>Cargando gráfico…</span>
+        </div>
+
+        <!-- IMPORTANTE: el chart necesita altura -->
+        <div
+          *ngIf="!chartLoading && chartOption"
+          echarts
+          class="chart"
+          [options]="chartOption"
+          [autoResize]="true">
+        </div>
+
+        <div *ngIf="!chartLoading && !chartOption" class="state muted">
+          No se pudo construir el gráfico (chartOption está vacío).
+        </div>
+      </div>
+    </section>
+
+    <!-- Hoteles analizados -->
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Hoteles analizados</h2>
+          <p class="muted">Resumen por hotel con calificación, satisfacción y temas recurrentes</p>
+        </div>
+      </div>
+
+      <div class="hotel-grid" *ngIf="hotels.length">
+        <article class="hotel-card" *ngFor="let h of hotels">
+          <div class="hotel-top">
+            <div class="hotel-main">
+              <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
+              <div class="hotel-address muted">{{ h.address }}</div>
+            </div>
+
+            <div class="hotel-right">
+              <div class="badge">
+                {{ h.avg_star_rating_hotel | number:'1.1-2' }} ★
+              </div>
+            </div>
+          </div>
+
+          <div class="hotel-metrics">
+            <div class="metric">
+              <div class="label">Reseñas</div>
+              <div class="value">{{ h.total_reviews_hotel | number }}</div>
+            </div>
+
+            <div class="metric">
+              <div class="label">Satisfacción</div>
+              <div class="value">{{ h.satisfaction_rate_hotel | number:'1.2-2' }}%</div>
+            </div>
+          </div>
+
+          <div class="chips" *ngIf="asChips(h.top_words).length">
+            <span class="chip" *ngFor="let w of asChips(h.top_words)">{{ w }}</span>
+          </div>
+
+          <div class="card-actions">
+            <a class="btn-link" routerLink="/hotels">Ver detalle</a>
+            <a class="btn-link secondary" routerLink="/about">Metodología</a>
+          </div>
+        </article>
+      </div>
+
+      <div *ngIf="!hotels.length" class="state muted">
+        No hay datos para mostrar en “Hoteles analizados”.
+      </div>
+    </section>
+  </ng-container>
+</div>
