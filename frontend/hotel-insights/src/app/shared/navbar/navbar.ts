@@ -13,10 +13,6 @@ import { AuthService } from '../../core/auth.service';
 export class Navbar {
   constructor(private auth: AuthService, private router: Router) {}
 
-  get session$() {
-    return this.auth.session$;
-  }
-
   async logout() {
     await this.auth.signOut();
     this.router.navigateByUrl('/login');
