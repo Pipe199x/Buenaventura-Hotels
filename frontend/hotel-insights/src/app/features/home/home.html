@@ -1,13 +1,5 @@
 <div class="home-page">
-  <!-- Header -->
-  <header class="page-header">
-    <div class="header-left">
-      <h1 class="title">Opiniones Hoteleras</h1>
-      <p class="subtitle">Dashboard de análisis de reseñas (2020–2025)</p>
-    </div>
-  </header>
-
-  <!-- Estados globales -->
+  <!-- LOADING / ERROR -->
   <div *ngIf="loading" class="state">
     <div class="spinner"></div>
     <span>Cargando datos…</span>
@@ -17,51 +9,90 @@
     <strong>Error:</strong> {{ errorMsg }}
   </div>
 
-  <!-- Contenido -->
+  <!-- CONTENT -->
   <ng-container *ngIf="!loading && !errorMsg">
-    <!-- KPIs -->
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <h2>Resumen global</h2>
-          <p class="muted">KPIs calculados desde la vista global</p>
+    <!-- HERO -->
+    <section class="hero">
+      <h1 class="hero-title">Percepción Turística de Hoteles en Buenaventura</h1>
+      <p class="hero-subtitle">
+        Análisis de sentimientos basado en reseñas de Google de los 5 hoteles más reseñados
+      </p>
+    </section>
+
+    <!-- KPI ROW -->
+    <section class="kpi-row" *ngIf="kpis">
+      <!-- KPI 1 -->
+      <article class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Total de reseñas</div>
+          <div class="kpi-icon" aria-hidden="true">
+            <!-- icon: chart -->
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 19V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 19V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M12 19V8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M16 19V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M20 19V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
         </div>
-      </div>
 
-      <div class="kpi-grid" *ngIf="kpis">
-        <article class="kpi-card">
-          <div class="kpi-label">Reseñas analizadas</div>
-          <div class="kpi-value">{{ kpis.total_reviews | number }}</div>
-          <div class="kpi-foot muted">Total de reseñas del proyecto</div>
-        </article>
+        <div class="kpi-value">{{ kpis.total_reviews | number }}</div>
+        <div class="kpi-foot">Reseñas analizadas del proyecto</div>
+      </article>
 
-        <article class="kpi-card">
+      <!-- KPI 2 -->
+      <article class="kpi-card">
+        <div class="kpi-top">
           <div class="kpi-label">Puntuación promedio</div>
-          <div class="kpi-value">{{ kpis.avg_star_rating | number:'1.2-2' }} ★</div>
-          <div class="kpi-foot muted">Promedio global</div>
-        </article>
+          <div class="kpi-icon" aria-hidden="true">
+            <!-- icon: trend -->
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 16l6-6 4 4 6-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M20 6v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
 
-        <article class="kpi-card">
+        <div class="kpi-value">
+          {{ kpis.avg_star_rating | number:'1.2-2' }}<span class="kpi-unit">/5</span>
+        </div>
+        <div class="kpi-foot">Promedio global</div>
+      </article>
+
+      <!-- KPI 3 -->
+      <article class="kpi-card kpi-card--success">
+        <div class="kpi-top">
           <div class="kpi-label">Tasa de satisfacción</div>
-          <div class="kpi-value">{{ kpis.tasa_satisfaccion_pct | number:'1.2-2' }}%</div>
-          <div class="kpi-foot muted">Positivas / etiquetadas</div>
-        </article>
-      </div>
+          <div class="kpi-icon" aria-hidden="true">
+            <!-- icon: check -->
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="kpi-value">
+          {{ kpis.tasa_satisfaccion_pct | number:'1.0-0' }}<span class="kpi-unit">%</span>
+        </div>
+        <div class="kpi-foot">Positivas / etiquetadas</div>
+      </article>
     </section>
 
     <!-- CHART -->
-    <section class="section">
-      <div class="section-head chart-head">
-        <div>
-          <h2>Distribución de sentimientos por hotel</h2>
-          <p class="muted">Barras agrupadas: positivo / neutral / negativo</p>
-        </div>
+    <section class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Comparación de Sentimientos por Hotel</div>
 
         <div class="legend-mini">
-          <span class="item"><span class="dot positive"></span> Positivo</span>
-          <span class="item"><span class="dot neutral"></span> Neutral</span>
-          <span class="item"><span class="dot negative"></span> Negativo</span>
+          <span class="dot positive"></span> Positivo
+          <span class="dot neutral"></span> Neutral
+          <span class="dot negative"></span> Negativo
         </div>
+      </div>
+
+      <div class="panel-subtitle">
+        Porcentaje de positivas / neutrales / negativas (sin null y sin mixed)
       </div>
 
       <div class="chart-box">
@@ -70,28 +101,20 @@
           <span>Cargando gráfico…</span>
         </div>
 
-        <!-- IMPORTANTE: el chart necesita altura -->
         <div
-          *ngIf="!chartLoading && chartOption"
+          *ngIf="!chartLoading"
           echarts
           class="chart"
-          [options]="chartOption"
-          [autoResize]="true">
-        </div>
-
-        <div *ngIf="!chartLoading && !chartOption" class="state muted">
-          No se pudo construir el gráfico (chartOption está vacío).
+          [options]="chartOption">
         </div>
       </div>
     </section>
 
-    <!-- Hoteles analizados -->
+    <!-- HOTELS -->
     <section class="section">
       <div class="section-head">
-        <div>
-          <h2>Hoteles analizados</h2>
-          <p class="muted">Resumen por hotel con calificación, satisfacción y temas recurrentes</p>
-        </div>
+        <h2 class="section-title">Hoteles Analizados</h2>
+        <p class="section-subtitle">Calificación, satisfacción y temas recurrentes</p>
       </div>
 
       <div class="hotel-grid" *ngIf="hotels.length">
@@ -99,12 +122,12 @@
           <div class="hotel-top">
             <div class="hotel-main">
               <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
-              <div class="hotel-address muted">{{ h.address }}</div>
+              <div class="hotel-address">{{ h.address }}</div>
             </div>
 
             <div class="hotel-right">
               <div class="badge">
-                {{ h.avg_star_rating_hotel | number:'1.1-2' }} ★
+                {{ h.avg_star_rating_hotel | number:'1.1-2' }}<span class="badge-unit">/5</span>
               </div>
             </div>
           </div>
@@ -117,7 +140,7 @@
 
             <div class="metric">
               <div class="label">Satisfacción</div>
-              <div class="value">{{ h.satisfaction_rate_hotel | number:'1.2-2' }}%</div>
+              <div class="value">{{ h.satisfaction_rate_hotel | number:'1.0-0' }}%</div>
             </div>
           </div>
 
@@ -133,7 +156,7 @@
       </div>
 
       <div *ngIf="!hotels.length" class="state muted">
-        No hay datos para mostrar en “Hoteles analizados”.
+        No hay datos para mostrar.
       </div>
     </section>
   </ng-container>
