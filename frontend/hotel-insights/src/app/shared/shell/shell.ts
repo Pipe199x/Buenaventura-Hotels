@@ -15,7 +15,7 @@ import { Navbar } from '../navbar/navbar';
   styles: [
     `
       .shell-main {
-        padding: 24px;
+        padding: 18px 16px 40px 16px;
         max-width: 1200px;
         margin: 0 auto;
       }
