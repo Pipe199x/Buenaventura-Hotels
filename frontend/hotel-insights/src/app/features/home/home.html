@@ -21,78 +21,30 @@
 
     <!-- KPI ROW -->
     <section class="kpi-row" *ngIf="kpis">
-      <!-- KPI 1 -->
       <article class="kpi-card">
-        <div class="kpi-top">
-          <div class="kpi-label">Total de reseñas</div>
-          <div class="kpi-icon" aria-hidden="true">
-            <!-- icon: chart -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M4 19V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M8 19V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M12 19V8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M16 19V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M20 19V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-        </div>
-
+        <div class="kpi-label">Total de reseñas</div>
         <div class="kpi-value">{{ kpis.total_reviews | number }}</div>
-        <div class="kpi-foot">Reseñas analizadas del proyecto</div>
       </article>
 
-      <!-- KPI 2 -->
       <article class="kpi-card">
-        <div class="kpi-top">
-          <div class="kpi-label">Puntuación promedio</div>
-          <div class="kpi-icon" aria-hidden="true">
-            <!-- icon: trend -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M4 16l6-6 4 4 6-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M20 6v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-
+        <div class="kpi-label">Puntuación promedio</div>
         <div class="kpi-value">
-          {{ kpis.avg_star_rating | number:'1.2-2' }}<span class="kpi-unit">/5</span>
+          {{ kpis.avg_star_rating | number:'1.2-2' }} <span class="kpi-unit">/5</span>
         </div>
-        <div class="kpi-foot">Promedio global</div>
       </article>
 
-      <!-- KPI 3 -->
       <article class="kpi-card kpi-card--success">
-        <div class="kpi-top">
-          <div class="kpi-label">Tasa de satisfacción</div>
-          <div class="kpi-icon" aria-hidden="true">
-            <!-- icon: check -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-
+        <div class="kpi-label">Tasa de satisfacción</div>
         <div class="kpi-value">
-          {{ kpis.tasa_satisfaccion_pct | number:'1.0-0' }}<span class="kpi-unit">%</span>
+          {{ kpis.tasa_satisfaccion_pct | number:'1.0-0' }} <span class="kpi-unit">%</span>
         </div>
-        <div class="kpi-foot">Positivas / etiquetadas</div>
       </article>
     </section>
 
-    <!-- CHART -->
+    <!-- ✅ PANEL (CHART) -->
     <section class="panel">
       <div class="panel-head">
-        <div class="panel-title">Comparación de Sentimientos por Hotel</div>
-
-        <div class="legend-mini">
-          <span class="dot positive"></span> Positivo
-          <span class="dot neutral"></span> Neutral
-          <span class="dot negative"></span> Negativo
-        </div>
-      </div>
-
-      <div class="panel-subtitle">
-        Porcentaje de positivas / neutrales / negativas (sin null y sin mixed)
+        <div class="panel-title">Comparación de sentimientos por hotel</div>
       </div>
 
       <div class="chart-box">
@@ -101,11 +53,9 @@
           <span>Cargando gráfico…</span>
         </div>
 
-        <div
-          *ngIf="!chartLoading"
-          echarts
-          class="chart"
-          [options]="chartOption">
+        <!-- ✅ TU COMPONENTE DE CHART -->
+        <div *ngIf="!chartLoading">
+          <app-sentiment-stacked-bar [rows]="sentimentRows"></app-sentiment-stacked-bar>
         </div>
       </div>
     </section>
@@ -113,45 +63,100 @@
     <!-- HOTELS -->
     <section class="section">
       <div class="section-head">
-        <h2 class="section-title">Hoteles Analizados</h2>
-        <p class="section-subtitle">Calificación, satisfacción y temas recurrentes</p>
+        <h2 class="section-title">
+          <span class="section-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 20V6a2 2 0 0 1 2-2h5v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M11 20V9a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          Hoteles Analizados
+        </h2>
       </div>
 
       <div class="hotel-grid" *ngIf="hotels.length">
         <article class="hotel-card" *ngFor="let h of hotels">
-          <div class="hotel-top">
-            <div class="hotel-main">
-              <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
-              <div class="hotel-address">{{ h.address }}</div>
+          <!-- title -->
+          <div class="hotel-title-row">
+            <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
+
+            <!-- circular badge -->
+            <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
+              <div class="badge-circle" [attr.data-tone]="b.tone">
+                <div class="badge-pct">{{ b.pct }}%</div>
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- meta -->
+          <div class="hotel-meta">
+            <div class="meta-line" *ngIf="h.address">
+              <span class="meta-icon" aria-hidden="true">
+                <!-- location -->
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 10.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </span>
+              <span class="meta-text">{{ h.address }}</span>
             </div>
 
-            <div class="hotel-right">
-              <div class="badge">
-                {{ h.avg_star_rating_hotel | number:'1.1-2' }}<span class="badge-unit">/5</span>
+            <div class="meta-stats">
+              <div class="meta-chip">
+                <span class="meta-icon" aria-hidden="true">
+                  <!-- star -->
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 17.3l-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3l2.8 5.7 6.2.9-4.5 4.5 1.1 6.2-5.6-3Z"
+                      stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}</span>
+                <span class="meta-muted">/5</span>
+              </div>
+
+              <div class="meta-chip">
+                <span class="meta-icon" aria-hidden="true">
+                  <!-- users/reviews -->
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M16 21v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M9 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M22 21v-1a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16 4.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <span class="meta-strong">{{ h.total_reviews_hotel | number }}</span>
+                <span class="meta-muted">reseñas</span>
               </div>
             </div>
           </div>
 
-          <div class="hotel-metrics">
-            <div class="metric">
-              <div class="label">Reseñas</div>
-              <div class="value">{{ h.total_reviews_hotel | number }}</div>
+          <!-- sentiment label under circle -->
+          <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
+            <div class="badge-label" [attr.data-tone]="b.tone">{{ b.label }}</div>
+          </ng-container>
+
+          <!-- keywords -->
+          <div class="kw-title">
+            <span class="kw-icon" aria-hidden="true">
+              <!-- trending -->
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 16l6-6 4 4 6-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20 6v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            Palabras clave:
+          </div>
+
+          <ng-container *ngIf="asChips(h.top_words, 6) as c">
+            <div class="chips" *ngIf="c.items.length">
+              <span class="chip" *ngFor="let w of c.items">{{ w }}</span>
+              <span class="chip chip-more" *ngIf="c.more > 0">+{{ c.more }} más</span>
             </div>
+          </ng-container>
 
-            <div class="metric">
-              <div class="label">Satisfacción</div>
-              <div class="value">{{ h.satisfaction_rate_hotel | number:'1.0-0' }}%</div>
-            </div>
-          </div>
-
-          <div class="chips" *ngIf="asChips(h.top_words).length">
-            <span class="chip" *ngFor="let w of asChips(h.top_words)">{{ w }}</span>
-          </div>
-
-          <div class="card-actions">
-            <a class="btn-link" routerLink="/hotels">Ver detalle</a>
-            <a class="btn-link secondary" routerLink="/about">Metodología</a>
-          </div>
+          <!-- action -->
+          <a class="btn-primary" routerLink="/hotels">Ver detalles</a>
         </article>
       </div>
 
