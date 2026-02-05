@@ -1,18 +1,28 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgxEchartsModule } from 'ngx-echarts';
 
 import {
   HomeDataService,
   HomeOverviewGlobal,
   HotelCardRow,
-  SentimentDistributionRow
+  SentimentDistributionRow,
 } from '../../core/data/home-data.service';
+
+// ✅ IMPORT del componente del chart (ajusta la ruta si tu carpeta difiere)
+import { SentimentStackedBarComponent } from '../../shared/charts/sentiment-stacked-bar/sentiment-stacked-bar';
+
+type BadgeTone = 'positive' | 'neutral' | 'negative';
+
+type HotelBadge = {
+  pct: number; // 0-100
+  tone: BadgeTone;
+  label: 'Positiva' | 'Neutral' | 'Negativa';
+};
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, NgxEchartsModule],
+  imports: [CommonModule, SentimentStackedBarComponent], // ✅ IMPORTA el chart aquí
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -23,103 +33,91 @@ export class Home implements OnInit {
   kpis: HomeOverviewGlobal | null = null;
   hotels: HotelCardRow[] = [];
 
-  chartOption: any = null;
+  // ✅ data del chart
+  sentimentRows: SentimentDistributionRow[] = [];
   chartLoading = true;
 
-  constructor(
-    private homeData: HomeDataService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  // badge por hotel_name
+  hotelBadge = new Map<string, HotelBadge>();
+
+  constructor(private homeData: HomeDataService) {}
 
   async ngOnInit() {
     this.loading = true;
     this.chartLoading = true;
     this.errorMsg = '';
 
-    const results = await Promise.allSettled([
-      this.homeData.getHomeOverviewGlobal(),
-      this.homeData.getHotelCards(),
-      this.homeData.getSentimentDistribution(),
-    ]);
+    try {
+      const [kpis, hotels, dist] = await Promise.all([
+        this.homeData.getHomeOverviewGlobal(),
+        this.homeData.getHotelCards(),
+        this.homeData.getSentimentDistribution(),
+      ]);
 
-    const kpisRes = results[0];
-    const hotelsRes = results[1];
-    const distRes = results[2];
+      this.kpis = kpis;
+      this.hotels = hotels;
 
-    if (kpisRes.status === 'fulfilled') this.kpis = kpisRes.value;
-    else console.error('KPIs error', kpisRes.reason);
-
-    if (hotelsRes.status === 'fulfilled') this.hotels = hotelsRes.value;
-    else console.error('Hotels error', hotelsRes.reason);
-
-    if (distRes.status === 'fulfilled') {
-      this.buildGroupedBars(distRes.value);
-    } else {
-      console.error('Chart error', distRes.reason);
-      this.chartOption = null;
+      this.sentimentRows = dist ?? [];
+      this.hotelBadge = this.buildBadges(this.sentimentRows);
+    } catch (e: any) {
+      this.errorMsg = e?.message ?? 'Error cargando datos del Home';
+    } finally {
+      this.loading = false;
+      this.chartLoading = false;
     }
-
-    const firstError =
-      (kpisRes.status === 'rejected' && kpisRes.reason) ||
-      (hotelsRes.status === 'rejected' && hotelsRes.reason) ||
-      (distRes.status === 'rejected' && distRes.reason);
-
-    if (firstError) {
-      this.errorMsg = firstError?.message ?? 'Error cargando datos del Home';
-    }
-
-    this.loading = false;
-    this.chartLoading = false;
-
-    // ✅ CLAVE en zoneless: forzar render cuando termina async
-    this.cdr.detectChanges();
   }
 
-  asChips(topWords: string): string[] {
-    if (!topWords) return [];
-    return topWords.split(',').map(w => w.trim()).filter(Boolean);
+  // chips (con "+X más")
+  asChips(topWords: string, max = 6): { items: string[]; more: number } {
+    if (!topWords) return { items: [], more: 0 };
+    const all = topWords
+      .split(',')
+      .map((w) => w.trim())
+      .filter(Boolean);
+
+    const items = all.slice(0, max);
+    const more = Math.max(0, all.length - items.length);
+    return { items, more };
   }
 
-  private buildGroupedBars(rows: SentimentDistributionRow[]) {
-    const hotels = Array.from(new Set(rows.map(r => r.hotel_display_name)));
+  // badge fallback si por algo no hay dist
+  getBadgeForHotel(hotelName: string): HotelBadge {
+    return (
+      this.hotelBadge.get(hotelName) ?? {
+        pct: 0,
+        tone: 'neutral',
+        label: 'Neutral',
+      }
+    );
+  }
 
-    const positive = new Map<string, number>();
-    const neutral  = new Map<string, number>();
-    const negative = new Map<string, number>();
+  private buildBadges(rows: SentimentDistributionRow[]): Map<string, HotelBadge> {
+    // agrupa por hotel_name y toma el MAYOR pct_label
+    const byHotel = new Map<string, SentimentDistributionRow[]>();
 
     for (const r of rows) {
-      if (r.sentiment_label === 'positive') positive.set(r.hotel_display_name, r.pct_label);
-      if (r.sentiment_label === 'neutral')  neutral.set(r.hotel_display_name, r.pct_label);
-      if (r.sentiment_label === 'negative') negative.set(r.hotel_display_name, r.pct_label);
+      if (!byHotel.has(r.hotel_name)) byHotel.set(r.hotel_name, []);
+      byHotel.get(r.hotel_name)!.push(r);
     }
 
-    const posData = hotels.map(h => positive.get(h) ?? 0);
-    const neuData = hotels.map(h => neutral.get(h) ?? 0);
-    const negData = hotels.map(h => negative.get(h) ?? 0);
+    const out = new Map<string, HotelBadge>();
 
-    this.chartOption = {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-        formatter: (params: any[]) => {
-          const hotel = params?.[0]?.axisValue ?? '';
-          const lines = params.map(p => `${p.marker} ${p.seriesName}: ${p.value}%`);
-          return `<b>${hotel}</b><br/>${lines.join('<br/>')}`;
-        }
-      },
-      legend: { top: 0, data: ['Positivo', 'Neutral', 'Negativo'] },
-      grid: { left: 40, right: 20, top: 40, bottom: 80, containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: hotels,
-        axisLabel: { interval: 0, rotate: 25, hideOverlap: false }
-      },
-      yAxis: { type: 'value', min: 0, max: 100, axisLabel: { formatter: '{value}%' } },
-      series: [
-        { name: 'Positivo', type: 'bar', data: posData, itemStyle: { color: '#2e7d32' } },
-        { name: 'Neutral',  type: 'bar', data: neuData, itemStyle: { color: '#f9a825' } },
-        { name: 'Negativo', type: 'bar', data: negData, itemStyle: { color: '#c62828' } }
-      ]
-    };
+    for (const [hotelName, list] of byHotel.entries()) {
+      const best = [...list].sort((a, b) => (b.pct_label ?? 0) - (a.pct_label ?? 0))[0];
+
+      const tone = best?.sentiment_label ?? 'neutral';
+      const pct = Math.round(best?.pct_label ?? 0);
+
+      const label =
+        tone === 'positive'
+          ? 'Positiva'
+          : tone === 'negative'
+          ? 'Negativa'
+          : 'Neutral';
+
+      out.set(hotelName, { pct, tone, label });
+    }
+
+    return out;
   }
 }
