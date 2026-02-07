@@ -1,12 +1,30 @@
+/* ========== GLOBAL RESET & BASE ========== */
+html, body {
+  background: #f6f7fb !important;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #1f2937;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+* { box-sizing: border-box; }
+body { width: 100vw; overflow-x: hidden; }
+
+::-webkit-scrollbar { width: 8px; background: #e2e8f0; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+
+/* ========== YOUR HOME COMPONENT (can stay here or in home.scss) ========== */
 :host {
   display: block;
-  background: #f6f7fb;
 }
 
 .home-page {
-  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  /* font-family is now global, but can stay as a backup: */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
 
-  --bg: #f6f7fb;
   --panel: #ffffff;
   --text: #1f2937;
   --muted: #6b7280;
@@ -16,8 +34,6 @@
   --positive: #2e7d32;
   --neutral: #f9a825;
   --negative: #c62828;
-
-  background: var(--bg);
   min-height: calc(100vh - 64px);
   padding: 24px;
 }
@@ -62,7 +78,7 @@
   margin: 0;
   font-size: clamp(22px, 3vw, 34px);
   line-height: 1.15;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text);
 }
@@ -89,7 +105,10 @@
   box-shadow: var(--shadow);
 }
 .kpi-card--success {
-  border-color: rgba(46, 125, 50, 0.30);
+  color: #2e7d32;
+}
+.kpi-card--success .kpi-unit {
+  color: #2e7d32;
 }
 .kpi-label {
   font-size: 13px;
@@ -98,16 +117,16 @@
 }
 .kpi-value {
   margin-top: 8px;
-  font-size: 30px;
-  font-weight: 800;
+  font-size: 35px;
+  font-weight: 700;
   display: flex;
   align-items: baseline;
   gap: 6px;
 }
 .kpi-unit {
   font-size: inherit;
-  font-weight: 800;
-  color: var(--muted);
+  font-weight: 700;
+  color: #1f2937;
 }
 
 /* ---------- PANEL (CHART) ---------- */
@@ -128,8 +147,8 @@
 }
 
 .panel-title {
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--text);
 }
 
@@ -154,8 +173,9 @@
 }
 .section-title {
   margin: 0;
-  font-size: 22px;
-  font-weight: 800;
+  font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--text);
   display: inline-flex;
   align-items: center;
@@ -165,6 +185,12 @@
   width: 22px;
   height: 22px;
   color: rgba(31, 41, 55, 0.75);
+}
+
+.section-icon img {
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 
 /* ---------- HOTEL GRID ---------- */
@@ -192,7 +218,7 @@
 
 .hotel-name {
   margin: 0;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 16px;
   color: var(--text);
 }
@@ -278,14 +304,15 @@
   align-items: center;
   gap: 8px;
   color: rgba(31, 41, 55, 0.85);
-  font-weight: 800;
+  font-weight: 700;
   font-size: 13px;
 }
-.kw-icon svg {
+.kw-icon img {
   width: 16px;
   height: 16px;
-  color: rgba(31, 41, 55, 0.65);
+  display: block;
 }
+
 
 .chips {
   margin-top: 10px;
