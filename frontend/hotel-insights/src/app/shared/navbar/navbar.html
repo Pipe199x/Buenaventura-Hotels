@@ -1,39 +1,20 @@
 <header class="nav">
   <div class="nav-inner">
-
-    <!-- Brand -->
-    <a class="brand" routerLink="/home">
-      <span class="brand-icon" aria-hidden="true">
-        <!-- icon: building -->
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M4 20V6a2 2 0 0 1 2-2h5v16"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <path d="M11 20V9a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v11"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <path d="M3 20h18"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <path d="M7 8h1M7 11h1M7 14h1"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <path d="M15 11h1M15 14h1M15 17h1"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </span>
-
-      <span class="brand-text">Opinión Hotelera</span>
+    <!-- Brand (izquierda) -->
+    <a class="brand" routerLink="/home" aria-label="Ir a Inicio">
+      Opinión Hotelera
     </a>
 
-    <!-- Links -->
+    <!-- Links (centrados) -->
     <nav class="links" aria-label="Navegación principal">
-
-      <!-- Inicio -->
       <a
+        class="link"
         routerLink="/home"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="link"
       >
-        <span class="link-icon" aria-hidden="true">
-          <!-- icon: home -->
+        <span class="icon" aria-hidden="true">
+          <!-- home -->
           <svg viewBox="0 0 24 24" fill="none">
             <path
               d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"
@@ -43,63 +24,96 @@
             />
           </svg>
         </span>
-        <span>Inicio</span>
+        <span class="label">Inicio</span>
       </a>
 
-      <!-- Hoteles -->
-      <a routerLink="/hotels" routerLinkActive="active" class="link">
-        <span class="link-icon" aria-hidden="true">
-          <!-- icon: hotel -->
+      <a class="link" routerLink="/hotels" routerLinkActive="active">
+        <span class="icon" aria-hidden="true">
+          <!-- bed/hotel -->
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M4 11V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M4 13h16a2 2 0 0 1 2 2v4"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M2 19h20"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M14 12h6"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path
+              d="M4 11V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M4 13h16a2 2 0 0 1 2 2v4"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M2 19h20"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M14 12h6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
           </svg>
         </span>
-        <span>Hoteles</span>
+        <span class="label">Hoteles</span>
       </a>
 
-      <!-- Acerca de -->
-      <a routerLink="/about" routerLinkActive="active" class="link">
-        <span class="link-icon" aria-hidden="true">
-          <!-- icon: info -->
+      <a class="link" routerLink="/about" routerLinkActive="active">
+        <span class="icon" aria-hidden="true">
+          <!-- info -->
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z"
-                  stroke="currentColor" stroke-width="2"/>
-            <path d="M12 10v7"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M12 7h.01"
-                  stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            <path
+              d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <path
+              d="M12 10v7"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M12 7h.01"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
           </svg>
         </span>
-        <span>Acerca de</span>
+        <span class="label">Acerca de</span>
       </a>
     </nav>
 
-    <!-- Right actions -->
-    <div class="actions">
-      <button class="btn ghost" type="button" (click)="logout()">
-        <span class="btn-icon" aria-hidden="true">
-          <!-- icon: logout -->
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M10 17l-1 0a4 4 0 0 1-4-4V11a4 4 0 0 1 4-4h1"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M15 7l5 5-5 5"
-                  stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"/>
-            <path d="M20 12H10"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </span>
-        <span>Salir</span>
-      </button>
-    </div>
-
+    <!-- Salir (derecha) -->
+    <button class="logout" type="button" (click)="logout()">
+      <span class="icon" aria-hidden="true">
+        <!-- logout -->
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M10 17h-1a4 4 0 0 1-4-4V11a4 4 0 0 1 4-4h1"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <path
+            d="M15 7l5 5-5 5"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M20 12H10"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </span>
+      <span class="label">Salir</span>
+    </button>
   </div>
 </header>
