@@ -41,19 +41,20 @@
       </article>
     </section>
 
-    <!-- ✅ PANEL (CHART) -->
-    <section class="panel">
+    <!-- PANEL (CHART) -->
+    <section class="panel panel--chart">
       <div class="panel-head">
-        <div class="panel-title">Comparación de sentimientos por hotel</div>
+        <div class="panel-title">
+          <span class="section-icon" aria-hidden="true">
+          </span>
+          Comparación de sentimientos por hotel
+        </div>
       </div>
-
       <div class="chart-box">
         <div *ngIf="chartLoading" class="state">
           <div class="spinner"></div>
           <span>Cargando gráfico…</span>
         </div>
-
-        <!-- ✅ TU COMPONENTE DE CHART -->
         <div *ngIf="!chartLoading">
           <app-sentiment-stacked-bar [rows]="sentimentRows"></app-sentiment-stacked-bar>
         </div>
@@ -73,85 +74,64 @@
 
       <div class="hotel-grid" *ngIf="hotels.length">
         <article class="hotel-card" *ngFor="let h of hotels">
-          <!-- title -->
-          <div class="hotel-title-row">
+          <!-- NEW: Name at very top, badge to the right -->
+          <div class="hotel-card-header">
             <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
-
-            <!-- circular badge -->
             <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
               <div class="badge-circle" [attr.data-tone]="b.tone">
                 <div class="badge-pct">{{ b.pct }}%</div>
               </div>
             </ng-container>
           </div>
+          <!-- Sentiment label right below badge, aligned -->
+          <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
+            <div class="badge-label" [attr.data-tone]="b.tone">{{ b.label }}</div>
+          </ng-container>
 
           <!-- meta -->
           <div class="hotel-meta">
+            <!-- Location -->
             <div class="meta-line" *ngIf="h.address">
               <span class="meta-icon" aria-hidden="true">
-                <!-- location -->
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" stroke="currentColor" stroke-width="2"/>
-                  <path d="M12 10.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="2"/>
-                </svg>
+                <img src="assets/location-home.png" alt="Ubicación" width="16" height="16" />
               </span>
               <span class="meta-text">{{ h.address }}</span>
             </div>
-
             <div class="meta-stats">
+              <!-- Stars -->
               <div class="meta-chip">
                 <span class="meta-icon" aria-hidden="true">
-                  <!-- star -->
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M12 17.3l-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3l2.8 5.7 6.2.9-4.5 4.5 1.1 6.2-5.6-3Z"
-                      stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                  </svg>
+                  <img src="assets/stars-home.png" alt="Estrellas" width="16" height="16" />
                 </span>
                 <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}</span>
                 <span class="meta-muted">/5</span>
               </div>
-
+              <!-- User (reseñas) -->
               <div class="meta-chip">
                 <span class="meta-icon" aria-hidden="true">
-                  <!-- users/reviews -->
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M16 21v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M9 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="2"/>
-                    <path d="M22 21v-1a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M16 4.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
+                  <img src="assets/users-home.png" alt="Usuarios" width="16" height="16" />
                 </span>
                 <span class="meta-strong">{{ h.total_reviews_hotel | number }}</span>
                 <span class="meta-muted">reseñas</span>
               </div>
             </div>
           </div>
-
-          <!-- sentiment label under circle -->
-          <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
-            <div class="badge-label" [attr.data-tone]="b.tone">{{ b.label }}</div>
-          </ng-container>
-
           <!-- keywords -->
           <div class="kw-title">
             <span class="kw-icon" aria-hidden="true">
-              <img src="assets/trending-home.png" alt="" width="16" height="16" />
+                <img src="assets/trending-home.png" alt="" width="22" height="22" />
             </span>
             Temáticas más discutidas:
           </div>
-
           <ng-container *ngIf="asChips(h.top_words, 6) as c">
             <div class="chips" *ngIf="c.items.length">
               <span class="chip" *ngFor="let w of c.items">{{ w }}</span>
               <span class="chip chip-more" *ngIf="c.more > 0">+{{ c.more }} más</span>
             </div>
           </ng-container>
-
-          <!-- action -->
           <a class="btn-primary" routerLink="/hotels">Ver detalles</a>
         </article>
       </div>
-
       <div *ngIf="!hotels.length" class="state muted">
         No hay datos para mostrar.
       </div>
