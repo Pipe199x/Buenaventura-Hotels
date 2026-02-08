@@ -1,25 +1,17 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import type { EChartsOption } from 'echarts';
+import type { TopLevelFormatterParams } from 'echarts/types/dist/shared';
+
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 
-// ECharts core
 import * as echarts from 'echarts/core';
 import { BarChart } from 'echarts/charts';
-import {
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-} from 'echarts/components';
+import { TooltipComponent, GridComponent, LegendComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 
-echarts.use([
-  BarChart,
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-  CanvasRenderer,
-]);
+echarts.use([BarChart, TooltipComponent, GridComponent, LegendComponent, CanvasRenderer]);
 
 type Row = {
   hotel_display_name: string;
@@ -27,28 +19,16 @@ type Row = {
   pct_label: number;
 };
 
-type SeriesName = 'Positivo' | 'Neutral' | 'Negativo';
-
 @Component({
   selector: 'app-sentiment-stacked-bar',
   standalone: true,
   imports: [CommonModule, NgxEchartsDirective],
   providers: [provideEchartsCore({ echarts })],
-  template: `
-    <div
-      echarts
-      class="chart"
-      [options]="option"
-      (chartInit)="onChartInit($event)"
-      (chartClick)="onChartClick($event)">
-    </div>
-  `,
+  template: `<div echarts class="echart" [options]="option"></div>`,
   styles: [
     `
-      .chart {
-        width: 100%;
-        height: 420px;
-      }
+      .echart { width: 100%; height: 360px; }
+      @media (max-width: 420px) { .echart { height: 360px; } }
     `,
   ],
 })
@@ -57,109 +37,81 @@ export class SentimentStackedBarComponent implements OnChanges {
 
   option: EChartsOption = {};
 
-  private chart: any | null = null;
-
   ngOnChanges(): void {
-    if (!this.rows || !this.rows.length) {
-      this.option = {};
-      return;
-    }
     this.option = this.buildOption(this.rows);
   }
 
-  onChartInit(ec: any) {
-    this.chart = ec;
-  }
-
-  onChartClick(e: any) {
-    // Click en una barra -> alternar (toggle) su serie
-    // e.seriesName será 'Positivo' | 'Neutral' | 'Negativo'
-    const seriesName: SeriesName | undefined = e?.seriesName;
-    if (!seriesName || !this.chart) return;
-
-    // Toggle programático de legend
-    this.chart.dispatchAction({
-      type: 'legendToggleSelect',
-      name: seriesName,
-    });
-  }
-
   private buildOption(rows: Row[]): EChartsOption {
-    const hotels = Array.from(new Set(rows.map(r => r.hotel_display_name)));
+    const hotelsRaw = Array.from(new Set(rows.map(r => r.hotel_display_name)));
 
-    const getPct = (hotel: string, label: Row['sentiment_label']) => {
+    // ✅ Label corto: quita "Hotel", "Hostal", etc.
+    const shortLabel = (name: string) => {
+      let s = (name ?? '').trim();
+      s = s.replace(/^(hotel|hostal)\s+/i, '').trim();
+      s = s.replace(/\s+/g, ' ').trim();
+      return s || name;
+    };
+
+    const hotelsShort = hotelsRaw.map(h => shortLabel(h));
+
+    const getPct = (hotelRaw: string, label: Row['sentiment_label']) => {
       const found = rows.find(
-        r => r.hotel_display_name === hotel && r.sentiment_label === label
+        r => r.hotel_display_name === hotelRaw && r.sentiment_label === label
       );
       return found?.pct_label ?? 0;
     };
 
-    const positive = hotels.map(h => getPct(h, 'positive'));
-    const neutral  = hotels.map(h => getPct(h, 'neutral'));
-    const negative = hotels.map(h => getPct(h, 'negative'));
+    const pos = hotelsRaw.map(h => getPct(h, 'positive'));
+    const neu = hotelsRaw.map(h => getPct(h, 'neutral'));
+    const neg = hotelsRaw.map(h => getPct(h, 'negative'));
 
-    return {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-        formatter: ((params: any) => {
-          const hotel = params?.[0]?.axisValue ?? '';
-
-          const pos = params.find((p: any) => p.seriesName === 'Positivo')?.value ?? 0;
-          const neu = params.find((p: any) => p.seriesName === 'Neutral')?.value ?? 0;
-          const neg = params.find((p: any) => p.seriesName === 'Negativo')?.value ?? 0;
-
-          return `
-            <div style="font-weight:700;margin-bottom:6px;">${hotel}</div>
-            <div>🟩 Positivo: <b>${pos}%</b></div>
-            <div>🟨 Neutral: <b>${neu}%</b></div>
-            <div>🟥 Negativo: <b>${neg}%</b></div>
-          `;
-        }) as any,
+    const tooltip = {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: (params: TopLevelFormatterParams) => {
+        const arr = Array.isArray(params) ? params : [params];
+        const axisValue = (arr[0] as any)?.axisValue ?? '';
+        const lines = arr
+          .map((p: any) => `${p.marker} ${p.seriesName}: ${p.value}%`)
+          .join('<br/>');
+        return `<div style="font-weight:700;margin-bottom:4px;">${axisValue}</div>${lines}`;
       },
+    } as const;
+
+    // =========================
+    // DESKTOP: vertical agrupado
+    // =========================
+    const desktop: EChartsOption = {
+      tooltip,
 
       legend: {
-        // ✅ en la mitad del chart (arriba-centro)
+        top: 10,
         left: 'center',
-        top: 8,
-        data: ['Positivo', 'Neutral', 'Negativo'],
-
-        // ✅ comportamiento de click en legend (toggle)
-        // 'multiple' deja apagar/encender varias
-        // 'single' dejaría solo una activa a la vez
-        selectedMode: 'multiple',
-
-        itemWidth: 10,
-        itemHeight: 10,
+        selectedMode: true,
+        itemWidth: 12,
+        itemHeight: 12,
         textStyle: { fontSize: 12 },
       },
 
       grid: {
-        left: 80,
-        right: 32,
-        top: 52,     // 👈 más espacio porque legend ahora está centrada
-        bottom: 100,
-        containLabel: false,
+        left: 56,
+        right: 20,
+        top: 52,
+        bottom: 72,
+        containLabel: true,
       },
 
       xAxis: {
         type: 'category',
-        data: hotels,
+        data: hotelsRaw,
         name: 'Hoteles analizados',
         nameLocation: 'middle',
-        nameGap: 70,
-        nameTextStyle: {
-          fontSize: 13,
-          fontWeight: 700,
-          color: '#1f2937',
-        },
+        nameGap: 46,
         axisLabel: {
-          margin: 18,
-          fontSize: 11,
-          color: '#374151',
+          interval: 0,
           rotate: 0,
+          hideOverlap: true,
         },
-        axisTick: { alignWithLabel: true },
       },
 
       yAxis: {
@@ -168,44 +120,94 @@ export class SentimentStackedBarComponent implements OnChanges {
         max: 100,
         name: 'Porcentaje (%)',
         nameLocation: 'middle',
-        nameGap: 55,
-        nameRotate: 90,
-        nameTextStyle: {
-          fontSize: 12,
-          fontWeight: 600,
-          color: '#374151',
-        },
+        nameGap: 50,
+        axisLabel: { formatter: '{value}%' },
+      },
+
+      series: [
+        { name: 'Positivo', type: 'bar', data: pos, itemStyle: { color: '#2e7d32' }, barMaxWidth: 26 },
+        { name: 'Neutral',  type: 'bar', data: neu, itemStyle: { color: '#f9a825' }, barMaxWidth: 26 },
+        { name: 'Negativo', type: 'bar', data: neg, itemStyle: { color: '#c62828' }, barMaxWidth: 26 },
+      ],
+    };
+
+    // =========================
+    // MOBILE: horizontal agrupado
+    // ✅ arregla el eje X para que NO se monten los porcentajes
+    // =========================
+    const mobile: EChartsOption = {
+      tooltip,
+
+      legend: {
+        top: 10,
+        left: 'center',
+        selectedMode: true,
+        itemWidth: 10,
+        itemHeight: 10,
+        textStyle: { fontSize: 11 },
+      },
+
+      // ✅ Aprovecha mejor el ancho disponible
+      grid: {
+        left: 118,   // más espacio para nombres de hoteles
+        right: 0,   // más aire a la derecha
+        top: 46,
+        bottom: 26,
+        containLabel: false,
+      },
+
+      // % en X (value)
+      xAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+
+        // ✅ fuerza menos divisiones -> menos etiquetas
+        splitNumber: 5, // típicamente 0,20,40,60,80,100
+
+        name: 'Porcentaje (%)',
+        nameLocation: 'middle',
+        nameGap: 36,
+
         axisLabel: {
-          formatter: '{value}%',
+          fontSize: 10,
+          margin: 10,
+
+          // ✅ muestra solo múltiplos de 20 para evitar “amontonamiento”
+          formatter: (value: number) => {
+            const v = Math.round(Number(value));
+            return v % 20 === 0 ? `${v}%` : '';
+          },
+
+          showMinLabel: true,
+          showMaxLabel: true,
+        },
+      },
+
+      // hoteles en Y (cortos)
+      yAxis: {
+        type: 'category',
+        data: hotelsShort,
+        name: 'Hoteles analizados',
+        nameLocation: 'middle',
+        nameGap: 72,
+        axisLabel: {
           fontSize: 11,
+          margin: 10,
+          formatter: (value: string) => (value.length > 16 ? value.slice(0, 16) + '…' : value),
         },
       },
 
       series: [
-        {
-          name: 'Positivo',
-          type: 'bar',
-          data: positive,
-          itemStyle: { color: '#2e7d32' },
-          barGap: '10%',
-          barCategoryGap: '35%',
-          emphasis: { focus: 'series' },
-        },
-        {
-          name: 'Neutral',
-          type: 'bar',
-          data: neutral,
-          itemStyle: { color: '#f9a825' },
-          emphasis: { focus: 'series' },
-        },
-        {
-          name: 'Negativo',
-          type: 'bar',
-          data: negative,
-          itemStyle: { color: '#c62828' },
-          emphasis: { focus: 'series' },
-        },
+        { name: 'Positivo', type: 'bar', data: pos, itemStyle: { color: '#2e7d32' }, barMaxWidth: 12 },
+        { name: 'Neutral',  type: 'bar', data: neu, itemStyle: { color: '#f9a825' }, barMaxWidth: 12 },
+        { name: 'Negativo', type: 'bar', data: neg, itemStyle: { color: '#c62828' }, barMaxWidth: 12 },
       ],
+    };
+
+    return {
+      ...desktop,
+      media: [{ query: { maxWidth: 420 }, option: mobile }],
     };
   }
 }
