@@ -16,15 +16,12 @@ body { width: 100vw; overflow-x: hidden; }
 ::-webkit-scrollbar { width: 8px; background: #e2e8f0; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
 
-/* ========== YOUR HOME COMPONENT (can stay here or in home.scss) ========== */
 :host {
   display: block;
 }
 
 .home-page {
-  /* font-family is now global, but can stay as a backup: */
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
-
   --panel: #ffffff;
   --text: #1f2937;
   --muted: #6b7280;
@@ -147,9 +144,18 @@ body { width: 100vw; overflow-x: hidden; }
 }
 
 .panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 24px;
   font-weight: 700;
   color: var(--text);
+}
+
+.section-icon img {
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 
 .chart-box {
@@ -181,12 +187,7 @@ body { width: 100vw; overflow-x: hidden; }
   align-items: center;
   gap: 10px;
 }
-.section-icon svg {
-  width: 22px;
-  height: 22px;
-  color: rgba(31, 41, 55, 0.75);
-}
-
+.section-icon svg,
 .section-icon img {
   width: 22px;
   height: 22px;
@@ -204,27 +205,70 @@ body { width: 100vw; overflow-x: hidden; }
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 18px;
-  padding: 16px;
+  padding: 28px 24px 16px 24px;
   box-shadow: var(--shadow);
   position: relative;
 }
 
-.hotel-title-row {
+/* NEW HEADER: Name at very top, badge to right */
+.hotel-card-header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 0;
+  padding-top: 0;
+  gap: 0;
 }
-
 .hotel-name {
   margin: 0;
   font-weight: 700;
   font-size: 16px;
   color: var(--text);
+  align-self: flex-start;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
 }
 
+/* Badge styling */
+.badge-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.12);
+  margin-left: 14px;
+  margin-top: 0;
+}
+.badge-circle[data-tone="positive"] { background: var(--positive); }
+.badge-circle[data-tone="neutral"]  { background: var(--neutral);  color: rgba(31,41,55,0.95); }
+.badge-circle[data-tone="negative"] { background: var(--negative); }
+
+.badge-pct { font-size: 14px; letter-spacing: -0.02em; }
+
+.badge-label {
+  text-align: right;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  /* These two lines keep the label directly below the badge, right-aligned */
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+.badge-label[data-tone="positive"] { color: var(--positive); }
+.badge-label[data-tone="neutral"]  { color: #b07d00; }
+.badge-label[data-tone="negative"] { color: var(--negative); }
+
+/* ---------- HOTEL META ---------- */
 .hotel-meta {
-  margin-top: 10px;
+  margin-top: 0;
+  margin-bottom: 10px;
 }
 
 .meta-line {
@@ -234,68 +278,33 @@ body { width: 100vw; overflow-x: hidden; }
   color: var(--muted);
   font-size: 13px;
   line-height: 1.35;
+  margin-bottom: 6px;
 }
-.meta-icon svg {
+
+.meta-icon img {
   width: 16px;
   height: 16px;
-  color: rgba(31, 41, 55, 0.60);
-  flex: 0 0 auto;
-  margin-top: 1px;
+  display: block;
 }
 
 .meta-stats {
-  margin-top: 10px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  gap: 16px;
+  margin-top: 3px;
 }
 .meta-chip {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: 4px;
+  padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.10);
   background: rgba(2, 6, 23, 0.02);
+  font-size: 15px;
 }
-.meta-strong {
-  font-weight: 800;
-  color: var(--text);
-}
-.meta-muted {
-  color: var(--muted);
-  font-weight: 600;
-}
-
-/* ---------- CIRCULAR BADGE ---------- */
-.badge-circle {
-  width: 64px;
-  height: 64px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  color: #fff;
-  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.12);
-}
-.badge-pct {
-  font-size: 14px;
-  letter-spacing: -0.02em;
-}
-
-.badge-circle[data-tone="positive"] { background: var(--positive); }
-.badge-circle[data-tone="neutral"]  { background: var(--neutral);  color: rgba(31,41,55,0.95); }
-.badge-circle[data-tone="negative"] { background: var(--negative); }
-
-.badge-label {
-  margin-top: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--muted);
-}
-.badge-label[data-tone="positive"] { color: var(--positive); }
-.badge-label[data-tone="neutral"]  { color: #b07d00; }
-.badge-label[data-tone="negative"] { color: var(--negative); }
+.meta-strong { font-weight: 700; color: var(--text);}
+.meta-muted  { color: var(--muted); font-weight: 600; }
 
 /* ---------- KEYWORDS ---------- */
 .kw-title {
@@ -312,7 +321,6 @@ body { width: 100vw; overflow-x: hidden; }
   height: 16px;
   display: block;
 }
-
 
 .chips {
   margin-top: 10px;
@@ -348,7 +356,388 @@ body { width: 100vw; overflow-x: hidden; }
   border: 1px solid rgba(59, 130, 246, 0.25);
   background: rgba(59, 130, 246, 0.10);
   color: rgba(29, 78, 216, 0.95);
-  font-weight: 900;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .kpi-row { grid-template-columns: 1fr; }
+  .hotel-grid { grid-template-columns: repe at(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .home-page { padding: 16px; }
+  .hotel-grid { grid-template-columns: 1fr; }
+  .badge-circle {
+    width: 42px;
+    height: 42px;
+    font-size: 13px;
+  }
+  .hotel-card-header {
+    min-height: 42px;
+  }
+}
+
+
+/* ========== GLOBAL RESET & BASE ========== */
+html, body {
+  background: #f6f7fb !important;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #1f2937;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+* { box-sizing: border-box; }
+body { width: 100vw; overflow-x: hidden; }
+
+::-webkit-scrollbar { width: 8px; background: #e2e8f0; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+
+:host {
+  display: block;
+}
+
+.home-page {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
+  --panel: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: rgba(15, 23, 42, 0.10);
+  --shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+
+  --positive: #2e7d32;
+  --neutral: #f9a825;
+  --negative: #c62828;
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+}
+
+/* ---------- STATES ---------- */
+.state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  max-width: 1100px;
+  margin: 12px auto;
+}
+.state.error {
+  border-color: rgba(198, 40, 40, 0.25);
+  background: rgba(198, 40, 40, 0.06);
+}
+.state.muted { color: var(--muted); }
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(31, 41, 55, 0.15);
+  border-top-color: rgba(31, 41, 55, 0.55);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- HERO ---------- */
+.hero {
+  max-width: 1100px;
+  margin: 0 auto 20px auto;
+  text-align: center;
+}
+.hero-title {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.hero-subtitle {
+  margin: 10px auto 0 auto;
+  max-width: 820px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---------- KPIs ---------- */
+.kpi-row {
+  max-width: 1100px;
+  margin: 20px auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.kpi-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+.kpi-card--success {
+  color: #2e7d32;
+}
+.kpi-card--success .kpi-unit {
+  color: #2e7d32;
+}
+.kpi-label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.kpi-value {
+  margin-top: 8px;
+  font-size: 35px;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.kpi-unit {
+  font-size: inherit;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* ---------- PANEL (CHART) ---------- */
+.panel {
+  max-width: 1100px;
+  margin: 0 auto 22px auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.section-icon img {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.chart-box {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.01);
+  padding: 12px;
+}
+
+/* ---------- SECTION ---------- */
+.section {
+  max-width: 1100px;
+  margin: 0 auto 28px auto;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0 14px 0;
+}
+.section-title {
+  margin: 0;
+  font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-icon svg,
+.section-icon img {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+/* ---------- HOTEL GRID ---------- */
+.hotel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.hotel-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px 24px 16px 24px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+/* NEW HEADER: Name at very top, badge to right */
+.hotel-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0;
+  padding-top: 0;
+  gap: 0;
+}
+.hotel-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+  align-self: flex-start;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
+/* Badge styling */
+.badge-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.12);
+  margin-left: 14px;
+  margin-top: 0;
+}
+.badge-circle[data-tone="positive"] { background: var(--positive); }
+.badge-circle[data-tone="neutral"]  { background: var(--neutral);  color: rgba(31,41,55,0.95); }
+.badge-circle[data-tone="negative"] { background: var(--negative); }
+
+.badge-pct { font-size: 14px; letter-spacing: -0.02em; }
+
+.badge-label {
+  text-align: right;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  /* These two lines keep the label directly below the badge, right-aligned */
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+.badge-label[data-tone="positive"] { color: var(--positive); }
+.badge-label[data-tone="neutral"]  { color: #b07d00; }
+.badge-label[data-tone="negative"] { color: var(--negative); }
+
+/* ---------- HOTEL META ---------- */
+.hotel-meta {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.meta-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.meta-icon img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.meta-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 3px;
+}
+.meta-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  background: rgba(2, 6, 23, 0.02);
+  font-size: 15px;
+}
+.meta-strong { font-weight: 700; color: var(--text);}
+.meta-muted  { color: var(--muted); font-weight: 600; }
+
+/* ---------- KEYWORDS ---------- */
+.kw-title {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(31, 41, 55, 0.85);
+  font-weight: 700;
+  font-size: 13px;
+}
+.kw-icon img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.chips {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  font-size: 12px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.04);
+  border: 1px solid rgba(2, 6, 23, 0.08);
+  color: rgba(31, 41, 55, 0.9);
+}
+.chip-more {
+  background: rgba(59, 130, 246, 0.10);
+  border-color: rgba(59, 130, 246, 0.18);
+  color: rgba(29, 78, 216, 0.95);
+  font-weight: 800;
+}
+
+/* ---------- BUTTON ---------- */
+.btn-primary {
+  margin-top: 14px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  background: rgba(59, 130, 246, 0.10);
+  color: rgba(29, 78, 216, 0.95);
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -360,4 +749,45 @@ body { width: 100vw; overflow-x: hidden; }
 @media (max-width: 640px) {
   .home-page { padding: 16px; }
   .hotel-grid { grid-template-columns: 1fr; }
+  .badge-circle {
+    width: 42px;
+    height: 42px;
+    font-size: 13px;
+  }
+  .hotel-card-header {
+    min-height: 42px;
+  }
 }
+
+
+/* =========================================================
+   MOBILE STRONG MODE – Chart más ancho (solo este panel)
+   Nexus 5 / <= 420px
+========================================================= */
+@media (max-width: 420px) {
+
+  /* El panel del gráfico se expande más allá del layout normal */
+  .panel.panel--chart {
+    width: calc(100% + 48px);      /* +48px total */
+    margin-left: -24px;            /* centra el overflow */
+    margin-right: -24px;
+
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Caja interna del chart */
+  .panel.panel--chart .chart-box {
+    width: 100%;
+    padding: 6px;
+  }
+
+  /* Forzar que el chart use TODO el ancho disponible */
+  .panel.panel--chart app-sentiment-stacked-bar,
+  .panel.panel--chart .echart,
+  .panel.panel--chart canvas {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
