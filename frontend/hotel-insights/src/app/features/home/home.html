@@ -1,16 +1,17 @@
 <div class="home-page">
-  <!-- LOADING / ERROR -->
+  <!-- LOADING -->
   <div *ngIf="loading" class="state">
     <div class="spinner"></div>
     <span>Cargando datos…</span>
   </div>
 
+  <!-- ERROR (no bloquea el contenido) -->
   <div *ngIf="!loading && errorMsg" class="state error">
     <strong>Error:</strong> {{ errorMsg }}
   </div>
 
   <!-- CONTENT -->
-  <ng-container *ngIf="!loading && !errorMsg">
+  <ng-container *ngIf="!loading">
     <!-- HERO -->
     <section class="hero">
       <h1 class="hero-title">Percepción Turística de Hoteles en Buenaventura</h1>
@@ -45,19 +46,28 @@
     <section class="panel panel--chart">
       <div class="panel-head">
         <div class="panel-title">
-          <span class="section-icon" aria-hidden="true">
-          </span>
+          <span class="section-icon" aria-hidden="true"></span>
           Comparación de sentimientos por hotel
         </div>
       </div>
+
       <div class="chart-box">
         <div *ngIf="chartLoading" class="state">
           <div class="spinner"></div>
           <span>Cargando gráfico…</span>
         </div>
-        <div *ngIf="!chartLoading">
-          <app-sentiment-stacked-bar [rows]="sentimentRows"></app-sentiment-stacked-bar>
-        </div>
+
+        <ng-container *ngIf="!chartLoading">
+          <div *ngIf="sentimentRows.length; else noChartData">
+            <app-sentiment-stacked-bar [rows]="sentimentRows"></app-sentiment-stacked-bar>
+          </div>
+
+          <ng-template #noChartData>
+            <div class="state muted">
+              No hay datos disponibles para la distribución de sentimientos.
+            </div>
+          </ng-template>
+        </ng-container>
       </div>
     </section>
 
@@ -72,33 +82,31 @@
         </h2>
       </div>
 
-      <div class="hotel-grid" *ngIf="hotels.length">
+      <div class="hotel-grid" *ngIf="hotels.length; else noHotels">
         <article class="hotel-card" *ngFor="let h of hotels">
-          <!-- NEW: Name at very top, badge to the right -->
           <div class="hotel-card-header">
             <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
+
             <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
               <div class="badge-circle" [attr.data-tone]="b.tone">
                 <div class="badge-pct">{{ b.pct }}%</div>
               </div>
             </ng-container>
           </div>
-          <!-- Sentiment label right below badge, aligned -->
+
           <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
             <div class="badge-label" [attr.data-tone]="b.tone">{{ b.label }}</div>
           </ng-container>
 
-          <!-- meta -->
           <div class="hotel-meta">
-            <!-- Location -->
             <div class="meta-line" *ngIf="h.address">
               <span class="meta-icon" aria-hidden="true">
                 <img src="assets/location-home.png" alt="Ubicación" width="16" height="16" />
               </span>
               <span class="meta-text">{{ h.address }}</span>
             </div>
+
             <div class="meta-stats">
-              <!-- Stars -->
               <div class="meta-chip">
                 <span class="meta-icon" aria-hidden="true">
                   <img src="assets/stars-home.png" alt="Estrellas" width="16" height="16" />
@@ -106,7 +114,7 @@
                 <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}</span>
                 <span class="meta-muted">/5</span>
               </div>
-              <!-- User (reseñas) -->
+
               <div class="meta-chip">
                 <span class="meta-icon" aria-hidden="true">
                   <img src="assets/users-home.png" alt="Usuarios" width="16" height="16" />
@@ -116,25 +124,28 @@
               </div>
             </div>
           </div>
-          <!-- keywords -->
+
           <div class="kw-title">
             <span class="kw-icon" aria-hidden="true">
-                <img src="assets/trending-home.png" alt="" width="22" height="22" />
+              <img src="assets/trending-home.png" alt="" width="22" height="22" />
             </span>
             Temáticas más discutidas:
           </div>
+
           <ng-container *ngIf="asChips(h.top_words, 6) as c">
             <div class="chips" *ngIf="c.items.length">
               <span class="chip" *ngFor="let w of c.items">{{ w }}</span>
               <span class="chip chip-more" *ngIf="c.more > 0">+{{ c.more }} más</span>
             </div>
           </ng-container>
+
           <a class="btn-primary" routerLink="/hotels">Ver detalles</a>
         </article>
       </div>
-      <div *ngIf="!hotels.length" class="state muted">
-        No hay datos para mostrar.
-      </div>
+
+      <ng-template #noHotels>
+        <div class="state muted">No hay datos para mostrar.</div>
+      </ng-template>
     </section>
   </ng-container>
 </div>
