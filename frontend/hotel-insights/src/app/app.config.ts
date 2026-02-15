@@ -1,6 +1,6 @@
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
 import { provideRouter, withRouterConfig } from '@angular/router';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { AuthService } from './core/auth.service';
@@ -28,13 +28,13 @@ export const appConfig: ApplicationConfig = {
       withRouterConfig({
         // ✅ si haces click en Inicio estando en /home, recarga el componente
         onSameUrlNavigation: 'reload',
-        paramsInheritanceStrategy: 'always',
       })
     ),
 
-    provideHttpClient(withFetch()),
+    // ✅ CLAVE: NO withFetch()
+    provideHttpClient(),
 
-    // ✅ ECharts
+    // ✅ ECharts global
     provideEchartsCore({ echarts }),
 
     // ✅ Auth init
