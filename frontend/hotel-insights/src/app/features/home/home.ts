@@ -1,4 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+  inject,
+  DestroyRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -43,6 +49,9 @@ export class Home implements OnInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
+  // ✅ CLAVE: esto arregla el NG0203
+  private destroyRef = inject(DestroyRef);
+
   private inFlight = false;
 
   ngOnInit(): void {
@@ -53,8 +62,13 @@ export class Home implements OnInit {
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-        filter((e) => e.urlAfterRedirects === '/home' || e.urlAfterRedirects.startsWith('/home')),
-        takeUntilDestroyed()
+        filter(
+          (e) =>
+            e.urlAfterRedirects === '/home' ||
+            e.urlAfterRedirects.startsWith('/home')
+        ),
+        // ✅ FIX REAL: pasar DestroyRef
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
         this.loadHome('nav');
@@ -89,9 +103,9 @@ export class Home implements OnInit {
     if (this.inFlight) return;
     this.inFlight = true;
 
-    // DEBUG visible en consola
+    // DEBUG visible en consola (sin warnings de label duplicado)
     console.groupCollapsed(`[Home] loadHome(${reason})`);
-    console.time('[Home] total');
+    const t0 = performance.now();
 
     this.loading = true;
     this.chartLoading = true;
@@ -102,10 +116,17 @@ export class Home implements OnInit {
 
     try {
       // Timeout para evitar “loading infinito” si algo queda colgado
-      const withTimeout = async <T>(p: Promise<T>, ms: number, label: string): Promise<T> => {
+      const withTimeout = async <T>(
+        p: Promise<T>,
+        ms: number,
+        label: string
+      ): Promise<T> => {
         let t: any;
         const timeout = new Promise<never>((_, rej) => {
-          t = setTimeout(() => rej(new Error(`Timeout (${ms}ms) en ${label}`)), ms);
+          t = setTimeout(
+            () => rej(new Error(`Timeout (${ms}ms) en ${label}`)),
+            ms
+          );
         });
         const out = await Promise.race([p, timeout]);
         clearTimeout(t);
@@ -113,9 +134,17 @@ export class Home implements OnInit {
       };
 
       const results = await Promise.allSettled([
-        withTimeout(this.homeData.getHomeOverviewGlobal(), 12000, 'getHomeOverviewGlobal'),
+        withTimeout(
+          this.homeData.getHomeOverviewGlobal(),
+          12000,
+          'getHomeOverviewGlobal'
+        ),
         withTimeout(this.homeData.getHotelCards(), 12000, 'getHotelCards'),
-        withTimeout(this.homeData.getSentimentDistribution(), 12000, 'getSentimentDistribution'),
+        withTimeout(
+          this.homeData.getSentimentDistribution(),
+          12000,
+          'getSentimentDistribution'
+        ),
       ]);
 
       const errs: string[] = [];
@@ -146,7 +175,9 @@ export class Home implements OnInit {
       } else {
         this.sentimentRows = [];
         this.hotelBadge = new Map();
-        errs.push(distR.reason?.message ?? 'Error en distribución de sentimientos');
+        errs.push(
+          distR.reason?.message ?? 'Error en distribución de sentimientos'
+        );
       }
 
       // Si hubo errores parciales, muéstralos (pero NO congeles la UI)
@@ -154,7 +185,6 @@ export class Home implements OnInit {
         this.errorMsg = errs.join(' | ');
       }
 
-      // DEBUG
       console.log('[Home] kpis:', this.kpis);
       console.log('[Home] hotels:', this.hotels.length);
       console.log('[Home] sentimentRows:', this.sentimentRows.length);
@@ -168,8 +198,10 @@ export class Home implements OnInit {
       // CLAVE: fuerza repaint al terminar async (evita “doble clic para que aparezca”)
       this.cdr.detectChanges();
 
-      console.timeEnd('[Home] total');
+      const ms = Math.round(performance.now() - t0);
+      console.log(`[Home] total: ${ms}ms`);
       console.groupEnd();
+
       this.inFlight = false;
     }
   }
@@ -185,13 +217,19 @@ export class Home implements OnInit {
     const out = new Map<string, HotelBadge>();
 
     for (const [hotelName, list] of byHotel.entries()) {
-      const best = [...list].sort((a, b) => (b.pct_label ?? 0) - (a.pct_label ?? 0))[0];
+      const best = [...list].sort(
+        (a, b) => (b.pct_label ?? 0) - (a.pct_label ?? 0)
+      )[0];
 
       const tone = best?.sentiment_label ?? 'neutral';
       const pct = Math.round(best?.pct_label ?? 0);
 
       const label =
-        tone === 'positive' ? 'Positiva' : tone === 'negative' ? 'Negativa' : 'Neutral';
+        tone === 'positive'
+          ? 'Positiva'
+          : tone === 'negative'
+          ? 'Negativa'
+          : 'Neutral';
 
       out.set(hotelName, { pct, tone, label });
     }
