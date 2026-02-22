@@ -167,14 +167,16 @@ export class Home implements OnInit {
         errs.push(hotelsR.reason?.message ?? 'Error en hoteles');
       }
 
+      // ✅ NUEVO: badges salen de satisfaction_rate_hotel (cards), no del chart
+      // (esto es lo que necesitas para la regla 63/60)
+      this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
+
       // Distribution (chart)
       const distR = results[2];
       if (distR.status === 'fulfilled') {
         this.sentimentRows = distR.value ?? [];
-        this.hotelBadge = this.buildBadges(this.sentimentRows);
       } else {
         this.sentimentRows = [];
-        this.hotelBadge = new Map();
         errs.push(
           distR.reason?.message ?? 'Error en distribución de sentimientos'
         );
@@ -206,32 +208,28 @@ export class Home implements OnInit {
     }
   }
 
-  private buildBadges(rows: SentimentDistributionRow[]): Map<string, HotelBadge> {
-    const byHotel = new Map<string, SentimentDistributionRow[]>();
-
-    for (const r of rows) {
-      if (!byHotel.has(r.hotel_name)) byHotel.set(r.hotel_name, []);
-      byHotel.get(r.hotel_name)!.push(r);
-    }
-
+  // ✅ BADGES por satisfacción (regla 63/60)
+  private buildBadgesFromSatisfaction(hotels: HotelCardRow[]): Map<string, HotelBadge> {
     const out = new Map<string, HotelBadge>();
 
-    for (const [hotelName, list] of byHotel.entries()) {
-      const best = [...list].sort(
-        (a, b) => (b.pct_label ?? 0) - (a.pct_label ?? 0)
-      )[0];
+    for (const h of hotels) {
+      const pct = Math.round(Number(h.satisfaction_rate_hotel ?? 0));
 
-      const tone = best?.sentiment_label ?? 'neutral';
-      const pct = Math.round(best?.pct_label ?? 0);
+      let tone: BadgeTone;
+      let label: HotelBadge['label'];
 
-      const label =
-        tone === 'positive'
-          ? 'Positiva'
-          : tone === 'negative'
-          ? 'Negativa'
-          : 'Neutral';
+      if (pct >= 63) {
+        tone = 'positive';
+        label = 'Positiva';
+      } else if (pct >= 60) {
+        tone = 'neutral';
+        label = 'Neutral';
+      } else {
+        tone = 'negative';
+        label = 'Negativa';
+      }
 
-      out.set(hotelName, { pct, tone, label });
+      out.set(h.hotel_name, { pct, tone, label });
     }
 
     return out;
