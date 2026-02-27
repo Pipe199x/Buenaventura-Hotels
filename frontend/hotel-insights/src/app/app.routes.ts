@@ -7,8 +7,11 @@ import { Register } from './features/auth/register/register';
 
 // Pages
 import { Home } from './features/home/home';
-import { Hotels } from './features/hotels/hotels';
 import { About } from './features/about/about';
+
+// NUEVOS COMPONENTES
+import { HotelsList } from './features/hotels/hotels-list/hotels-list';
+import { HotelDetail } from './features/hotels/hotel-detail/hotel-detail';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
@@ -23,7 +26,15 @@ export const routes: Routes = [
     component: ShellComponent,
     children: [
       { path: 'home', component: Home },
-      { path: 'hotels', component: Hotels },
+
+      {
+        path: 'hotels',
+        children: [
+          { path: '', component: HotelsList },
+          { path: ':hotelSlug', component: HotelDetail },
+        ],
+      },
+
       { path: 'about', component: About },
     ],
   },
