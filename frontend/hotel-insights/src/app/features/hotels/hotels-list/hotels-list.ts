@@ -9,7 +9,7 @@ import { HomeDataService, HotelCardRow } from '../../../core/data/home-data.serv
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './hotels-list.html',
-  styleUrls: ['./hotels-list.scss'],
+  styleUrl: './hotels-list.scss',
 })
 export class HotelsList implements OnInit {
   loading = true;
