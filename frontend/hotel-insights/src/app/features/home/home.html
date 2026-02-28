@@ -139,7 +139,8 @@
             </div>
           </ng-container>
 
-          <a class="btn-primary" routerLink="/hotels">Ver detalles</a>
+          <!--<a class="btn-primary" routerLink="/hotels">Ver detalles</a>-->
+          <a class="btn-primary" [routerLink]="['/hotels', h.hotel_name]">Ver más detalles</a>
 
         </article>
       </div>
