@@ -6,7 +6,7 @@ import {
   DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -30,7 +30,7 @@ type HotelBadge = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, SentimentStackedBarComponent],
+  imports: [CommonModule, RouterLink, SentimentStackedBarComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
