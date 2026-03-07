@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth.service';
 
@@ -10,15 +10,31 @@ import { AuthService } from '../../../core/auth.service';
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
-export class Register {
+export class Register implements OnInit {
   email = '';
   password = '';
   confirmPassword = '';
 
-  // ✅ ADD THIS
+  // mostrar contraseña
   showPassword = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  // ⬅️ NUEVO: a dónde redirigir después del registro
+  redirectUrl = '/home';
+
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
+    // leer query param redirect
+    const redirect = this.route.snapshot.queryParamMap.get('redirect');
+
+    if (redirect) {
+      this.redirectUrl = redirect;
+    }
+  }
 
   async register() {
     if (this.password !== this.confirmPassword) {
@@ -27,19 +43,21 @@ export class Register {
     }
 
     const { error } = await this.auth.signUp(this.email, this.password);
+
     if (error) {
       alert(error.message);
       return;
     }
 
     alert('Cuenta creada. Revisa tu correo si se requiere confirmación.');
-    this.router.navigateByUrl('/login');
+
+    // ⬅️ REDIRECCIÓN INTELIGENTE
+    this.router.navigateByUrl(this.redirectUrl);
   }
 
-  // ✅ ADD THIS (so register.html can call it)
+  // login con Google
   async registerGoogle() {
     const { error } = await this.auth.signInWithGoogle();
     if (error) alert(error.message);
   }
 }
-
