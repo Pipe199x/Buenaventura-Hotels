@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 
 @Component({
@@ -10,14 +11,14 @@ import { AuthService } from '../../../core/auth.service';
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
-export class Register implements OnInit {
+export class Register implements OnInit, OnDestroy {
   email = '';
   password = '';
   confirmPassword = '';
 
   showPassword = false;
-
   redirectUrl = '/home';
+  private sessionSub?: Subscription;
 
   constructor(
     private auth: AuthService,
@@ -31,6 +32,17 @@ export class Register implements OnInit {
     if (redirect) {
       this.redirectUrl = redirect;
     }
+
+    // ✅ Si vuelve de Google y ya hay sesión, redirigir automáticamente
+    this.sessionSub = this.auth.session$.subscribe((session) => {
+      if (session) {
+        this.router.navigateByUrl(this.redirectUrl);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sessionSub?.unsubscribe();
   }
 
   async register() {
