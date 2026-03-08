@@ -15,10 +15,8 @@ export class Register implements OnInit {
   password = '';
   confirmPassword = '';
 
-  // mostrar contraseña
   showPassword = false;
 
-  // ⬅️ NUEVO: a dónde redirigir después del registro
   redirectUrl = '/home';
 
   constructor(
@@ -28,7 +26,6 @@ export class Register implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // leer query param redirect
     const redirect = this.route.snapshot.queryParamMap.get('redirect');
 
     if (redirect) {
@@ -50,14 +47,16 @@ export class Register implements OnInit {
     }
 
     alert('Cuenta creada. Revisa tu correo si se requiere confirmación.');
-
-    // ⬅️ REDIRECCIÓN INTELIGENTE
     this.router.navigateByUrl(this.redirectUrl);
   }
 
-  // login con Google
   async registerGoogle() {
-    const { error } = await this.auth.signInWithGoogle();
-    if (error) alert(error.message);
+    const redirectTo = `${window.location.origin}/register?redirect=${encodeURIComponent(this.redirectUrl)}`;
+
+    const { error } = await this.auth.signInWithGoogle(redirectTo);
+
+    if (error) {
+      alert(error.message);
+    }
   }
 }
