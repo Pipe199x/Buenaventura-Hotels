@@ -44,7 +44,7 @@
 
     <p class="foot">
       ¿Ya tienes cuenta?
-      <a routerLink="/login">Inicia sesión</a>
+      <a [routerLink]="['/login']" [queryParams]="{ redirect: redirectUrl }">Inicia sesión</a>
     </p>
   </section>
 </div>
