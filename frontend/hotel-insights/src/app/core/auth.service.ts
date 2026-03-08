@@ -8,7 +8,7 @@ export class AuthService {
   private _session$ = new BehaviorSubject<Session | null>(null);
   readonly session$ = this._session$.asObservable();
 
-  // ✅ evita inicializar más de una vez
+  // evita inicializar más de una vez
   private initialized = false;
 
   async init(): Promise<void> {
@@ -27,10 +27,12 @@ export class AuthService {
     );
   }
 
-  signInWithGoogle() {
+  signInWithGoogle(redirectTo?: string) {
     return supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin },
+      options: {
+        redirectTo: redirectTo ?? window.location.origin,
+      },
     });
   }
 
