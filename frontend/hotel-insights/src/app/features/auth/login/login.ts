@@ -1,22 +1,23 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+
 import { AuthService } from '../../../core/auth.service';
 
 @Component({
-  selector: 'app-register',
+  selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, FormsModule],
-  templateUrl: './register.html',
-  styleUrl: './register.scss',
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './login.html',
+  styleUrl: './login.scss',
 })
-export class Register implements OnInit, OnDestroy {
+export class Login implements OnInit, OnDestroy {
   email = '';
   password = '';
-  confirmPassword = '';
-
   showPassword = false;
+
   redirectUrl = '/home';
   private sessionSub?: Subscription;
 
@@ -28,7 +29,6 @@ export class Register implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const redirect = this.route.snapshot.queryParamMap.get('redirect');
-
     if (redirect) {
       this.redirectUrl = redirect;
     }
@@ -45,30 +45,24 @@ export class Register implements OnInit, OnDestroy {
     this.sessionSub?.unsubscribe();
   }
 
-  async register() {
-    if (this.password !== this.confirmPassword) {
-      alert('Las contraseñas no coinciden.');
-      return;
-    }
-
-    const { error } = await this.auth.signUp(this.email, this.password);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    alert('Cuenta creada. Revisa tu correo si se requiere confirmación.');
-    this.router.navigateByUrl(this.redirectUrl);
-  }
-
-  async registerGoogle() {
-    const redirectTo = `${window.location.origin}/register?redirect=${encodeURIComponent(this.redirectUrl)}`;
+  async loginGoogle() {
+    const redirectTo = `${window.location.origin}/login?redirect=${encodeURIComponent(this.redirectUrl)}`;
 
     const { error } = await this.auth.signInWithGoogle(redirectTo);
 
     if (error) {
       alert(error.message);
     }
+  }
+
+  async loginEmail() {
+    const { error } = await this.auth.signIn(this.email, this.password);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    this.router.navigateByUrl(this.redirectUrl);
   }
 }
