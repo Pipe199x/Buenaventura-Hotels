@@ -33,7 +33,10 @@ export class Login implements OnInit {
   }
 
   async loginGoogle() {
-    const { error } = await this.auth.signInWithGoogle();
+    const redirectTo = `${window.location.origin}/login?redirect=${encodeURIComponent(this.redirectUrl)}`;
+
+    const { error } = await this.auth.signInWithGoogle(redirectTo);
+
     if (error) {
       alert(error.message);
     }
