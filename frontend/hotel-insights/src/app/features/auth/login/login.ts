@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
 import { AuthService } from '../../../core/auth.service';
 
@@ -12,21 +12,41 @@ import { AuthService } from '../../../core/auth.service';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements OnInit {
   email = '';
   password = '';
   showPassword = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  redirectUrl = '/home';
+
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
+    const redirect = this.route.snapshot.queryParamMap.get('redirect');
+    if (redirect) {
+      this.redirectUrl = redirect;
+    }
+  }
 
   async loginGoogle() {
     const { error } = await this.auth.signInWithGoogle();
-    if (error) alert(error.message);
+    if (error) {
+      alert(error.message);
+    }
   }
 
   async loginEmail() {
     const { error } = await this.auth.signIn(this.email, this.password);
-    if (error) alert(error.message);
-    else this.router.navigateByUrl('/');
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    this.router.navigateByUrl(this.redirectUrl);
   }
 }
