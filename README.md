@@ -1,42 +1,56 @@
-# 🐋Sentiment Analysis in Hotel Reviews of Buenaventura through Text Mining🐋
+🐋Sentiment Analysis in Hotel Reviews of Buenaventura through Text Mining🐋
+===========================================================================
 
-This project presents a sentiment analysis platform based on hotel reviews from **Buenaventura, Valle del Cauca, Colombia**. The goal is to analyze tourism perception using real review data and text mining techniques.
+The project aims to create a sentiment analysis platform based on hotel reviews from **Buenaventura, Valle del Cauca, Colombia**.
 
-The platform allows visitors, researchers, and the local community to explore insights derived from hotel reviews, helping understand how travelers perceive hospitality services in the city.
+The project will allow visitors, researchers, and the community to explore the information obtained from hotel reviews, helping them understand the perceptions of tourists about the city.
 
-Users can explore information such as:
+Users will have access to information such as:
 
-- Sentiment distribution in hotel reviews
-- Comparison between hotels in Buenaventura
-- Overall visitor satisfaction trends
-- Analysis of aspects frequently mentioned by guests
+*   Distribution of sentiment found in hotel reviews
+    
+*   Comparison of hotels in the area
+    
+*   Visitor satisfaction
+    
+*   Analysis of information provided by visitors about their experience
+    
 
-The project is publicly available at:
+The project is available at the following link:
 
-https://buenaventuradatos.com
+[https://buenaventuradatos.com](https://buenaventuradatos.com)
 
-This platform is freely accessible and aims to contribute to open, data-driven insights about tourism in Buenaventura.
+The project is free to access, aiming to provide free information about the area.
 
-## Tech Stack
+Tech Stack
+----------
 
-- **Frontend:** Angular  
-- **Data Processing:** Python / Text Mining techniques  
-- **Database:** Supabase (PostgreSQL)  
-- **Hosting:** Netlify  
-- **Domain & DNS:** Cloudflare  
-- **Data Visualization:** ECharts  
+*   Frontend: Angular
+    
+*   Data Processing: Python, Text Mining
+    
+*   Database: Supabase (PostgreSQL)
+    
+*   Hosting: Netlify
+    
+*   Domain & DNS: Cloudflare
+    
+*   Data Visualization: ECharts
+    
 
-## Architecture (High Level)
+Architecture
+------------
 
-The system follows a simple modern web architecture:
+The project will have a simple modern architecture.
 
-Data sources (hotel reviews) are collected and processed using text mining techniques.  
-Processed data is stored in a database and exposed to the frontend application.  
-The Angular web platform queries this processed data to generate visual insights and dashboards.
+Data Sources: Hotel ReviewsData Processing: Text MiningDatabase: Data SourcesFrontend: Data Processing
 
-Infrastructure:
+The architecture will have the following infrastructure:
 
-Cloudflare → Domain and DNS management  
-Netlify → Hosting and deployment  
-Supabase → Database and backend services  
-Angular → Web application interface
+*   Cloudflare: Domain & DNS
+    
+*   Netlify: Hosting
+    
+*   Supabase: Database
+    
+*   Angular: Frontend
