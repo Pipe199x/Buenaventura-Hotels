@@ -1,1 +1,110 @@
-<p>about works!</p>
+<div class="about-page">
+  <!-- HERO -->
+  <section class="hero">
+    <h1 class="hero-title">Acerca del Proyecto</h1>
+    <p class="hero-subtitle hero-subtitle--strong">
+      Análisis de percepción turística en Buenaventura
+    </p>
+    <p class="hero-subtitle">
+      Este proyecto analiza la percepción turística de los hoteles en Buenaventura,
+      Valle del Cauca, Colombia, utilizando técnicas de análisis de sentimientos
+      aplicadas a reseñas de Google Reviews.
+    </p>
+  </section>
+
+  <!-- METODOLOGÍA -->
+  <section class="panel">
+    <div class="panel-head">
+      <div class="panel-title">
+        <span class="section-icon" aria-hidden="true">
+          <!-- icono libre -->
+        </span>
+        Metodología
+      </div>
+    </div>
+
+    <div class="about-block">
+      <h3 class="about-subtitle">
+        <span class="mini-icon" aria-hidden="true">
+          <!-- icono libre -->
+        </span>
+        Fuente de datos
+      </h3>
+
+      <p class="about-text">
+        Se recopilaron reseñas públicas de Google Reviews correspondientes a los
+        cinco hoteles con mayor número de reseñas en Buenaventura, Colombia.
+        El conjunto de datos incluye comentarios escritos por los usuarios,
+        calificaciones otorgadas a los hoteles y fechas de publicación.
+      </p>
+
+      <p class="about-text">
+        Las reseñas incluyen comentarios en diferentes idiomas como español,
+        inglés, alemán y otros, reflejando la diversidad de visitantes que llegan a la ciudad.
+      </p>
+    </div>
+
+    <div class="about-block">
+      <h3 class="about-subtitle">
+        <span class="mini-icon" aria-hidden="true">
+          <!-- icono libre -->
+        </span>
+        Técnicas de análisis
+      </h3>
+
+      <ul class="about-list">
+        <li *ngFor="let tecnica of tecnicas">{{ tecnica }}</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- OBJETIVOS -->
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">
+        <span class="section-icon" aria-hidden="true">
+          <!-- icono libre -->
+        </span>
+        Objetivos
+      </h2>
+    </div>
+
+    <div class="about-grid">
+      <article class="about-card" *ngFor="let objetivo of objetivos">
+        <div class="about-card-head">
+          <span class="card-icon" aria-hidden="true">
+            <!-- icono libre -->
+          </span>
+          <h3 class="about-card-title">{{ objetivo.titulo }}</h3>
+        </div>
+
+        <p class="about-card-text">{{ objetivo.descripcion }}</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- TECNOLOGÍAS -->
+  <section class="panel">
+    <div class="panel-head">
+      <div class="panel-title">
+        <span class="section-icon" aria-hidden="true">
+          <!-- icono libre -->
+        </span>
+        Tecnologías utilizadas
+      </div>
+    </div>
+
+    <div class="chips chips--about">
+      <span class="chip" *ngFor="let tech of tecnologias">{{ tech }}</span>
+    </div>
+  </section>
+
+  <!-- BLOQUE FINAL -->
+  <section class="panel panel--footer">
+    <div class="research-box">
+      <h3 class="research-title">Proyecto de investigación</h3>
+      <p class="research-text">Universidad de Manizales — Manizales, Colombia</p>
+      <p class="research-text">Análisis de datos turísticos para el desarrollo local</p>
+    </div>
+  </section>
+</div>
