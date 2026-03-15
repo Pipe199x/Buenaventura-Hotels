@@ -1,24 +1,12 @@
-<div class="page">
-  <h1 class="title">Hoteles</h1>
+<div class="detail-wrapper">
+  <div class="card">
+    <div class="emoji">🚧</div>
 
-  <div *ngIf="loading" class="state">Cargando…</div>
-  <div *ngIf="!loading && errorMsg" class="state error">{{ errorMsg }}</div>
+    <h1>Estamos trabajando en ello</h1>
 
-  <div *ngIf="!loading && !errorMsg" class="grid">
-    <a
-      class="card"
-      *ngFor="let h of hotels; trackBy: trackByHotelName"
-      [routerLink]="['/hotels', h.hotel_name]"
-    >
-      <div class="name">{{ h.hotel_display_name }}</div>
+    <p class="subtitle">
+      estará disponible muy pronto.
+    </p>
 
-      <div class="meta">
-        <span>{{ h.avg_star_rating_hotel | number:'1.1-2' }}/5</span>
-        <span>·</span>
-        <span>{{ h.total_reviews_hotel | number }} reseñas</span>
-      </div>
+    <div class="loader"></div>
 
-      <div class="cta">Ver detalles →</div>
-    </a>
-  </div>
-</div>
