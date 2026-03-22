@@ -17,7 +17,7 @@
     <div class="panel-head">
       <div class="panel-title">
         <span class="section-icon" aria-hidden="true">
-          <!-- icono libre -->
+          <img src="assets/methodology.png" alt="Metodología">
         </span>
         Metodología
       </div>
@@ -26,7 +26,7 @@
     <div class="about-block">
       <h3 class="about-subtitle">
         <span class="mini-icon" aria-hidden="true">
-          <!-- icono libre -->
+          <img src="assets/datasources.png" alt="Fuente de datos">
         </span>
         Fuente de datos
       </h3>
@@ -47,7 +47,7 @@
     <div class="about-block">
       <h3 class="about-subtitle">
         <span class="mini-icon" aria-hidden="true">
-          <!-- icono libre -->
+          <img src="assets/technique analysis.png" alt="Técnicas de análisis">
         </span>
         Técnicas de análisis
       </h3>
@@ -63,7 +63,6 @@
     <div class="section-head">
       <h2 class="section-title">
         <span class="section-icon" aria-hidden="true">
-          <!-- icono libre -->
         </span>
         Objetivos
       </h2>
@@ -73,7 +72,7 @@
       <article class="about-card" *ngFor="let objetivo of objetivos">
         <div class="about-card-head">
           <span class="card-icon" aria-hidden="true">
-            <!-- icono libre -->
+            <img [src]="objetivo.icono" [alt]="objetivo.titulo">
           </span>
           <h3 class="about-card-title">{{ objetivo.titulo }}</h3>
         </div>
@@ -88,7 +87,6 @@
     <div class="panel-head">
       <div class="panel-title">
         <span class="section-icon" aria-hidden="true">
-          <!-- icono libre -->
         </span>
         Tecnologías utilizadas
       </div>
