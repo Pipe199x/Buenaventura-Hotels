@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 type ObjetivoCard = {
   titulo: string;
   descripcion: string;
+  icono: string;
 };
 
 @Component({
@@ -14,22 +15,27 @@ type ObjetivoCard = {
   styleUrl: './about.scss',
 })
 export class About {
+
   objetivos: ObjetivoCard[] = [
     {
       titulo: 'Identificar fortalezas',
       descripcion: 'Detectar aspectos positivos valorados por los huéspedes.',
+      icono: 'assets/strength.png',
     },
     {
       titulo: 'Áreas de mejora',
       descripcion: 'Señalar oportunidades de mejora en los servicios hoteleros.',
+      icono: 'assets/areas de mejora.png',
     },
     {
       titulo: 'Tendencias temporales',
       descripcion: 'Analizar cómo evoluciona la percepción de los visitantes a lo largo del tiempo.',
+      icono: 'assets/temporal trends.png',
     },
     {
       titulo: 'Información para el sector turístico',
       descripcion: 'Generar información útil para apoyar el análisis del turismo local.',
+      icono: 'assets/turism.png',
     },
   ];
 
