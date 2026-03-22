@@ -251,9 +251,64 @@ body { width: 100vw; overflow-x: hidden; }
   line-height: 1.6;
 }
 
+/* ---------- NEW: ADVISORS + AUTHOR ---------- */
+.research-advisors-grid {
+  max-width: 860px;
+  margin: 22px auto 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.advisor-card {
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.10);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.03);
+}
+
+.advisor-label {
+  margin: 0 0 6px 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.advisor-name {
+  margin: 0;
+  color: var(--text);
+  font-size: 20px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+.research-author {
+  margin-top: 18px;
+}
+
+.author-label {
+  margin: 0 0 2px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.author-name {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 1024px) {
   .about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .research-advisors-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -297,5 +352,12 @@ body { width: 100vw; overflow-x: hidden; }
   .research-title {
     font-size: 22px;
   }
-}
 
+  .advisor-name {
+    font-size: 18px;
+  }
+
+  .author-name {
+    font-size: 13px;
+  }
+}
