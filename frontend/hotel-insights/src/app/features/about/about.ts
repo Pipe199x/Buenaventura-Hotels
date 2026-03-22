@@ -25,12 +25,12 @@ export class About {
     {
       titulo: 'Áreas de mejora',
       descripcion: 'Señalar oportunidades de mejora en los servicios hoteleros.',
-      icono: 'assets/areas de mejora.png',
+      icono: 'assets/feedback.png',
     },
     {
       titulo: 'Tendencias temporales',
       descripcion: 'Analizar cómo evoluciona la percepción de los visitantes a lo largo del tiempo.',
-      icono: 'assets/temporal trends.png',
+      icono: 'assets/temporal-trends.png',
     },
     {
       titulo: 'Información para el sector turístico',
