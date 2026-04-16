@@ -64,8 +64,8 @@ export class Home implements OnInit {
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
         filter(
           (e) =>
-            e.urlAfterRedirects === '/home' ||
-            e.urlAfterRedirects.startsWith('/home')
+            e.urlAfterRedirects === '/' ||
+            e.urlAfterRedirects.startsWith('/')
         ),
         // ✅ FIX REAL: pasar DestroyRef
         takeUntilDestroyed(this.destroyRef)
