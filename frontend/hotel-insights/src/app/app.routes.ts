@@ -14,8 +14,6 @@ import { HotelsList } from './features/hotels/hotels-list/hotels-list';
 import { HotelDetail } from './features/hotels/hotel-detail/hotel-detail';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'home' },
-
   // Auth (sin shell)
   { path: 'login', component: Login },
   { path: 'register', component: Register },
@@ -25,7 +23,8 @@ export const routes: Routes = [
     path: '',
     component: ShellComponent,
     children: [
-      { path: 'home', component: Home },
+      { path: '', component: Home, pathMatch: 'full' },
+      { path: 'home', redirectTo: '', pathMatch: 'full' },
 
       {
         path: 'hotels',
@@ -39,5 +38,5 @@ export const routes: Routes = [
     ],
   },
 
-  { path: '**', redirectTo: 'home' },
+  { path: '**', redirectTo: '' },
 ];
