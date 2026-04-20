@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+
+Disallow: /login
+Disallow: /register
+
+
+Disallow: /api/
+Disallow: /*?*
+
+# Sitemap 
+Sitemap: https://buenaventuradatos.com/sitemap.xml
