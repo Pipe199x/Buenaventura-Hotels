@@ -1,22 +1,36 @@
+/* ========== GLOBAL RESET & BASE ========== */
+html, body {
+  background: #f6f7fb !important;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #1f2937;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+* { box-sizing: border-box; }
+body { width: 100vw; overflow-x: hidden; }
+
+::-webkit-scrollbar { width: 8px; background: #e2e8f0; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+
 :host {
   display: block;
 }
 
-.hotels-page {
+.home-page {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
   --panel: #ffffff;
   --text: #1f2937;
   --muted: #6b7280;
-  --border: #dbeafe;
-  --shadow: 0 8px 20px rgba(2, 6, 23, 0.04);
+  --border: rgba(15, 23, 42, 0.10);
+  --shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
 
-  --positive: #16a34a;
-  --neutral: #d97706;
-  --negative: #ef4444;
-
+  --positive: #2e7d32;
+  --neutral: #f9a825;
+  --negative: #c62828;
   min-height: calc(100vh - 64px);
   padding: 24px;
 }
