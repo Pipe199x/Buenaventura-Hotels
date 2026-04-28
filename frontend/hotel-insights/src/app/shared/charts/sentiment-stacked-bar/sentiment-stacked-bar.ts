@@ -44,7 +44,7 @@ export class SentimentStackedBarComponent implements OnChanges {
   private buildOption(rows: Row[]): EChartsOption {
     const hotelsRaw = Array.from(new Set(rows.map((r) => r.hotel_display_name)));
 
-    // ✅ Label corto: quita "Hotel", "Hostal", etc.
+    // Common name prefixes removed for shorter axis labels.
     const shortLabel = (name: string) => {
       let s = (name ?? '').trim();
       s = s.replace(/^(hotel|hostal)\s+/i, '').trim();
@@ -65,7 +65,7 @@ export class SentimentStackedBarComponent implements OnChanges {
     const neu = hotelsRaw.map((h) => getPct(h, 'neutral'));
     const neg = hotelsRaw.map((h) => getPct(h, 'negative'));
 
-    // ✅ MAX AUTO: sube al siguiente “salto” (10 en 10), mínimo 50, máximo 100
+    // Max value rounded to the next 10 and clamped to [50, 100].
     const computedMax = (() => {
       const all = [...pos, ...neu, ...neg].map((n) => Number(n) || 0);
       const top = Math.max(0, ...all);
@@ -73,7 +73,7 @@ export class SentimentStackedBarComponent implements OnChanges {
       return Math.min(100, Math.max(50, rounded));
     })();
 
-    // ✅ para que ECharts sepa el max en desktop y mobile
+    // Shared axis max for desktop and mobile configs.
     const axisMax = computedMax;
 
     const tooltip = {
@@ -89,9 +89,7 @@ export class SentimentStackedBarComponent implements OnChanges {
       },
     } as const;
 
-    // =========================
-    // DESKTOP: vertical agrupado
-    // =========================
+    // Desktop layout: grouped vertical bars.
     const desktop: EChartsOption = {
       tooltip,
 
@@ -128,7 +126,7 @@ export class SentimentStackedBarComponent implements OnChanges {
       yAxis: {
         type: 'value',
         min: 0,
-        max: axisMax, // ✅ AUTO (ya no es 100 fijo)
+        max: axisMax, // Dynamic y-axis max.
         name: 'Porcentaje (%)',
         nameLocation: 'middle',
         nameGap: 50,
@@ -142,9 +140,7 @@ export class SentimentStackedBarComponent implements OnChanges {
       ],
     };
 
-    // =========================
-    // MOBILE: horizontal agrupado
-    // =========================
+    // Mobile layout: grouped horizontal bars.
     const mobile: EChartsOption = {
       tooltip,
 
@@ -165,19 +161,19 @@ export class SentimentStackedBarComponent implements OnChanges {
         containLabel: false,
       },
 
-      // % en X (value)
+      // Percentage x-axis.
       xAxis: {
         type: 'value',
         min: 0,
-        max: axisMax, // ✅ AUTO (ya no es 100 fijo)
-        splitNumber: axisMax <= 60 ? 3 : 4, // menos ticks en pantallas angostas
+        max: axisMax, // Dynamic x-axis max.
+        splitNumber: axisMax <= 60 ? 3 : 4, // Tick density is reduced on narrow screens.
         name: 'Porcentaje (%)',
         nameLocation: 'middle',
         nameGap: 36,
         axisLabel: {
           fontSize: 10,
           margin: 10,
-          // ✅ muestra solo múltiplos “limpios” (20 en 20)
+          // Labels displayed at 20-point steps.
           formatter: (value: number) => {
             const v = Math.round(Number(value));
             return v % 20 === 0 ? `${v}%` : '';
@@ -187,7 +183,7 @@ export class SentimentStackedBarComponent implements OnChanges {
         },
       },
 
-      // hoteles en Y (cortos)
+      // Hotel label axis.
       yAxis: {
         type: 'category',
         data: hotelsShort,

@@ -1,24 +1,24 @@
 import { Routes } from '@angular/router';
 import { ShellComponent } from './shared/shell/shell';
 
-// Auth
+// Authentication views.
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
 
-// Pages
+// Main app pages.
 import { Home } from './features/home/home';
 import { About } from './features/about/about';
 
-// NUEVOS COMPONENTES
+// Hotel feature pages.
 import { HotelsList } from './features/hotels/hotels-list/hotels-list';
 import { HotelDetail } from './features/hotels/hotel-detail/hotel-detail';
 
 export const routes: Routes = [
-  // Auth (sin shell)
+  // Public auth routes (no shell layout).
   { path: 'login', component: Login },
   { path: 'register', component: Register },
 
-  // App (con navbar)
+  // App routes rendered inside the shell.
   {
     path: '',
     component: ShellComponent,

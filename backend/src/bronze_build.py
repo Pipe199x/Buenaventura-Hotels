@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Iterable
 
 from azure.storage.blob import BlobServiceClient, ContentSettings
-from azure.core.exceptions import ResourceExistsError  # ← AQUÍ EL CAMBIO
+from azure.core.exceptions import ResourceExistsError  # Exception used when create_container is called on an existing container
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,9 +18,9 @@ PROJ_ROOT = Path(__file__).resolve().parents[1]
 LOCAL_DATA = PROJ_ROOT / "Datasets"
 
 DATE_PREFIX = datetime.utcnow().strftime("%Y-%m-%d")
-BLOB_PREFIX = "bronze/"   # set to "" if you don't want a subfolder
+BLOB_PREFIX = "bronze/"   # Prefix used in blob names
 
-ALLOWED_EXT = {".xlsx", ".xls"}       # add ".csv" if needed
+ALLOWED_EXT = {".xlsx", ".xls"}       # File extensions included in uploads
 
 def ensure_env():
     if not CONN_STR:

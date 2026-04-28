@@ -8,7 +8,7 @@ export class AuthService {
   private _session$ = new BehaviorSubject<Session | null>(null);
   readonly session$ = this._session$.asObservable();
 
-  // evita inicializar más de una vez
+  // Prevent duplicate auth listeners.
   private initialized = false;
 
   async init(): Promise<void> {
