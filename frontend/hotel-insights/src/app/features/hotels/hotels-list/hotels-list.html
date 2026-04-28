@@ -13,7 +13,10 @@
 
           <div class="skeleton-card-header">
             <div class="skeleton-line skeleton-hotel-name"></div>
-            <div class="skeleton-line skeleton-badge"></div>
+            <div>
+              <div class="skeleton-line skeleton-badge"></div>
+              <div class="skeleton-line skeleton-badge-label"></div>
+            </div>
           </div>
 
           <div class="skeleton-line skeleton-address"></div>
@@ -50,7 +53,6 @@
       <h2 class="section-title">Selecciona un hotel</h2>
     </div>
 
-    <!-- GRID -->
     <div class="hotel-grid" *ngIf="hotels.length; else noHotels">
 
       <article
@@ -58,18 +60,22 @@
         *ngFor="let h of hotels; trackBy: trackByHotelName"
       >
 
-        <!-- HEADER -->
         <div class="hotel-card-header">
           <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
 
           <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
-            <div class="badge-pill" [attr.data-tone]="b.tone">
-              {{ b.pct }}% {{ b.label }}
+            <div class="badge-wrapper">
+              <div class="badge-circle" [attr.data-tone]="b.tone">
+                <span class="badge-pct">{{ b.pct }}%</span>
+              </div>
+
+              <div class="badge-label" [attr.data-tone]="b.tone">
+                {{ b.label }}
+              </div>
             </div>
           </ng-container>
         </div>
 
-        <!-- META -->
         <div class="hotel-meta">
 
           <div class="meta-line" *ngIf="h.address">
@@ -85,8 +91,8 @@
               <span class="meta-icon" aria-hidden="true">
                 <img src="assets/stars-home.png" alt="Estrellas" width="14" height="14" />
               </span>
-              <span class="meta-strong">
-                {{ h.avg_star_rating_hotel | number:'1.1-2' }}/5
+              <span class="meta-rating">
+                {{ h.avg_star_rating_hotel | number:'1.1-2' }}<span>/5</span>
               </span>
             </div>
 
@@ -94,15 +100,15 @@
               <span class="meta-icon" aria-hidden="true">
                 <img src="assets/users-home.png" alt="Usuarios" width="14" height="14" />
               </span>
-              <span class="meta-muted">
-                {{ h.total_reviews_hotel | number }} reseñas
+              <span class="meta-reviews">
+                <strong>{{ h.total_reviews_hotel | number }}</strong>
+                <span>reseñas</span>
               </span>
             </div>
 
           </div>
         </div>
 
-        <!-- KEYWORDS -->
         <div class="kw-title">
           <span class="kw-icon" aria-hidden="true">
             <img src="assets/trending-home.png" alt="" width="22" height="22" />
@@ -118,7 +124,6 @@
           </div>
         </ng-container>
 
-        <!-- CTA -->
         <a
           class="btn-primary"
           [routerLink]="['/register']"
@@ -130,7 +135,6 @@
       </article>
     </div>
 
-    <!-- EMPTY STATE -->
     <ng-template #noHotels>
       <div class="state muted">
         No hay datos para mostrar.
