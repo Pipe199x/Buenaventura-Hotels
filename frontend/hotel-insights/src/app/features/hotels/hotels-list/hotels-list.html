@@ -57,7 +57,13 @@
           </div>
         </div>
 
-        <div class="kw-title">TEMÁTICAS MÁS DISCUTIDAS</div>
+        <div class="kw-title">
+          <span class="kw-icon" aria-hidden="true">
+            <img src="assets/trending-home.png" alt="" width="22" height="22" />
+          </span>
+          Temáticas más discutidas:
+        </div>
+        
 
         <ng-container *ngIf="asChips(h.top_words, 6) as c">
           <div class="chips" *ngIf="c.items.length">
@@ -65,11 +71,8 @@
           </div>
         </ng-container>
 
-        <a class="btn-primary" [routerLink]="['/hotels', h.hotel_name]">
-          Ver análisis completo <span aria-hidden="true">→</span>
-        </a>
-      </article>
-    </div>
+        
+        <a class="btn-primary" [routerLink]="['/register']" [queryParams]="{ redirect: '/hotels/' + h.hotel_name }">Ver más detalles</a>
 
     <ng-template #noHotels>
       <div class="state muted">No hay datos para mostrar.</div>
