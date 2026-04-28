@@ -42,37 +42,43 @@
   color: var(--muted);
 }
 
-/* ---------- SKELETON ---------- */
+/* ---------- SKELETON (MEJORADO Y ALINEADO A CARDS) ---------- */
 .skeleton-loader {
   width: 100%;
   display: grid;
-  gap: 12px;
+  gap: 16px;
+}
+
+.skeleton-header {
+  margin-bottom: 10px;
 }
 
 .skeleton-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.skeleton-hotel-card {
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: rgba(148, 163, 184, 0.06);
+  padding: 20px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-.skeleton-card {
-  border-radius: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(148, 163, 184, 0.06);
-  padding: 12px;
-  display: grid;
-  gap: 10px;
-}
-
+/* BASE */
 .skeleton-line {
   position: relative;
   overflow: hidden;
   background: #e5e7eb;
-  border-radius: 8px;
-  height: 12px;
-  width: 100%;
+  border-radius: 999px;
 }
 
+/* ANIMACIÓN */
 .skeleton-line::after {
   content: "";
   position: absolute;
@@ -80,31 +86,91 @@
   transform: translateX(-100%);
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.65) 50%,
-    rgba(255, 255, 255, 0) 100%
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.65) 50%,
+    rgba(255,255,255,0) 100%
   );
   animation: skeleton-shimmer 1.2s infinite;
 }
 
-.skeleton-line--title {
+/* HEADER */
+.skeleton-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skeleton-hotel-name {
+  width: 65%;
+  height: 16px;
+}
+
+.skeleton-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
+/* META */
+.skeleton-address {
+  width: 80%;
+  height: 12px;
+}
+
+.skeleton-meta-row {
+  display: flex;
+  gap: 10px;
+}
+
+.skeleton-rating {
+  width: 70px;
+  height: 26px;
+  border-radius: 999px;
+}
+
+.skeleton-reviews {
+  width: 110px;
+  height: 26px;
+  border-radius: 999px;
+}
+
+/* KEYWORDS */
+.skeleton-keywords-title {
+  width: 50%;
+  height: 12px;
+}
+
+.skeleton-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skeleton-chip {
+  width: 70px;
+  height: 26px;
+  border-radius: 999px;
+}
+
+.skeleton-chip-short {
+  width: 50px;
+}
+
+/* BUTTON */
+.skeleton-button {
+  width: 100%;
+  height: 42px;
+  border-radius: 12px;
+  margin-top: 6px;
+}
+
+/* TITLE */
+.skeleton-title {
+  width: 200px;
   height: 20px;
-  max-width: 45%;
 }
 
-.skeleton-line--short {
-  max-width: 40%;
-}
-
-.skeleton-line--value {
-  height: 24px;
-  max-width: 55%;
-}
-
-.skeleton-line--long {
-  max-width: 75%;
-}
-
+/* ANIMACIÓN */
 @keyframes skeleton-shimmer {
   100% {
     transform: translateX(100%);
