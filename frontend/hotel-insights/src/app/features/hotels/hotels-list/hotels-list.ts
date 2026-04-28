@@ -31,6 +31,6 @@ export class HotelsList implements OnInit {
     }
   }
 
-  // slug estable y escalable: hotel_name
+  // Keep DOM updates stable by tracking with hotel_name.
   trackByHotelName = (_: number, h: HotelCardRow) => h.hotel_name;
 }

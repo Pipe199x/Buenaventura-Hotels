@@ -33,7 +33,7 @@ export class Register implements OnInit, OnDestroy {
       this.redirectUrl = redirect;
     }
 
-    // ✅ Si vuelve de Google y ya hay sesión, redirigir automáticamente
+    // Handle OAuth return: if session exists, continue to the target page.
     this.sessionSub = this.auth.session$.subscribe((session) => {
       if (session) {
         this.router.navigateByUrl(this.redirectUrl);

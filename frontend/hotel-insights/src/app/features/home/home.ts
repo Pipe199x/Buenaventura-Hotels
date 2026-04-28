@@ -49,16 +49,16 @@ export class Home implements OnInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
-  // ✅ CLAVE: esto arregla el NG0203
+  // DestroyRef instance used by takeUntilDestroyed.
   private destroyRef = inject(DestroyRef);
 
   private inFlight = false;
 
   ngOnInit(): void {
-    // 1) Carga inicial
+    // Initial data load.
     this.loadHome('init');
 
-    // 2) Cada vez que se navega a /home, recarga (sin depender de doble clic)
+    // Data reload on route revisit.
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
@@ -67,7 +67,7 @@ export class Home implements OnInit {
             e.urlAfterRedirects === '/' ||
             e.urlAfterRedirects.startsWith('/')
         ),
-        // ✅ FIX REAL: pasar DestroyRef
+        // Stream lifecycle bound to component destroy.
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
@@ -75,7 +75,7 @@ export class Home implements OnInit {
       });
   }
 
-  // chips (con "+X más")
+  // Comma-separated words transformed into chip items.
   asChips(topWords: string, max = 6): { items: string[]; more: number } {
     if (!topWords) return { items: [], more: 0 };
     const all = topWords
@@ -99,11 +99,11 @@ export class Home implements OnInit {
   }
 
   private async loadHome(reason: 'init' | 'nav'): Promise<void> {
-    // Evita que 2 recargas se pisen (muy común con router events)
+    // Overlapping reload requests are skipped.
     if (this.inFlight) return;
     this.inFlight = true;
 
-    // DEBUG visible en consola (sin warnings de label duplicado)
+    // Grouped debug logs per request cycle.
     console.groupCollapsed(`[Home] loadHome(${reason})`);
     const t0 = performance.now();
 
@@ -111,11 +111,11 @@ export class Home implements OnInit {
     this.chartLoading = true;
     this.errorMsg = '';
 
-    // Fuerza que el spinner aparezca INMEDIATO (sin esperar otro click)
+    // UI state flushed before async calls.
     this.cdr.detectChanges();
 
     try {
-      // Timeout para evitar “loading infinito” si algo queda colgado
+      // Per-query timeout wrapper.
       const withTimeout = async <T>(
         p: Promise<T>,
         ms: number,
@@ -149,7 +149,7 @@ export class Home implements OnInit {
 
       const errs: string[] = [];
 
-      // KPIs
+      // KPIs.
       const kpisR = results[0];
       if (kpisR.status === 'fulfilled') {
         this.kpis = kpisR.value;
@@ -158,7 +158,7 @@ export class Home implements OnInit {
         errs.push(kpisR.reason?.message ?? 'Error en KPIs');
       }
 
-      // Hotels
+      // Hotel cards.
       const hotelsR = results[1];
       if (hotelsR.status === 'fulfilled') {
         this.hotels = hotelsR.value ?? [];
@@ -167,11 +167,10 @@ export class Home implements OnInit {
         errs.push(hotelsR.reason?.message ?? 'Error en hoteles');
       }
 
-      // ✅ NUEVO: badges salen de satisfaction_rate_hotel (cards), no del chart
-      // (esto es lo que necesitas para la regla 63/60)
+      // Badge color/label derived from satisfaction_rate_hotel.
       this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
 
-      // Distribution (chart)
+      // Chart distribution rows.
       const distR = results[2];
       if (distR.status === 'fulfilled') {
         this.sentimentRows = distR.value ?? [];
@@ -182,7 +181,7 @@ export class Home implements OnInit {
         );
       }
 
-      // Si hubo errores parciales, muéstralos (pero NO congeles la UI)
+      // Partial errors are displayed while available data still renders.
       if (errs.length) {
         this.errorMsg = errs.join(' | ');
       }
@@ -197,7 +196,7 @@ export class Home implements OnInit {
       this.loading = false;
       this.chartLoading = false;
 
-      // CLAVE: fuerza repaint al terminar async (evita “doble clic para que aparezca”)
+      // Final UI state flush after async completion.
       this.cdr.detectChanges();
 
       const ms = Math.round(performance.now() - t0);
@@ -208,7 +207,7 @@ export class Home implements OnInit {
     }
   }
 
-  // ✅ BADGES por satisfacción (regla 63/60)
+  // Satisfaction thresholds: >=63 positive, >=60 neutral, otherwise negative.
   private buildBadgesFromSatisfaction(hotels: HotelCardRow[]): Map<string, HotelBadge> {
     const out = new Map<string, HotelBadge>();
 

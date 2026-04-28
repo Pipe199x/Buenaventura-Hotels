@@ -26,18 +26,18 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withRouterConfig({
-        // ✅ si haces click en Inicio estando en /home, recarga el componente
+        // Enables component reload when navigating to the same URL.
         onSameUrlNavigation: 'reload',
       })
     ),
 
-    // ✅ CLAVE: NO withFetch()
+    // HttpClient provider.
     provideHttpClient(),
 
-    // ✅ ECharts global
+    // ECharts provider at app bootstrap.
     provideEchartsCore({ echarts }),
 
-    // ✅ Auth init
+    // Auth initializer.
     {
       provide: APP_INITIALIZER,
       useFactory: initAuth,
