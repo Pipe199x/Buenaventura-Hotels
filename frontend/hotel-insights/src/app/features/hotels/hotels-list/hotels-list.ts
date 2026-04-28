@@ -1,6 +1,14 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+  inject,
+  DestroyRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HomeDataService, HotelCardRow } from '../../../core/data/home-data.service';
 
@@ -26,19 +34,24 @@ export class HotelsList implements OnInit {
   hotelBadge = new Map<string, HotelBadge>();
 
   private homeData = inject(HomeDataService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
-  async ngOnInit() {
-    this.loading = true;
-    this.errorMsg = '';
+  private inFlight = false;
 
-    try {
-      this.hotels = await this.homeData.getHotelCards();
-      this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
-    } catch (e: any) {
-      this.errorMsg = e?.message ?? 'Error cargando hoteles';
-    } finally {
-      this.loading = false;
-    }
+  ngOnInit(): void {
+    this.loadHotels('init');
+
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        filter((e) => e.urlAfterRedirects === '/hotels'),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.loadHotels('nav');
+      });
   }
 
   trackByHotelName = (_: number, h: HotelCardRow) => h.hotel_name;
@@ -65,6 +78,49 @@ export class HotelsList implements OnInit {
         label: 'Neutral',
       }
     );
+  }
+
+  private async loadHotels(reason: 'init' | 'nav'): Promise<void> {
+    if (this.inFlight) return;
+    this.inFlight = true;
+
+    this.loading = true;
+    this.errorMsg = '';
+    this.cdr.detectChanges();
+
+    try {
+      const withTimeout = async <T>(
+        p: Promise<T>,
+        ms: number,
+        label: string
+      ): Promise<T> => {
+        let t: any;
+        const timeout = new Promise<never>((_, rej) => {
+          t = setTimeout(
+            () => rej(new Error(`Timeout (${ms}ms) en ${label}`)),
+            ms
+          );
+        });
+        const out = await Promise.race([p, timeout]);
+        clearTimeout(t);
+        return out as T;
+      };
+
+      this.hotels = await withTimeout(
+        this.homeData.getHotelCards(),
+        12000,
+        `getHotelCards:${reason}`
+      );
+      this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
+    } catch (e: any) {
+      this.hotels = [];
+      this.hotelBadge = new Map();
+      this.errorMsg = e?.message ?? 'Error cargando hoteles';
+    } finally {
+      this.loading = false;
+      this.inFlight = false;
+      this.cdr.detectChanges();
+    }
   }
 
   private buildBadgesFromSatisfaction(hotels: HotelCardRow[]): Map<string, HotelBadge> {
