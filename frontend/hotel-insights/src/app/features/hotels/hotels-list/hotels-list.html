@@ -1,4 +1,6 @@
 <div class="hotels-page">
+
+  <!-- LOADING -->
   <div *ngIf="loading" class="state">
     <div class="skeleton-loader" aria-label="Cargando hoteles analizados">
       <div class="skeleton-line skeleton-line--title"></div>
@@ -14,17 +16,27 @@
     </div>
   </div>
 
+  <!-- ERROR -->
   <div *ngIf="!loading && errorMsg" class="state error">
     <strong>Error:</strong> {{ errorMsg }}
   </div>
 
+  <!-- CONTENT -->
   <section class="section" *ngIf="!loading">
+
     <div class="hero-copy">
       <h2 class="section-title">Selecciona un hotel</h2>
     </div>
 
+    <!-- GRID -->
     <div class="hotel-grid" *ngIf="hotels.length; else noHotels">
-      <article class="hotel-card" *ngFor="let h of hotels; trackBy: trackByHotelName">
+
+      <article
+        class="hotel-card"
+        *ngFor="let h of hotels; trackBy: trackByHotelName"
+      >
+
+        <!-- HEADER -->
         <div class="hotel-card-header">
           <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
 
@@ -35,7 +47,9 @@
           </ng-container>
         </div>
 
+        <!-- META -->
         <div class="hotel-meta">
+
           <div class="meta-line" *ngIf="h.address">
             <span class="meta-icon" aria-hidden="true">
               <img src="assets/location-home.png" alt="Ubicación" width="14" height="14" />
@@ -44,6 +58,7 @@
           </div>
 
           <div class="meta-stats">
+
             <div class="meta-inline">
               <span class="meta-icon" aria-hidden="true">
                 <img src="assets/stars-home.png" alt="Estrellas" width="14" height="14" />
@@ -61,9 +76,11 @@
                 {{ h.total_reviews_hotel | number }} reseñas
               </span>
             </div>
+
           </div>
         </div>
 
+        <!-- KEYWORDS -->
         <div class="kw-title">
           <span class="kw-icon" aria-hidden="true">
             <img src="assets/trending-home.png" alt="" width="22" height="22" />
@@ -73,10 +90,13 @@
 
         <ng-container *ngIf="asChips(h.top_words, 6) as c">
           <div class="chips" *ngIf="c.items.length">
-            <span class="chip" *ngFor="let w of c.items">{{ w }}</span>
+            <span class="chip" *ngFor="let w of c.items">
+              {{ w }}
+            </span>
           </div>
         </ng-container>
 
+        <!-- CTA -->
         <a
           class="btn-primary"
           [routerLink]="['/register']"
@@ -84,11 +104,16 @@
         >
           Ver más detalles
         </a>
+
       </article>
     </div>
 
+    <!-- EMPTY STATE -->
     <ng-template #noHotels>
-      <div class="state muted">No hay datos para mostrar.</div>
+      <div class="state muted">
+        No hay datos para mostrar.
+      </div>
     </ng-template>
+
   </section>
 </div>
