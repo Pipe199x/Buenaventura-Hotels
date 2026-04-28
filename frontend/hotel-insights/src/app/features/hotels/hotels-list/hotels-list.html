@@ -1,12 +1,94 @@
-<div class="detail-wrapper">
-  <div class="card">
-    <div class="emoji">🚧</div>
+<div class="hotels-page">
+  <div *ngIf="errorMsg" class="state error">
+    <strong>Error:</strong> {{ errorMsg }}
+  </div>
 
-    <h1>Estamos trabajando en ello</h1>
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">
+        <span class="section-icon" aria-hidden="true">
+          <img src="assets/nav-hotel.png" alt="" width="22" height="22" />
+        </span>
+        Hoteles Analizados
+      </h2>
+    </div>
 
-    <p class="subtitle">
-      Estará disponible muy pronto.
-    </p>
+    <div class="hotel-grid" *ngIf="loading">
+      <article class="hotel-card hotel-card--skeleton" *ngFor="let _ of skeletonCards">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-badge"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-chip-row"></div>
+        <div class="skeleton skeleton-chip-row short"></div>
+        <div class="skeleton skeleton-button"></div>
+      </article>
+    </div>
 
-    <div class="loader"></div>
+    <div class="hotel-grid" *ngIf="!loading && hotels.length; else noHotels">
+      <article class="hotel-card" *ngFor="let h of hotels; trackBy: trackByHotelName">
+        <div class="hotel-card-header">
+          <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
 
+          <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
+            <div class="badge-circle" [attr.data-tone]="b.tone">
+              <div class="badge-pct">{{ b.pct }}%</div>
+            </div>
+          </ng-container>
+        </div>
+
+        <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
+          <div class="badge-label" [attr.data-tone]="b.tone">{{ b.label }}</div>
+        </ng-container>
+
+        <div class="hotel-meta">
+          <div class="meta-line" *ngIf="h.address">
+            <span class="meta-icon" aria-hidden="true">
+              <img src="assets/location-home.png" alt="Ubicación" width="16" height="16" />
+            </span>
+            <span class="meta-text">{{ h.address }}</span>
+          </div>
+
+          <div class="meta-stats">
+            <div class="meta-chip">
+              <span class="meta-icon" aria-hidden="true">
+                <img src="assets/stars-home.png" alt="Estrellas" width="16" height="16" />
+              </span>
+              <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}</span>
+              <span class="meta-muted">/5</span>
+            </div>
+
+            <div class="meta-chip">
+              <span class="meta-icon" aria-hidden="true">
+                <img src="assets/users-home.png" alt="Usuarios" width="16" height="16" />
+              </span>
+              <span class="meta-strong">{{ h.total_reviews_hotel | number }}</span>
+              <span class="meta-muted">reseñas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kw-title">
+          <span class="kw-icon" aria-hidden="true">
+            <img src="assets/trending-home.png" alt="" width="22" height="22" />
+          </span>
+          Temáticas más discutidas:
+        </div>
+
+        <ng-container *ngIf="asChips(h.top_words, 6) as c">
+          <div class="chips" *ngIf="c.items.length">
+            <span class="chip" *ngFor="let w of c.items">{{ w }}</span>
+            <span class="chip chip-more" *ngIf="c.more > 0">+{{ c.more }} más</span>
+          </div>
+        </ng-container>
+
+        <button class="btn-primary" type="button" (click)="goToHotelDetail(h.hotel_name)">
+          Ver más detalles
+        </button>
+      </article>
+    </div>
+
+    <ng-template #noHotels>
+      <div class="state muted" *ngIf="!loading">No hay datos para mostrar.</div>
+    </ng-template>
+  </section>
+</div>
