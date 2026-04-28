@@ -55,6 +55,105 @@ body { width: 100vw; overflow-x: hidden; }
 }
 .state.muted { color: var(--muted); }
 
+.skeleton-loader {
+  width: 100%;
+  display: grid;
+  gap: 12px;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .skeleton-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skeleton-card {
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(148, 163, 184, 0.06);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.skeleton-line,
+.skeleton-bar {
+  position: relative;
+  overflow: hidden;
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+
+.skeleton-line::after,
+.skeleton-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-shimmer 1.2s infinite;
+}
+
+.skeleton-line {
+  height: 12px;
+  width: 100%;
+}
+
+.skeleton-line--title {
+  height: 20px;
+  max-width: 45%;
+}
+
+.skeleton-line--short {
+  max-width: 40%;
+}
+
+.skeleton-line--value {
+  height: 24px;
+  max-width: 55%;
+}
+
+.skeleton-line--long {
+  max-width: 75%;
+}
+
+.skeleton-loader--chart .skeleton-line--short {
+  max-width: 30%;
+}
+
+.skeleton-chart-bars {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+  min-height: 160px;
+}
+
+.skeleton-bar {
+  height: 100%;
+}
+
+.skeleton-chart-bars .skeleton-bar:nth-child(1) { height: 50%; }
+.skeleton-chart-bars .skeleton-bar:nth-child(2) { height: 70%; }
+.skeleton-chart-bars .skeleton-bar:nth-child(3) { height: 85%; }
+.skeleton-chart-bars .skeleton-bar:nth-child(4) { height: 65%; }
+.skeleton-chart-bars .skeleton-bar:nth-child(5) { height: 40%; }
+
+@keyframes skeleton-shimmer {
+  100% { transform: translateX(100%); }
+}
+
 .spinner {
   width: 18px;
   height: 18px;
@@ -790,4 +889,3 @@ body { width: 100vw; overflow-x: hidden; }
     max-width: none !important;
   }
 }
-
