@@ -2,6 +2,7 @@
   <div *ngIf="loading" class="state">
     <div class="skeleton-loader" aria-label="Cargando hoteles analizados">
       <div class="skeleton-line skeleton-line--title"></div>
+
       <div class="skeleton-grid">
         <div class="skeleton-card" *ngFor="let _ of [1, 2, 3]">
           <div class="skeleton-line skeleton-line--short"></div>
@@ -28,7 +29,9 @@
           <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
 
           <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
-            <div class="badge-pill" [attr.data-tone]="b.tone">{{ b.pct }}% {{ b.label }}</div>
+            <div class="badge-pill" [attr.data-tone]="b.tone">
+              {{ b.pct }}% {{ b.label }}
+            </div>
           </ng-container>
         </div>
 
@@ -45,14 +48,18 @@
               <span class="meta-icon" aria-hidden="true">
                 <img src="assets/stars-home.png" alt="Estrellas" width="14" height="14" />
               </span>
-              <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}/5</span>
+              <span class="meta-strong">
+                {{ h.avg_star_rating_hotel | number:'1.1-2' }}/5
+              </span>
             </div>
 
             <div class="meta-inline">
               <span class="meta-icon" aria-hidden="true">
                 <img src="assets/users-home.png" alt="Usuarios" width="14" height="14" />
               </span>
-              <span class="meta-muted">{{ h.total_reviews_hotel | number }} reseñas</span>
+              <span class="meta-muted">
+                {{ h.total_reviews_hotel | number }} reseñas
+              </span>
             </div>
           </div>
         </div>
@@ -63,7 +70,6 @@
           </span>
           Temáticas más discutidas:
         </div>
-        
 
         <ng-container *ngIf="asChips(h.top_words, 6) as c">
           <div class="chips" *ngIf="c.items.length">
@@ -71,8 +77,15 @@
           </div>
         </ng-container>
 
-        
-        <a class="btn-primary" [routerLink]="['/register']" [queryParams]="{ redirect: '/hotels/' + h.hotel_name }">Ver más detalles</a>
+        <a
+          class="btn-primary"
+          [routerLink]="['/register']"
+          [queryParams]="{ redirect: '/hotels/' + h.hotel_name }"
+        >
+          Ver más detalles
+        </a>
+      </article>
+    </div>
 
     <ng-template #noHotels>
       <div class="state muted">No hay datos para mostrar.</div>
