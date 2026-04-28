@@ -1,7 +1,16 @@
 <div class="hotels-page">
   <div *ngIf="loading" class="state">
-    <div class="spinner"></div>
-    <span>Cargando hoteles…</span>
+    <div class="skeleton-loader" aria-label="Cargando hoteles analizados">
+      <div class="skeleton-line skeleton-line--title"></div>
+      <div class="skeleton-grid">
+        <div class="skeleton-card" *ngFor="let _ of [1, 2, 3]">
+          <div class="skeleton-line skeleton-line--short"></div>
+          <div class="skeleton-line skeleton-line--value"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line skeleton-line--long"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div *ngIf="!loading && errorMsg" class="state error">
@@ -9,8 +18,8 @@
   </div>
 
   <section class="section" *ngIf="!loading">
-    <div class="section-head">
-      <h2 class="section-title">Hoteles Analizados</h2>
+    <div class="hero-copy">
+      <h2 class="section-title">Selecciona un hotel</h2>
     </div>
 
     <div class="hotel-grid" *ngIf="hotels.length; else noHotels">
@@ -19,50 +28,46 @@
           <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
 
           <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
-            <div class="badge-circle" [attr.data-tone]="b.tone">
-              <div class="badge-pct">{{ b.pct }}%</div>
-            </div>
+            <div class="badge-pill" [attr.data-tone]="b.tone">{{ b.pct }}% {{ b.label }}</div>
           </ng-container>
         </div>
 
-        <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
-          <div class="badge-label" [attr.data-tone]="b.tone">{{ b.label }}</div>
-        </ng-container>
-
         <div class="hotel-meta">
           <div class="meta-line" *ngIf="h.address">
-            <span class="meta-icon" aria-hidden="true">📍</span>
+            <span class="meta-icon" aria-hidden="true">
+              <img src="assets/location-home.png" alt="Ubicación" width="14" height="14" />
+            </span>
             <span class="meta-text">{{ h.address }}</span>
           </div>
 
           <div class="meta-stats">
-            <div class="meta-chip">
-              <span aria-hidden="true">⭐</span>
-              <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}</span>
-              <span class="meta-muted">/5</span>
+            <div class="meta-inline">
+              <span class="meta-icon" aria-hidden="true">
+                <img src="assets/stars-home.png" alt="Estrellas" width="14" height="14" />
+              </span>
+              <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}/5</span>
             </div>
 
-            <div class="meta-chip">
-              <span aria-hidden="true">👥</span>
-              <span class="meta-strong">{{ h.total_reviews_hotel | number }}</span>
-              <span class="meta-muted">reseñas</span>
+            <div class="meta-inline">
+              <span class="meta-icon" aria-hidden="true">
+                <img src="assets/users-home.png" alt="Usuarios" width="14" height="14" />
+              </span>
+              <span class="meta-muted">{{ h.total_reviews_hotel | number }} reseñas</span>
             </div>
           </div>
         </div>
 
-        <div class="kw-title">
-          <span aria-hidden="true">🔥</span>
-          Temáticas más discutidas:
-        </div>
+        <div class="kw-title">TEMÁTICAS MÁS DISCUTIDAS</div>
 
         <ng-container *ngIf="asChips(h.top_words, 6) as c">
           <div class="chips" *ngIf="c.items.length">
             <span class="chip" *ngFor="let w of c.items">{{ w }}</span>
-            <span class="chip chip-more" *ngIf="c.more > 0">+{{ c.more }} más</span>
           </div>
         </ng-container>
 
-        <a class="btn-primary" [routerLink]="['/hotels', h.hotel_name]">Ver más detalles</a>
+        <a class="btn-primary" [routerLink]="['/hotels', h.hotel_name]">
+          Ver análisis completo <span aria-hidden="true">→</span>
+        </a>
       </article>
     </div>
 
