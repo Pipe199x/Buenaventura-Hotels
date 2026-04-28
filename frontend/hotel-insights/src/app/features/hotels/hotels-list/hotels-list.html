@@ -1,12 +1,73 @@
-<div class="detail-wrapper">
-  <div class="card">
-    <div class="emoji">🚧</div>
+<div class="hotels-page">
+  <div *ngIf="loading" class="state">
+    <div class="spinner"></div>
+    <span>Cargando hoteles…</span>
+  </div>
 
-    <h1>Estamos trabajando en ello</h1>
+  <div *ngIf="!loading && errorMsg" class="state error">
+    <strong>Error:</strong> {{ errorMsg }}
+  </div>
 
-    <p class="subtitle">
-      Estará disponible muy pronto.
-    </p>
+  <section class="section" *ngIf="!loading">
+    <div class="section-head">
+      <h2 class="section-title">Hoteles Analizados</h2>
+    </div>
 
-    <div class="loader"></div>
+    <div class="hotel-grid" *ngIf="hotels.length; else noHotels">
+      <article class="hotel-card" *ngFor="let h of hotels; trackBy: trackByHotelName">
+        <div class="hotel-card-header">
+          <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
 
+          <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
+            <div class="badge-circle" [attr.data-tone]="b.tone">
+              <div class="badge-pct">{{ b.pct }}%</div>
+            </div>
+          </ng-container>
+        </div>
+
+        <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
+          <div class="badge-label" [attr.data-tone]="b.tone">{{ b.label }}</div>
+        </ng-container>
+
+        <div class="hotel-meta">
+          <div class="meta-line" *ngIf="h.address">
+            <span class="meta-icon" aria-hidden="true">📍</span>
+            <span class="meta-text">{{ h.address }}</span>
+          </div>
+
+          <div class="meta-stats">
+            <div class="meta-chip">
+              <span aria-hidden="true">⭐</span>
+              <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}</span>
+              <span class="meta-muted">/5</span>
+            </div>
+
+            <div class="meta-chip">
+              <span aria-hidden="true">👥</span>
+              <span class="meta-strong">{{ h.total_reviews_hotel | number }}</span>
+              <span class="meta-muted">reseñas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kw-title">
+          <span aria-hidden="true">🔥</span>
+          Temáticas más discutidas:
+        </div>
+
+        <ng-container *ngIf="asChips(h.top_words, 6) as c">
+          <div class="chips" *ngIf="c.items.length">
+            <span class="chip" *ngFor="let w of c.items">{{ w }}</span>
+            <span class="chip chip-more" *ngIf="c.more > 0">+{{ c.more }} más</span>
+          </div>
+        </ng-container>
+
+        <a class="btn-primary" [routerLink]="['/hotels', h.hotel_name]">Ver más detalles</a>
+      </article>
+    </div>
+
+    <ng-template #noHotels>
+      <div class="state muted">No hay datos para mostrar.</div>
+    </ng-template>
+  </section>
+</div>
