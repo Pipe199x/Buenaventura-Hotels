@@ -1,17 +1,39 @@
 <div class="hotels-page">
 
-  <!-- LOADING -->
+  <!-- LOADING (skeleton realista) -->
   <div *ngIf="loading" class="state">
     <div class="skeleton-loader" aria-label="Cargando hoteles analizados">
-      <div class="skeleton-line skeleton-line--title"></div>
+
+      <div class="skeleton-header">
+        <div class="skeleton-line skeleton-title"></div>
+      </div>
 
       <div class="skeleton-grid">
-        <div class="skeleton-card" *ngFor="let _ of [1, 2, 3]">
-          <div class="skeleton-line skeleton-line--short"></div>
-          <div class="skeleton-line skeleton-line--value"></div>
-          <div class="skeleton-line"></div>
-          <div class="skeleton-line skeleton-line--long"></div>
-        </div>
+        <article class="skeleton-hotel-card" *ngFor="let _ of [1,2,3,4,5,6]">
+
+          <div class="skeleton-card-header">
+            <div class="skeleton-line skeleton-hotel-name"></div>
+            <div class="skeleton-line skeleton-badge"></div>
+          </div>
+
+          <div class="skeleton-line skeleton-address"></div>
+
+          <div class="skeleton-meta-row">
+            <div class="skeleton-line skeleton-rating"></div>
+            <div class="skeleton-line skeleton-reviews"></div>
+          </div>
+
+          <div class="skeleton-line skeleton-keywords-title"></div>
+
+          <div class="skeleton-chips">
+            <div class="skeleton-line skeleton-chip"></div>
+            <div class="skeleton-line skeleton-chip"></div>
+            <div class="skeleton-line skeleton-chip skeleton-chip-short"></div>
+          </div>
+
+          <div class="skeleton-line skeleton-button"></div>
+
+        </article>
       </div>
     </div>
   </div>
