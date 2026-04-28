@@ -111,6 +111,12 @@
   border-radius: 50%;
 }
 
+.skeleton-badge-label {
+  width: 54px;
+  height: 12px;
+  margin-top: 6px;
+}
+
 /* META */
 .skeleton-address {
   width: 80%;
@@ -323,6 +329,26 @@
   background: var(--negative);
 }
 
+.badge-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-left: 14px;
+  flex: 0 0 auto;
+}
+
+.badge-wrapper .badge-circle,
+.badge-wrapper .badge-pill {
+  margin-left: 0;
+}
+
+.badge-label {
+  margin: 0;
+  text-align: center;
+  justify-content: center;
+}
+
 /* ---------- HOTEL META ---------- */
 .hotel-meta {
   margin-top: 0;
@@ -373,6 +399,29 @@
 .meta-muted {
   color: var(--muted);
   font-weight: 600;
+}
+
+.meta-rating {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.meta-rating span {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.meta-reviews {
+  font-weight: 600;
+}
+
+.meta-reviews strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.meta-reviews span {
+  color: var(--muted);
 }
 
 /* ---------- KEYWORDS ---------- */
@@ -450,7 +499,8 @@
   }
 
   .badge-circle,
-  .badge-pill {
+  .badge-pill,
+  .skeleton-badge {
     width: 42px;
     height: 42px;
     font-size: 10px;
