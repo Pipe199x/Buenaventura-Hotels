@@ -231,7 +231,43 @@
   width: 220px;
 }
 
-/* ---------- RESPONSIVE ---------- */
+/* ---------- DETAIL WIDGETS ---------- */
+
+.detail-widgets {
+  max-width: 1250px;
+  margin: 24px auto 0;
+  display: grid;
+  grid-template-columns: 400px 1fr 400px;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.trend-card {
+  background: #ffffff;
+  border: 1px solid #e5eaf3;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  box-sizing: border-box;
+}
+
+.section-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  text-align: center;   // ✅ ADD THIS
+}
+
+.section-subtitle {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: #64748b;
+  text-align: center;   // ✅ ADD THIS
+}
+
+
+
 
 /* ---------- RESPONSIVE ---------- */
 
@@ -310,5 +346,15 @@
 
   .satisfaction-card h2 {
     font-size: 44px;
+  }
+
+  .detail-widgets {
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .trend-card {
+    padding: 20px 16px;
   }
 }
