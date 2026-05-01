@@ -47,8 +47,9 @@
             class="meta-icon stars-icon"
           />
 
-          <span class="meta-text">
-            {{ hotel.avg_star_rating_hotel | number:'1.2-2' }} / 5
+          <span class="meta-text meta-rating">
+            {{ hotel.avg_star_rating_hotel | number:'1.2-2' }}
+            <span>/ 5</span>
           </span>
         </div>
 
@@ -59,8 +60,9 @@
             class="meta-icon users-icon"
           />
 
-          <span class="meta-text">
-            {{ hotel.total_reviews_hotel }} reseñas
+          <span class="meta-text meta-reviews">
+            <strong>{{ hotel.total_reviews_hotel }}</strong>
+            <span>reseñas</span>
           </span>
         </div>
 
@@ -69,13 +71,13 @@
 
     <!-- KPI -->
     <aside class="satisfaction-card" [ngClass]="badge.tone">
-      <p>TASA DE SATISFACIÓN</p>
+      <p>TASA DE SATISFACCIÓN</p>
 
       <h2>
         {{ badge.pct }}%
       </h2>
 
-      <span class="badge" [ngClass]="badge.tone">
+      <span class="badge">
         {{ badge.label }}
       </span>
     </aside>
