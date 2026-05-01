@@ -1,69 +1,265 @@
-.detail-wrapper {
-  min-height: 70vh;
+.hotel-detail-page {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
+
+  min-height: calc(100vh - 70px);
+  background: #f6f8fb;
+  padding: 28px 20px;
+  overflow-x: hidden;
+}
+
+.hotel-header {
+  max-width: 1250px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e5eaf3;
+  border-radius: 18px;
+  padding: 52px 32px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 40px 16px;
+  justify-content: space-between;
+  gap: 32px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  box-sizing: border-box;
 }
 
-.card {
-  max-width: 600px;
-  width: 100%;
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 40px 32px;
+.hotel-info h1 {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: clamp(30px, 3vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.address {
+  margin: 0 0 20px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.icon {
+  margin-right: 5px;
+  color: #64748b;
+}
+
+/* ---------- HOTEL META ---------- */
+
+.hotel-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.meta-icon {
+  width: auto;
+  height: 20px;
+  display: block;
+  object-fit: contain;
+}
+
+.meta-text {
+  color: #1f2937;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ---------- KPI CARD (DYNAMIC STATES) ---------- */
+
+.satisfaction-card {
+  min-width: 236px;
+  border-radius: 16px;
+  padding: 26px 24px;
   text-align: center;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.08);
+  border: 1px solid transparent;
 }
 
-.emoji {
-  font-size: 56px;
-  margin-bottom: 12px;
+/* TITLE */
+.satisfaction-card p {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-h1 {
-  margin: 0 0 12px;
-  font-size: 26px;
+/* PERCENT */
+.satisfaction-card h2 {
+  margin: 0;
+  font-size: 48px;
+  line-height: 1;
   font-weight: 700;
 }
 
-.subtitle {
-  color: rgba(0, 0, 0, 0.6);
-  margin-bottom: 20px;
-}
-
-.small {
-  margin-top: 20px;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.5);
-}
-
-ul {
-  list-style: none;
-  padding: 0;
+/* BADGE BASE */
+.badge {
+  display: inline-block;
   margin-top: 10px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: white;
 }
 
-li {
-  margin: 6px 0;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.7);
+/* ---------------- STATES ---------------- */
+
+/* 🟢 POSITIVE */
+.satisfaction-card.positive {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
 }
 
-/* Loader animado */
+.satisfaction-card.positive p {
+  color: #047857;
+}
 
-.loader {
-  margin: 20px auto;
-  width: 36px;
+.satisfaction-card.positive h2 {
+  color: #059669;
+}
+
+.satisfaction-card.positive .badge {
+  color: #059669;
+}
+
+/* 🟠 NEUTRAL */
+.satisfaction-card.neutral {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.satisfaction-card.neutral p {
+  color: #b45309;
+}
+
+.satisfaction-card.neutral h2 {
+  color: #d97706;
+}
+
+.satisfaction-card.neutral .badge {
+  color: #d97706;
+}
+
+/* 🔴 NEGATIVE (soft, consistent with others) */
+.satisfaction-card.negative {
+  background: #fef2f2; /* light red */
+  border-color: #fecaca;
+}
+
+.satisfaction-card.negative p {
+  color: #b91c1c;
+}
+
+.satisfaction-card.negative h2 {
+  color: #dc2626;
+}
+
+.satisfaction-card.negative .badge {
+  color: #dc2626;
+}
+
+/* ---------- SKELETON ---------- */
+
+.skeleton-title,
+.skeleton-line {
+  background: #e5e7eb;
+  border-radius: 999px;
+}
+
+.skeleton-title {
+  width: 360px;
   height: 36px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #2563eb;
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
+  margin-bottom: 16px;
 }
 
-@keyframes spin {
-  100% {
-    transform: rotate(360deg);
+.skeleton-line {
+  width: 280px;
+  height: 14px;
+  margin-bottom: 12px;
+}
+
+.skeleton-line.small {
+  width: 220px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 768px) {
+  .hotel-detail-page {
+    padding: 16px;
+  }
+
+  .hotel-header {
+    width: 100%;
+    padding: 28px 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+    overflow: hidden;
+  }
+
+  .hotel-info {
+    min-width: 0;
+  }
+
+  .hotel-info h1 {
+    font-size: clamp(24px, 8vw, 30px);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
+  }
+
+  .address {
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+
+  .address .meta-text {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+  }
+
+  .hotel-meta {
+    gap: 12px;
+  }
+
+  .meta-item {
+    min-width: 0;
+    font-size: 14px;
+  }
+
+  .meta-text {
+    white-space: normal;
+  }
+
+  .meta-icon {
+    height: 17px;
+    flex: 0 0 auto;
+  }
+
+  .satisfaction-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 24px 16px;
+  margin: 0;
+  box-sizing: border-box;
+  }
+
+  .satisfaction-card h2 {
+    font-size: 44px;
   }
 }
