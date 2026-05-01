@@ -1,25 +1,85 @@
-<div class="detail-wrapper">
-  <div class="card">
-    <div class="emoji">🚧</div>
+<div class="hotel-detail-page">
 
-    <h1>Estamos trabajando en ello</h1>
+  <!-- LOADING -->
+  <section *ngIf="loading" class="hotel-header skeleton">
+    <div>
+      <div class="skeleton-title"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line small"></div>
+    </div>
+  </section>
 
-    <p class="subtitle">
-      El dashboard detallado del hotel
-      <strong>{{ hotelSlug }}</strong>
-      estará disponible muy pronto.
-    </p>
+  <!-- ERROR -->
+  <section *ngIf="!loading && error" class="hotel-header">
+    <div>
+      <h1>Hotel no encontrado</h1>
+      <p class="address">
+        No se encontró información para este hotel.
+      </p>
+    </div>
+  </section>
 
-    <div class="loader"></div>
+  <!-- CONTENT -->
+  <section *ngIf="!loading && hotel" class="hotel-header">
 
-    <p class="small">
-      Próximamente podrás ver:
-    </p>
+    <div class="hotel-info">
 
-    <ul>
-      <li>Tendencia anual de sentimientos</li>
-      <li>Porcentaje de reseñas respondidas</li>
-      <li>Análisis profundo por aspectos</li>
-    </ul>
-  </div>
+      <h1>{{ hotel.hotel_display_name }}</h1>
+
+      <div class="meta-item address">
+        <img
+          src="assets/location-home.png"
+          alt="Ubicación"
+          class="meta-icon"
+        />
+
+        <span class="meta-text">
+          {{ hotel.address || 'Dirección no disponible' }}
+        </span>
+      </div>
+
+      <div class="hotel-meta">
+
+        <div class="meta-item">
+          <img
+            src="assets/stars-home.png"
+            alt="Calificación"
+            class="meta-icon stars-icon"
+          />
+
+          <span class="meta-text">
+            {{ hotel.avg_star_rating_hotel | number:'1.2-2' }} / 5
+          </span>
+        </div>
+
+        <div class="meta-item">
+          <img
+            src="assets/users-home.png"
+            alt="Reseñas"
+            class="meta-icon users-icon"
+          />
+
+          <span class="meta-text">
+            {{ hotel.total_reviews_hotel }} reseñas
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <aside class="satisfaction-card" [ngClass]="badge.tone">
+      <p>TASA DE SATISFACIÓN</p>
+
+      <h2>
+        {{ badge.pct }}%
+      </h2>
+
+      <span class="badge" [ngClass]="badge.tone">
+        {{ badge.label }}
+      </span>
+    </aside>
+
+  </section>
+
 </div>
