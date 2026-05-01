@@ -37,6 +37,19 @@ export type SentimentDistributionRow = {
 };
 
 /* =======================
+   TIPOS – TREND LINE
+======================= */
+
+export type SentimentTrendRow = {
+  hotel_name: string;
+  year: number;
+  sentiment_label: 'positive' | 'neutral' | 'negative';
+  total_reviews: number;
+  total_year_reviews: number;
+  pct_year_decimal: number;
+};
+
+/* =======================
    SERVICE
 ======================= */
 
@@ -104,5 +117,32 @@ export class HomeDataService {
     }
 
     return (data ?? []) as SentimentDistributionRow[];
+  }
+
+  /* =======================
+     TENDENCIA ANUAL SENTIMIENTO
+     (GRÁFICO LÍNEAS)
+  ======================= */
+  async getSentimentTrendByHotel(hotelName: string): Promise<SentimentTrendRow[]> {
+    const { data, error } = await supabase
+      .from('vw_trend_line')
+      .select(`
+        hotel_name,
+        year,
+        sentiment_label,
+        total_reviews,
+        total_year_reviews,
+        pct_year_decimal
+      `)
+      .eq('hotel_name', hotelName)
+      .order('year', { ascending: true })
+      .order('sentiment_label', { ascending: true });
+
+    if (error) {
+      console.error('Error cargando tendencia anual de sentimiento', error);
+      throw error;
+    }
+
+    return (data ?? []) as SentimentTrendRow[];
   }
 }
