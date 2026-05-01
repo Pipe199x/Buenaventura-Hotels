@@ -20,68 +20,93 @@
   </section>
 
   <!-- CONTENT -->
-  <section *ngIf="!loading && hotel" class="hotel-header">
+  <ng-container *ngIf="!loading && hotel">
 
-    <div class="hotel-info">
+    <!-- HEADER -->
+    <section class="hotel-header">
 
-      <h1>{{ hotel.hotel_display_name }}</h1>
+      <div class="hotel-info">
 
-      <div class="meta-item address">
-        <img
-          src="assets/location-home.png"
-          alt="Ubicación"
-          class="meta-icon"
-        />
+        <h1>{{ hotel.hotel_display_name }}</h1>
 
-        <span class="meta-text">
-          {{ hotel.address || 'Dirección no disponible' }}
+        <div class="meta-item address">
+          <img
+            src="assets/location-home.png"
+            alt="Ubicación"
+            class="meta-icon"
+          />
+
+          <span class="meta-text">
+            {{ hotel.address || 'Dirección no disponible' }}
+          </span>
+        </div>
+
+        <div class="hotel-meta">
+
+          <div class="meta-item">
+            <img
+              src="assets/stars-home.png"
+              alt="Calificación"
+              class="meta-icon stars-icon"
+            />
+
+            <span class="meta-text meta-rating">
+              {{ hotel.avg_star_rating_hotel | number:'1.2-2' }}
+              <span>/ 5</span>
+            </span>
+          </div>
+
+          <div class="meta-item">
+            <img
+              src="assets/users-home.png"
+              alt="Reseñas"
+              class="meta-icon users-icon"
+            />
+
+            <span class="meta-text meta-reviews">
+              <strong>{{ hotel.total_reviews_hotel }}</strong>
+              <span>reseñas</span>
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- KPI -->
+      <aside class="satisfaction-card" [ngClass]="badge.tone">
+        <p>TASA DE SATISFACCIÓN</p>
+
+        <h2>{{ badge.pct }}%</h2>
+
+        <span class="badge">
+          {{ badge.label }}
         </span>
-      </div>
+      </aside>
 
-      <div class="hotel-meta">
+    </section>
 
-        <div class="meta-item">
-          <img
-            src="assets/stars-home.png"
-            alt="Calificación"
-            class="meta-icon stars-icon"
-          />
+    <!-- DETAIL WIDGETS -->
+    <section class="detail-widgets">
 
-          <span class="meta-text meta-rating">
-            {{ hotel.avg_star_rating_hotel | number:'1.2-2' }}
-            <span>/ 5</span>
-          </span>
-        </div>
+      <!-- TREND CHART CARD -->
+      <article class="trend-card">
 
-        <div class="meta-item">
-          <img
-            src="assets/users-home.png"
-            alt="Reseñas"
-            class="meta-icon users-icon"
-          />
+        <h3 class="section-title">
+          Tendencia anual de sentimientos
+        </h3>
 
-          <span class="meta-text meta-reviews">
-            <strong>{{ hotel.total_reviews_hotel }}</strong>
-            <span>reseñas</span>
-          </span>
-        </div>
+        <p class="section-subtitle">
+          (2020 – 2025)
+        </p>
 
-      </div>
-    </div>
+        <app-sentiment-trend-line
+          [rows]="trendRows">
+        </app-sentiment-trend-line>
 
-    <!-- KPI -->
-    <aside class="satisfaction-card" [ngClass]="badge.tone">
-      <p>TASA DE SATISFACCIÓN</p>
+      </article>
 
-      <h2>
-        {{ badge.pct }}%
-      </h2>
+    </section>
 
-      <span class="badge">
-        {{ badge.label }}
-      </span>
-    </aside>
-
-  </section>
+  </ng-container>
 
 </div>
