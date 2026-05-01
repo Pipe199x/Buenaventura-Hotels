@@ -1,4 +1,7 @@
 .hotel-detail-page {
+  --text: #111827;
+  --muted: #6b7280;
+
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
 
   min-height: calc(100vh - 70px);
@@ -31,10 +34,14 @@
 }
 
 .address {
-  margin: 0 0 20px;
+  margin: 0 0 18px;
   color: #64748b;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.4;
+}
+
+.address .meta-text {
+  color: var(--muted);
 }
 
 .icon {
@@ -70,9 +77,39 @@
 }
 
 .meta-text {
-  color: #1f2937;
+  color: var(--text);
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* ---------- META RATING ---------- */
+
+.meta-rating {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.meta-rating span {
+  color: var(--muted); /* "/ 5" in gray */
+  font-weight: 600;
+}
+
+/* ---------- META REVIEWS ---------- */
+
+.meta-reviews {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.meta-reviews strong {
+  color: var(--text); /* number strong */
+  font-weight: 700;
+}
+
+.meta-reviews span {
+  color: var(--muted); /* "reseñas" in gray */
 }
 
 /* ---------- KPI CARD (DYNAMIC STATES) ---------- */
@@ -196,6 +233,8 @@
 
 /* ---------- RESPONSIVE ---------- */
 
+/* ---------- RESPONSIVE ---------- */
+
 @media (max-width: 768px) {
   .hotel-detail-page {
     padding: 16px;
@@ -208,10 +247,13 @@
     align-items: stretch;
     gap: 24px;
     overflow: hidden;
+    box-sizing: border-box;
   }
 
+  /* 🔴 CENTER CONTENT */
   .hotel-info {
     min-width: 0;
+    text-align: center;
   }
 
   .hotel-info h1 {
@@ -219,10 +261,12 @@
     line-height: 1.15;
     letter-spacing: -0.03em;
     overflow-wrap: anywhere;
+    text-align: center;
   }
 
+  /* ADDRESS */
   .address {
-    align-items: flex-start;
+    justify-content: flex-start;
     margin-bottom: 18px;
   }
 
@@ -230,15 +274,19 @@
     white-space: normal;
     overflow-wrap: anywhere;
     line-height: 1.4;
+    text-align: left;
   }
 
+  /* META (stars + reviews) */
   .hotel-meta {
     gap: 12px;
+    justify-content: center;
   }
 
   .meta-item {
     min-width: 0;
     font-size: 14px;
+    justify-content: center;
   }
 
   .meta-text {
@@ -250,13 +298,14 @@
     flex: 0 0 auto;
   }
 
+  /* KPI CARD */
   .satisfaction-card {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  padding: 24px 16px;
-  margin: 0;
-  box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 24px 16px;
+    margin: 0;
+    box-sizing: border-box;
   }
 
   .satisfaction-card h2 {
