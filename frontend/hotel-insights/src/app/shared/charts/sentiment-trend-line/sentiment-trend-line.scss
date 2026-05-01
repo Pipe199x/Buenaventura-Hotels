@@ -1,0 +1,11 @@
+.chart {
+  width: 100%;
+  height: 360px;
+}
+
+/* Nexus 5 (360x640) y similares */
+@media (max-width: 420px) {
+  .chart {
+    height: 320px;
+  }
+}
