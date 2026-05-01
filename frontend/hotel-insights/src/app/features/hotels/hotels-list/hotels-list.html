@@ -49,8 +49,12 @@
   <!-- CONTENT -->
   <section class="section" *ngIf="!loading">
 
+    <!-- HERO (REPLACED) -->
     <div class="hero-copy">
-      <h2 class="section-title">Selecciona un hotel</h2>
+      <h1 class="hero-title">Selecciona un hotel</h1>
+      <p class="hero-subtitle">
+        Explora analíticas profundas de cada hotel
+      </p>
     </div>
 
     <div class="hotel-grid" *ngIf="hotels.length; else noHotels">
