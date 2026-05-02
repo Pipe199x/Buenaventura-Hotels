@@ -44,7 +44,7 @@ export class SentimentTrendLine implements OnChanges {
         (r) => r.year === year && r.sentiment_label === label
       );
 
-      return Math.round((Number(found?.pct_year_decimal ?? 0) * 100) * 100) / 100;
+      return Math.round(Number(found?.pct_year_decimal ?? 0) * 10000) / 100;
     };
 
     const pos = years.map((y) => getPct(y, 'positive'));
@@ -69,37 +69,40 @@ export class SentimentTrendLine implements OnChanges {
       tooltip,
 
       legend: {
-        top: 10,
+        top: 6,
         left: 'center',
-        selectedMode: true,
         itemWidth: 12,
         itemHeight: 12,
-        textStyle: { fontSize: 12 },
+        textStyle: {
+          fontSize: 12,
+          fontWeight: 400,
+        },
       },
 
+      // ✅ MAIN FIX → MORE WIDTH
       grid: {
-        left: 56,
-        right: 24,
-        top: 56,
-        bottom: 48,
-        containLabel: true,
+        left: 40,     // ⬅️ smaller = more chart width
+        right: 6,
+        top: 40,
+        bottom: 45,
+        containLabel: false, // ⬅️ critical
       },
 
       xAxis: {
         type: 'category',
         data: years,
-
-        // ✅ TITLE
         name: 'Periodo',
         nameLocation: 'middle',
-        nameGap: 30,
-
-        // (optional but recommended for styling)
+        nameGap: 28,
         nameTextStyle: {
           fontSize: 13,
-          fontWeight: 600,
-          color: '#374151'
-        }
+          fontWeight: 400, // not bold
+          color: '#374151',
+        },
+        axisLabel: {
+          fontSize: 11,
+          color: '#374151',
+        },
       },
 
       yAxis: {
@@ -108,8 +111,18 @@ export class SentimentTrendLine implements OnChanges {
         max: 100,
         name: 'Porcentaje (%)',
         nameLocation: 'middle',
-        nameGap: 42,
-        axisLabel: { formatter: '{value}%' },
+        nameGap: 34,
+        nameTextStyle: {
+          fontSize: 13,
+          fontWeight: 400, // not bold
+          color: '#374151',
+        },
+        axisLabel: {
+          formatter: '{value}%',
+          fontSize: 11,
+          color: '#374151',
+          margin: 6,
+        },
       },
 
       series: [
