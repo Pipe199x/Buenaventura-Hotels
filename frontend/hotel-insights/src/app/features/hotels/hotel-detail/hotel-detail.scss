@@ -266,12 +266,63 @@
   text-align: center;   // ✅ ADD THIS
 }
 
+/* ---------- DONUT CARD ---------- */
+
+.donut-card {
+  background: #ffffff;
+  border: 1px solid #e5eaf3;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  min-height: 430px;
+}
+
+.donut-legend {
+  margin: 18px auto 0;
+  width: 88%;
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 14px 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 15px;
+  color: #374151;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot.blue {
+  background: #3157d9;
+}
+
+.dot.gray {
+  background: #dbe3ef;
+}
 
 
 
 /* ---------- RESPONSIVE ---------- */
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .hotel-detail-page {
     padding: 16px;
   }
