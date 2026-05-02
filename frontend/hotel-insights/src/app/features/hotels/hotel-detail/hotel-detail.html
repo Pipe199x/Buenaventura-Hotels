@@ -88,7 +88,7 @@
     <!-- DETAIL WIDGETS -->
     <section class="detail-widgets">
 
-      <!-- TREND CHART CARD -->
+      <!-- LEFT: TREND -->
       <article class="trend-card">
 
         <h3 class="section-title">
@@ -104,6 +104,39 @@
         </app-sentiment-trend-line>
 
       </article>
+
+      <!-- CENTER: DONUT -->
+      <article class="donut-card">
+
+        <h3 class="section-title">
+          Reseñas respondidas
+        </h3>
+
+        <p class="section-subtitle">
+          vs. sin responder
+        </p>
+
+        <app-response-rate-donut
+          [responseRate]="responseRate">
+        </app-response-rate-donut>
+
+        <!-- LEGEND -->
+        <div class="donut-legend" *ngIf="responseRate">
+          <div class="legend-item">
+            <span class="dot blue"></span>
+            {{ responseRate.total_reviews_responded }} respondidas
+          </div>
+
+          <div class="legend-item">
+            <span class="dot gray"></span>
+            {{ responseRate.total_reviews - responseRate.total_reviews_responded }} sin responder
+          </div>
+        </div>
+
+      </article>
+
+      <!-- RIGHT (empty for now) -->
+      <article class="placeholder-card"></article>
 
     </section>
 
