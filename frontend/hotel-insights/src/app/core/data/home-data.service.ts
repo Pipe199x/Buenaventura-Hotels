@@ -50,14 +50,22 @@ export type SentimentTrendRow = {
 };
 
 /* =======================
+   TIPOS – RESPONSE RATE
+======================= */
+
+export type HotelResponseRateRow = {
+  hotel_name: string;
+  total_reviews: number;
+  total_reviews_responded: number;
+  pct_reviews_responded: number;
+};
+
+/* =======================
    SERVICE
 ======================= */
 
 @Injectable({ providedIn: 'root' })
 export class HomeDataService {
-  /* =======================
-     KPIs GLOBALES (HOME)
-  ======================= */
   async getHomeOverviewGlobal(): Promise<HomeOverviewGlobal> {
     const { data, error } = await supabase
       .from('vw_home_overview_global_count')
@@ -72,9 +80,6 @@ export class HomeDataService {
     return data as HomeOverviewGlobal;
   }
 
-  /* =======================
-     CARDS DE HOTELES
-  ======================= */
   async getHotelCards(): Promise<HotelCardRow[]> {
     const { data, error } = await supabase
       .from('vw_home_hotels_cards_count')
@@ -97,10 +102,6 @@ export class HomeDataService {
     return (data ?? []) as HotelCardRow[];
   }
 
-  /* =======================
-     DISTRIBUCIÓN SENTIMIENTOS
-     (GRÁFICO BARRAS)
-  ======================= */
   async getSentimentDistribution(): Promise<SentimentDistributionRow[]> {
     const { data, error } = await supabase
       .from('vw_home_sentiment_distribution_count')
@@ -119,10 +120,6 @@ export class HomeDataService {
     return (data ?? []) as SentimentDistributionRow[];
   }
 
-  /* =======================
-     TENDENCIA ANUAL SENTIMIENTO
-     (GRÁFICO LÍNEAS)
-  ======================= */
   async getSentimentTrendByHotel(hotelName: string): Promise<SentimentTrendRow[]> {
     const { data, error } = await supabase
       .from('vw_trend_line')
@@ -144,5 +141,25 @@ export class HomeDataService {
     }
 
     return (data ?? []) as SentimentTrendRow[];
+  }
+
+  async getHotelResponseRateByHotel(hotelName: string): Promise<HotelResponseRateRow | null> {
+    const { data, error } = await supabase
+      .from('vw_hotel_response_rate')
+      .select(`
+        hotel_name,
+        total_reviews,
+        total_reviews_responded,
+        pct_reviews_responded
+      `)
+      .eq('hotel_name', hotelName)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error cargando tasa de respuesta del hotel', error);
+      throw error;
+    }
+
+    return data as HotelResponseRateRow | null;
   }
 }
