@@ -10,11 +10,13 @@ import { ActivatedRoute } from '@angular/router';
 
 import { supabase } from '../../../core/supabase/supabase.client';
 
-// ✅ Import chart component
 import { SentimentTrendLine } from '../../../shared/charts/sentiment-trend-line/sentiment-trend-line';
+import { ResponseRateDonut } from '../../../shared/charts/response-rate-donut/response-rate-donut';
 
-// ✅ Import service (needed to fetch trend data)
-import { HomeDataService } from '../../../core/data/home-data.service';
+import {
+  HomeDataService,
+  HotelResponseRateRow,
+} from '../../../core/data/home-data.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
 
@@ -27,8 +29,7 @@ type SatisfactionBadge = {
 @Component({
   selector: 'app-hotel-detail',
   standalone: true,
-  // ✅ ADD COMPONENT HERE
-  imports: [CommonModule, SentimentTrendLine],
+  imports: [CommonModule, SentimentTrendLine, ResponseRateDonut],
   templateUrl: './hotel-detail.html',
   styleUrl: './hotel-detail.scss',
 })
@@ -39,8 +40,8 @@ export class HotelDetail implements OnInit {
   loading = true;
   error = false;
 
-  // ✅ Trend data for chart
   trendRows: any[] = [];
+  responseRate: HotelResponseRateRow | null = null;
 
   badge: SatisfactionBadge = {
     pct: 0,
@@ -51,8 +52,6 @@ export class HotelDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
-
-  // ✅ Inject service
   private homeData = inject(HomeDataService);
 
   ngOnInit(): void {
@@ -66,6 +65,8 @@ export class HotelDetail implements OnInit {
     this.loading = true;
     this.error = false;
     this.hotel = null;
+    this.trendRows = [];
+    this.responseRate = null;
 
     try {
       const { data, error } = await supabase
@@ -76,12 +77,13 @@ export class HotelDetail implements OnInit {
 
       if (error) throw error;
 
-      // ✅ Load trend data (IMPORTANT)
       const trend = await this.homeData.getSentimentTrendByHotel(data.hotel_name);
+      const responseRate = await this.homeData.getHotelResponseRateByHotel(data.hotel_name);
 
       this.zone.run(() => {
         this.hotel = data;
         this.trendRows = trend;
+        this.responseRate = responseRate;
 
         this.computeBadge(data?.satisfaction_rate_hotel);
 
