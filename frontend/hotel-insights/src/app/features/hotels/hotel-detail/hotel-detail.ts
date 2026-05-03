@@ -12,10 +12,12 @@ import { supabase } from '../../../core/supabase/supabase.client';
 
 import { SentimentTrendLine } from '../../../shared/charts/sentiment-trend-line/sentiment-trend-line';
 import { ResponseRateDonut } from '../../../shared/charts/response-rate-donut/response-rate-donut';
+import { NegativeTopicsTable } from '../../../shared/charts/negative-topics-table/negative-topics-table';
 
 import {
   HomeDataService,
   HotelResponseRateRow,
+  NegativeTopicRow,
 } from '../../../core/data/home-data.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
@@ -29,7 +31,12 @@ type SatisfactionBadge = {
 @Component({
   selector: 'app-hotel-detail',
   standalone: true,
-  imports: [CommonModule, SentimentTrendLine, ResponseRateDonut],
+  imports: [
+    CommonModule,
+    SentimentTrendLine,
+    ResponseRateDonut,
+    NegativeTopicsTable,
+  ],
   templateUrl: './hotel-detail.html',
   styleUrl: './hotel-detail.scss',
 })
@@ -42,6 +49,7 @@ export class HotelDetail implements OnInit {
 
   trendRows: any[] = [];
   responseRate: HotelResponseRateRow | null = null;
+  negativeTopics: NegativeTopicRow[] = [];
 
   badge: SatisfactionBadge = {
     pct: 0,
@@ -67,6 +75,7 @@ export class HotelDetail implements OnInit {
     this.hotel = null;
     this.trendRows = [];
     this.responseRate = null;
+    this.negativeTopics = [];
 
     try {
       const { data, error } = await supabase
@@ -79,11 +88,13 @@ export class HotelDetail implements OnInit {
 
       const trend = await this.homeData.getSentimentTrendByHotel(data.hotel_name);
       const responseRate = await this.homeData.getHotelResponseRateByHotel(data.hotel_name);
+      const negativeTopics = await this.homeData.getNegativeTopicsByHotel(data.hotel_name);
 
       this.zone.run(() => {
         this.hotel = data;
         this.trendRows = trend;
         this.responseRate = responseRate;
+        this.negativeTopics = negativeTopics;
 
         this.computeBadge(data?.satisfaction_rate_hotel);
 
@@ -93,7 +104,7 @@ export class HotelDetail implements OnInit {
         this.cdr.detectChanges();
       });
     } catch (err) {
-      console.error('Error cargando hotel:', err);
+      console.error('Error loading hotel:', err);
 
       this.zone.run(() => {
         this.error = true;

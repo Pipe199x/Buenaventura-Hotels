@@ -135,8 +135,15 @@
 
       </article>
 
-      <!-- RIGHT (empty for now) -->
-      <article class="placeholder-card"></article>
+      <!-- RIGHT: NEGATIVE TOPICS -->
+      <article class="negative-topics-card">
+
+        <app-negative-topics-table
+          *ngIf="negativeTopics.length"
+          [rows]="negativeTopics">
+        </app-negative-topics-table>
+
+      </article>
 
     </section>
 

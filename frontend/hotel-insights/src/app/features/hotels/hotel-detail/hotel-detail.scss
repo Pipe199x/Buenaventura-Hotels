@@ -5,7 +5,7 @@
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
 
   min-height: calc(100vh - 70px);
-  background: #f6f8fb;
+  background: ffffff;
   padding: 28px 20px;
   overflow-x: hidden;
 }
@@ -237,7 +237,7 @@
   max-width: 1250px;
   margin: 24px auto 0;
   display: grid;
-  grid-template-columns: 400px 1fr 400px;
+  grid-template-columns: minmax(0, 400px) minmax(0, 1fr) minmax(0, 400px);
   gap: 24px;
   align-items: stretch;
 }
@@ -318,7 +318,17 @@
   background: #dbe3ef;
 }
 
+.trend-card,
+.donut-card,
+.negative-topics-card {
+  min-height: 520px;
+}
 
+.negative-topics-card {
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+}
 
 /* ---------- RESPONSIVE ---------- */
 
@@ -408,4 +418,11 @@
   .trend-card {
     padding: 20px 16px;
   }
+}
+
+.trend-card,
+.donut-card,
+.negative-topics-card {
+  width: 100%;
+  min-height: auto;
 }
