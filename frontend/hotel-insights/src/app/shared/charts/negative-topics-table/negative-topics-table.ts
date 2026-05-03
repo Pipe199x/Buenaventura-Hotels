@@ -24,6 +24,24 @@ export type NegativeTopicRow = {
 export class NegativeTopicsTable {
   @Input() rows: NegativeTopicRow[] = [];
 
+  // Dynamic years definition
+  years = [
+    { key: 'y2020', label: '2020' },
+    { key: 'y2021', label: '2021' },
+    { key: 'y2022', label: '2022' },
+    { key: 'y2023', label: '2023' },
+    { key: 'y2024', label: '2024' },
+    { key: 'y2025', label: '2025' },
+  ] as const;
+
+  // Only show years that actually have data
+  get visibleYears() {
+    return this.years.filter((year) =>
+      this.rows.some((row) => row[year.key] > 0)
+    );
+  }
+
+  // Heatmap intensity logic per row
   getIntensityClass(value: number, row: NegativeTopicRow): string {
     const values = [
       row.y2020,

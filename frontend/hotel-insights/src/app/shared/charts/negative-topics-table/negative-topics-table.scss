@@ -1,12 +1,28 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+
 /* =======================
-   CONTAINER (card style)
+   CONTAINER
 ======================= */
 
 .table-container {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+
   background: #ffffff;
   border: 1px solid #f3caca;
   border-radius: 14px;
   padding: 16px 16px 10px 16px;
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 /* =======================
@@ -15,6 +31,7 @@
 
 .table-header {
   margin-bottom: 10px;
+  text-align: center;
 
   .title {
     font-size: 16px;
@@ -26,7 +43,7 @@
   .subtitle {
     font-size: 12px;
     color: #ef4444;
-    margin-top: 2px;
+    margin: 2px 0 0;
   }
 }
 
@@ -35,7 +52,11 @@
 ======================= */
 
 .table-scroll {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
+  overflow-y: auto;
 }
 
 /* =======================
@@ -44,9 +65,9 @@
 
 .topics-table {
   width: 100%;
+  min-width: 430px;
   border-collapse: collapse;
   font-size: 13px;
-  min-width: 520px;
 }
 
 /* =======================
@@ -59,11 +80,11 @@ thead th {
   font-weight: 600;
   color: #991b1b;
   border-bottom: 1px solid #f3caca;
+  white-space: nowrap;
 }
 
-/* First column width */
 .col-topic {
-  width: 220px;
+  width: 130px;
 }
 
 /* =======================
@@ -86,16 +107,18 @@ tbody tr:hover {
 td {
   padding: 8px;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
-/* Topic label */
 .topic {
   font-weight: 500;
   color: #374151;
+  white-space: normal;
+  line-height: 1.25;
 }
 
 /* =======================
-   BADGES (HEATMAP)
+   BADGES / HEATMAP
 ======================= */
 
 .cell-badge {
@@ -108,31 +131,26 @@ td {
   transition: all 0.15s ease;
 }
 
-/* ZERO VALUES */
 .cell-badge.zero {
   color: #9ca3af;
   background: transparent;
 }
 
-/* VERY LOW */
 .cell-badge.very-low {
   background: #fee2e2;
   color: #b91c1c;
 }
 
-/* LOW */
 .cell-badge.low {
   background: #fecaca;
   color: #991b1b;
 }
 
-/* MEDIUM */
 .cell-badge.medium {
   background: #fca5a5;
   color: #7f1d1d;
 }
 
-/* HIGH */
 .cell-badge.high {
   background: #dc2626;
   color: #ffffff;
@@ -145,11 +163,17 @@ td {
 
 @media (max-width: 420px) {
   .topics-table {
+    min-width: 400px;
     font-size: 12px;
   }
 
   .col-topic {
-    width: 180px;
+    width: 120px;
+  }
+
+  td,
+  thead th {
+    padding: 7px 6px;
   }
 
   .cell-badge {

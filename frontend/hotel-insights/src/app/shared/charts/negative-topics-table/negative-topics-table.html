@@ -3,7 +3,10 @@
   <!-- Header -->
   <div class="table-header">
     <h3 class="title">Patrones negativos identificados</h3>
-    <p class="subtitle">Frecuencia por año (2020 – 2025)</p>
+    <p class="subtitle">
+      Frecuencia por año
+      ({{ visibleYears[0]?.label }} – {{ visibleYears[visibleYears.length - 1]?.label }})
+    </p>
   </div>
 
   <!-- Table -->
@@ -14,12 +17,11 @@
       <thead>
         <tr>
           <th class="col-topic">Patrón</th>
-          <th>2020</th>
-          <th>2021</th>
-          <th>2022</th>
-          <th>2023</th>
-          <th>2024</th>
-          <th>2025</th>
+
+          <!-- 🔥 Dynamic years -->
+          <th *ngFor="let year of visibleYears">
+            {{ year.label }}
+          </th>
         </tr>
       </thead>
 
@@ -32,52 +34,12 @@
             {{ row.thematic_label }}
           </td>
 
-          <!-- Years -->
-          <td>
+          <!-- 🔥 Dynamic values -->
+          <td *ngFor="let year of visibleYears">
             <span
               class="cell-badge"
-              [class.active]="row.y2020 > 0">
-              {{ row.y2020 }}
-            </span>
-          </td>
-
-          <td>
-            <span
-              class="cell-badge"
-              [class.active]="row.y2021 > 0">
-              {{ row.y2021 }}
-            </span>
-          </td>
-
-          <td>
-            <span
-              class="cell-badge"
-              [class.active]="row.y2022 > 0">
-              {{ row.y2022 }}
-            </span>
-          </td>
-
-          <td>
-            <span
-              class="cell-badge"
-              [class.active]="row.y2023 > 0">
-              {{ row.y2023 }}
-            </span>
-          </td>
-
-          <td>
-            <span
-              class="cell-badge"
-              [class.active]="row.y2024 > 0">
-              {{ row.y2024 }}
-            </span>
-          </td>
-
-          <td>
-            <span
-              class="cell-badge"
-              [class.active]="row.y2025 > 0">
-              {{ row.y2025 }}
+              [ngClass]="getIntensityClass(row[year.key], row)">
+              {{ row[year.key] }}
             </span>
           </td>
 
