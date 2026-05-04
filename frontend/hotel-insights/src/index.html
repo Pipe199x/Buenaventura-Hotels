@@ -24,14 +24,107 @@
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://buenaventuradatos.com/web-app-manifest-512x512.png">
 
-  <!-- Schema.org Structured Data -->
+  <!-- Schema.org: WebSite -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": "https://buenaventuradatos.com/#website",
     "name": "Buenaventura Datos",
     "url": "https://buenaventuradatos.com/",
-    "description": "Plataforma de reseñas y análisis de sentimiento de hoteles en Buenaventura. Consulta opiniones reales, calificaciones y tendencias de los hoteles analizados."
+    "description": "Plataforma de reseñas y análisis de sentimiento de hoteles en Buenaventura. Consulta opiniones reales, calificaciones y tendencias de los hoteles analizados.",
+    "inLanguage": "es-CO"
+  }
+  </script>
+
+  <!-- Schema.org: Person / Author -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": "https://buenaventuradatos.com/#author",
+    "name": "Andrés Felipe Duque Caicedo",
+    "url": "https://buenaventuradatos.com/",
+    "affiliation": {
+      "@type": "CollegeOrUniversity",
+      "name": "Universidad de Manizales"
+    },
+    "knowsAbout": [
+      "Analítica de datos",
+      "Minería de texto",
+      "Análisis de sentimientos",
+      "Procesamiento de lenguaje natural",
+      "Percepción turística",
+      "Reseñas hoteleras",
+      "Hoteles en Buenaventura"
+    ]
+  }
+  </script>
+
+  <!-- Schema.org: Dataset / Research Data Product -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "@id": "https://buenaventuradatos.com/#dataset",
+    "name": "Análisis de sentimientos en reseñas hoteleras de Buenaventura",
+    "alternateName": "Buenaventura Datos",
+    "url": "https://buenaventuradatos.com/",
+    "description": "Proyecto de análisis de sentimientos aplicado a reseñas de Google de hoteles en Buenaventura mediante minería de texto, procesamiento de lenguaje natural y visualización de datos.",
+    "inLanguage": "es-CO",
+    "creator": {
+      "@id": "https://buenaventuradatos.com/#author"
+    },
+    "publisher": {
+      "@id": "https://buenaventuradatos.com/#author"
+    },
+    "keywords": [
+      "análisis de sentimientos",
+      "minería de texto",
+      "reseñas hoteleras",
+      "Google Reviews",
+      "percepción turística",
+      "hoteles en Buenaventura",
+      "procesamiento de lenguaje natural",
+      "analítica de datos",
+      "turismo en Buenaventura"
+    ],
+    "spatialCoverage": {
+      "@type": "Place",
+      "name": "Buenaventura, Valle del Cauca, Colombia"
+    },
+    "temporalCoverage": "2020-01-01/2025-08-21",
+    "variableMeasured": [
+      "sentimiento positivo",
+      "sentimiento neutral",
+      "sentimiento negativo",
+      "calificación promedio",
+      "temáticas positivas",
+      "temáticas negativas",
+      "tasa de respuesta hotelera",
+      "tendencia temporal de reseñas"
+    ],
+    "measurementTechnique": [
+      "Minería de texto",
+      "Análisis automatizado de sentimientos",
+      "Procesamiento de lenguaje natural",
+      "Azure Cognitive Services Text Analytics",
+      "CRISP-DM"
+    ],
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "Percepción turística"
+      },
+      {
+        "@type": "Thing",
+        "name": "Reputación digital hotelera"
+      },
+      {
+        "@type": "Place",
+        "name": "Buenaventura"
+      }
+    ]
   }
   </script>
 
