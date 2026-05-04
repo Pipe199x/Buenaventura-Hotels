@@ -11,6 +11,7 @@ import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HomeDataService, HotelCardRow } from '../../../core/data/home-data.service';
+import { SchemaService } from '../../../core/seo/schema.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
 
@@ -37,10 +38,12 @@ export class HotelsList implements OnInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private schemaService = inject(SchemaService);
 
   private inFlight = false;
 
   ngOnInit(): void {
+    this.setHotelsCollectionSchema();
     this.loadHotels('init');
 
     this.router.events
@@ -50,6 +53,7 @@ export class HotelsList implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
+        this.setHotelsCollectionSchema();
         this.loadHotels('nav');
       });
   }
@@ -80,6 +84,61 @@ export class HotelsList implements OnInit {
     );
   }
 
+  private setHotelsCollectionSchema(): void {
+    this.schemaService.setSchema('schema-hotels-collection-page', {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      '@id': 'https://buenaventuradatos.com/hotels#collection',
+      name: 'Hoteles analizados en Buenaventura',
+      url: 'https://buenaventuradatos.com/hotels',
+      inLanguage: 'es-CO',
+      description:
+        'Listado de hoteles de Buenaventura analizados mediante reseñas de Google, análisis de sentimientos, temáticas, calificaciones y tendencias de percepción turística.',
+      isPartOf: {
+        '@id': 'https://buenaventuradatos.com/#website',
+      },
+      about: {
+        '@id': 'https://buenaventuradatos.com/#dataset',
+      },
+      mainEntity: {
+        '@type': 'ItemList',
+        name: 'Hoteles analizados en Buenaventura',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Hotel Cordillera',
+            url: 'https://buenaventuradatos.com/hotels/cordillera',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Hotel Cosmos Pacífico',
+            url: 'https://buenaventuradatos.com/hotels/cosmos_pacifico',
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: 'Hotel Magüipí',
+            url: 'https://buenaventuradatos.com/hotels/maguipi',
+          },
+          {
+            '@type': 'ListItem',
+            position: 4,
+            name: 'Hotel Torre Mar',
+            url: 'https://buenaventuradatos.com/hotels/torre_mar',
+          },
+          {
+            '@type': 'ListItem',
+            position: 5,
+            name: 'Hotel Steven Buenaventura',
+            url: 'https://buenaventuradatos.com/hotels/steven_buenaventura',
+          },
+        ],
+      },
+    });
+  }
+
   private async loadHotels(reason: 'init' | 'nav'): Promise<void> {
     if (this.inFlight) return;
     this.inFlight = true;
@@ -101,8 +160,10 @@ export class HotelsList implements OnInit {
             ms
           );
         });
+
         const out = await Promise.race([p, timeout]);
         clearTimeout(t);
+
         return out as T;
       };
 
@@ -111,6 +172,7 @@ export class HotelsList implements OnInit {
         12000,
         `getHotelCards:${reason}`
       );
+
       this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
     } catch (e: any) {
       this.hotels = [];
@@ -123,7 +185,9 @@ export class HotelsList implements OnInit {
     }
   }
 
-  private buildBadgesFromSatisfaction(hotels: HotelCardRow[]): Map<string, HotelBadge> {
+  private buildBadgesFromSatisfaction(
+    hotels: HotelCardRow[]
+  ): Map<string, HotelBadge> {
     const out = new Map<string, HotelBadge>();
 
     for (const h of hotels) {
