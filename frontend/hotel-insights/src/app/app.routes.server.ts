@@ -1,12 +1,5 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
-
-const HOTEL_SLUGS = [
-  'torre_mar',
-  'cosmos_pacifico',
-  'maguipi',
-  'steven_buenaventura',
-  'cordillera',
-] as const;
+import { HOTEL_SLUGS } from './core/seo/hotels.metadata';
 
 export const serverRoutes: ServerRoute[] = [
   // Pre-render static pages.

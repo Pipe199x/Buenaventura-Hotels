@@ -1,5 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Title, Meta } from '@angular/platform-browser';
+
+import { SchemaService } from '../../core/seo/schema.service';
+import { SITE_ORIGIN } from '../../core/seo/hotels.metadata';
+import { buildBreadcrumb } from '../../core/seo/hotel-schema';
 
 type ObjetivoCard = {
   titulo: string;
@@ -14,7 +19,41 @@ type ObjetivoCard = {
   templateUrl: './about.html',
   styleUrl: './about.scss',
 })
-export class About {
+export class About implements OnInit {
+  private schemaService = inject(SchemaService);
+  private title = inject(Title);
+  private meta = inject(Meta);
+
+  ngOnInit(): void {
+    this.title.setTitle('Acerca del proyecto | Buenaventura Datos');
+    this.meta.updateTag({
+      name: 'description',
+      content:
+        'Objetivos, tecnologías y técnicas detrás del análisis de sentimientos de reseñas hoteleras de Buenaventura.',
+    });
+
+    this.schemaService.setSchema('schema-about-page', {
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      '@id': `${SITE_ORIGIN}/about#webpage`,
+      name: 'Acerca del proyecto',
+      url: `${SITE_ORIGIN}/about`,
+      inLanguage: 'es-CO',
+      description:
+        'Objetivos, tecnologías y técnicas detrás del análisis de sentimientos de reseñas hoteleras de Buenaventura.',
+      isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+      about: { '@id': `${SITE_ORIGIN}/#dataset` },
+      mainEntity: { '@id': `${SITE_ORIGIN}/#author` },
+    });
+
+    this.schemaService.setSchema(
+      'schema-about-breadcrumb',
+      buildBreadcrumb([
+        { name: 'Inicio', url: `${SITE_ORIGIN}/` },
+        { name: 'Acerca de', url: `${SITE_ORIGIN}/about` },
+      ])
+    );
+  }
 
   objetivos: ObjetivoCard[] = [
     {

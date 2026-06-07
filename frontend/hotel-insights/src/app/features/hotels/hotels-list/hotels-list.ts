@@ -7,11 +7,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HomeDataService, HotelCardRow } from '../../../core/data/home-data.service';
 import { SchemaService } from '../../../core/seo/schema.service';
+import { SITE_ORIGIN, HOTELS } from '../../../core/seo/hotels.metadata';
+import { buildHotelSchema } from '../../../core/seo/hotel-schema';
 import { AuthModalService } from '../../../shared/auth-modal/auth-modal.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
@@ -41,10 +44,13 @@ export class HotelsList implements OnInit {
   private destroyRef = inject(DestroyRef);
   private schemaService = inject(SchemaService);
   private authModal = inject(AuthModalService);
+  private title = inject(Title);
+  private meta = inject(Meta);
 
   private inFlight = false;
 
   ngOnInit(): void {
+    this.setPageMeta();
     this.setHotelsCollectionSchema();
     this.loadHotels('init');
 
@@ -55,9 +61,19 @@ export class HotelsList implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
+        this.setPageMeta();
         this.setHotelsCollectionSchema();
         this.loadHotels('nav');
       });
+  }
+
+  private setPageMeta(): void {
+    this.title.setTitle('Hoteles analizados en Buenaventura | Buenaventura Datos');
+    this.meta.updateTag({
+      name: 'description',
+      content:
+        'Listado de hoteles de Buenaventura analizados mediante reseñas de Google: calificaciones, análisis de sentimientos y tendencias de percepción turística.',
+    });
   }
 
   trackByHotelName = (_: number, h: HotelCardRow) => h.hotel_name;
@@ -91,57 +107,37 @@ export class HotelsList implements OnInit {
     this.authModal.open('register', '/hotels/' + hotelName);
   }
 
-  private setHotelsCollectionSchema(): void {
+  // Builds the CollectionPage + ItemList schema from the shared HOTELS metadata.
+  // Called synchronously (no rows -> base Hotel items, captured at prerender) and
+  // again after load with `rows` so each ListItem carries an AggregateRating.
+  private setHotelsCollectionSchema(rows?: HotelCardRow[]): void {
+    const byName = new Map((rows ?? []).map((r) => [r.hotel_name, r]));
+
+    const itemListElement = HOTELS.map((meta, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: buildHotelSchema(meta, byName.get(meta.slug)),
+    }));
+
     this.schemaService.setSchema('schema-hotels-collection-page', {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      '@id': 'https://buenaventuradatos.com/hotels#collection',
+      '@id': `${SITE_ORIGIN}/hotels#collection`,
       name: 'Hoteles analizados en Buenaventura',
-      url: 'https://buenaventuradatos.com/hotels',
+      url: `${SITE_ORIGIN}/hotels`,
       inLanguage: 'es-CO',
       description:
         'Listado de hoteles de Buenaventura analizados mediante reseñas de Google, análisis de sentimientos, temáticas, calificaciones y tendencias de percepción turística.',
       isPartOf: {
-        '@id': 'https://buenaventuradatos.com/#website',
+        '@id': `${SITE_ORIGIN}/#website`,
       },
       about: {
-        '@id': 'https://buenaventuradatos.com/#dataset',
+        '@id': `${SITE_ORIGIN}/#dataset`,
       },
       mainEntity: {
         '@type': 'ItemList',
         name: 'Hoteles analizados en Buenaventura',
-        itemListElement: [
-          {
-            '@type': 'ListItem',
-            position: 1,
-            name: 'Hotel Cordillera',
-            url: 'https://buenaventuradatos.com/hotels/cordillera',
-          },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: 'Hotel Cosmos Pacífico',
-            url: 'https://buenaventuradatos.com/hotels/cosmos_pacifico',
-          },
-          {
-            '@type': 'ListItem',
-            position: 3,
-            name: 'Hotel Magüipí',
-            url: 'https://buenaventuradatos.com/hotels/maguipi',
-          },
-          {
-            '@type': 'ListItem',
-            position: 4,
-            name: 'Hotel Torre Mar',
-            url: 'https://buenaventuradatos.com/hotels/torre_mar',
-          },
-          {
-            '@type': 'ListItem',
-            position: 5,
-            name: 'Hotel Steven Buenaventura',
-            url: 'https://buenaventuradatos.com/hotels/steven_buenaventura',
-          },
-        ],
+        itemListElement,
       },
     });
   }
@@ -181,6 +177,9 @@ export class HotelsList implements OnInit {
       );
 
       this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
+
+      // Enrich the ItemList with per-hotel AggregateRating now that data is loaded.
+      this.setHotelsCollectionSchema(this.hotels);
     } catch (e: any) {
       this.hotels = [];
       this.hotelBadge = new Map();

@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -16,6 +17,10 @@ import {
   HotelCardRow,
   SentimentDistributionRow,
 } from '../../core/data/home-data.service';
+
+import { SchemaService } from '../../core/seo/schema.service';
+import { SITE_ORIGIN } from '../../core/seo/hotels.metadata';
+import { buildBreadcrumb } from '../../core/seo/hotel-schema';
 
 import { SentimentStackedBarComponent } from '../../shared/charts/sentiment-stacked-bar/sentiment-stacked-bar';
 import { AuthModalService } from '../../shared/auth-modal/auth-modal.service';
@@ -50,6 +55,9 @@ export class Home implements OnInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private authModal = inject(AuthModalService);
+  private schemaService = inject(SchemaService);
+  private title = inject(Title);
+  private meta = inject(Meta);
 
   // DestroyRef instance used by takeUntilDestroyed.
   private destroyRef = inject(DestroyRef);
@@ -57,6 +65,9 @@ export class Home implements OnInit {
   private inFlight = false;
 
   ngOnInit(): void {
+    // SEO set synchronously so it is captured during prerender.
+    this.setHomeSeo();
+
     // Initial data load.
     this.loadHome('init');
 
@@ -75,6 +86,33 @@ export class Home implements OnInit {
       .subscribe(() => {
         this.loadHome('nav');
       });
+  }
+
+  private setHomeSeo(): void {
+    this.title.setTitle('Hoteles en Buenaventura: Reseñas y Opiniones | Buenaventura Datos');
+    this.meta.updateTag({
+      name: 'description',
+      content:
+        'Plataforma de reseñas y análisis de sentimientos de hoteles en Buenaventura. Consulta opiniones reales, calificaciones y tendencias de los hoteles analizados.',
+    });
+
+    this.schemaService.setSchema('schema-home-webpage', {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      '@id': `${SITE_ORIGIN}/#webpage`,
+      name: 'Hoteles en Buenaventura: Reseñas y Opiniones',
+      url: `${SITE_ORIGIN}/`,
+      inLanguage: 'es-CO',
+      description:
+        'Plataforma de reseñas y análisis de sentimiento de hoteles en Buenaventura. Consulta opiniones reales, calificaciones y tendencias de los hoteles analizados.',
+      isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+      about: { '@id': `${SITE_ORIGIN}/#dataset` },
+    });
+
+    this.schemaService.setSchema(
+      'schema-home-breadcrumb',
+      buildBreadcrumb([{ name: 'Inicio', url: `${SITE_ORIGIN}/` }])
+    );
   }
 
   // Comma-separated words transformed into chip items.
