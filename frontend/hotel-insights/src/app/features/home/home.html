@@ -154,7 +154,7 @@
 
           <!--<a class="btn-primary" routerLink="/hotels">Ver detalles</a>-->
           <!--<a class="btn-primary" [routerLink]="['/hotels', h.hotel_name]">Ver más detalles</a>-->
-          <a class="btn-primary" [routerLink]="['/register']" [queryParams]="{ redirect: '/hotels/' + h.hotel_name }">Ver más detalles</a>
+          <button class="btn-primary" type="button" (click)="openDetails(h.hotel_name)">Ver más detalles</button>
 
         </article>
       </div>

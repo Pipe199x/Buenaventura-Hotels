@@ -1,0 +1,114 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="close()">
+    <div
+      class="modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="modal-close" aria-label="Cerrar" (click)="close()">×</button>
+
+      <div class="tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="tab"
+          [class.active]="(authModal.mode$ | async) === 'login'"
+          (click)="switchMode('login')"
+        >
+          Iniciar Sesión
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="tab"
+          [class.active]="(authModal.mode$ | async) === 'register'"
+          (click)="switchMode('register')"
+        >
+          Crear Cuenta
+        </button>
+      </div>
+
+      @if ((authModal.mode$ | async) === 'login') {
+        <h2 id="auth-modal-title">Iniciar Sesión</h2>
+
+        <label class="label">Correo electrónico</label>
+        <div class="input-wrap">
+          <input [(ngModel)]="email" type="email" placeholder="ejemplo@correo.com" autocomplete="email" />
+        </div>
+
+        <label class="label">Contraseña</label>
+        <div class="input-wrap">
+          <input
+            [(ngModel)]="password"
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+          <button type="button" class="icon-btn" (click)="showPassword = !showPassword">
+            {{ showPassword ? '🙈' : '👁' }}
+          </button>
+        </div>
+
+        <button class="btn primary" (click)="loginEmail()">Iniciar sesión</button>
+
+        <div class="divider"><span>o</span></div>
+
+        <button class="btn ghost google" (click)="loginGoogle()">
+          <img class="google-icon" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
+          <span>Continuar con Google</span>
+        </button>
+
+        <p class="foot">
+          ¿No tienes cuenta?
+          <a (click)="switchMode('register')">Regístrate</a>
+        </p>
+      } @else {
+        <h2 id="auth-modal-title">Crear Cuenta</h2>
+
+        <label class="label">Correo electrónico</label>
+        <div class="input-wrap">
+          <input [(ngModel)]="email" type="email" placeholder="ejemplo@correo.com" autocomplete="email" />
+        </div>
+
+        <label class="label">Contraseña</label>
+        <div class="input-wrap">
+          <input
+            [(ngModel)]="password"
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="••••••••"
+            autocomplete="new-password"
+          />
+          <button type="button" class="icon-btn" (click)="showPassword = !showPassword">
+            {{ showPassword ? '🙈' : '👁' }}
+          </button>
+        </div>
+
+        <label class="label">Confirmar contraseña</label>
+        <div class="input-wrap">
+          <input
+            [(ngModel)]="confirmPassword"
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="••••••••"
+            autocomplete="new-password"
+          />
+        </div>
+
+        <button class="btn primary" (click)="register()">Registrarse</button>
+
+        <div class="divider"><span>o</span></div>
+
+        <button class="btn ghost google" (click)="registerGoogle()">
+          <img class="google-icon" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
+          <span>Continuar con Google</span>
+        </button>
+
+        <p class="foot">
+          ¿Ya tienes cuenta?
+          <a (click)="switchMode('login')">Inicia sesión</a>
+        </p>
+      }
+    </div>
+  </div>
+}

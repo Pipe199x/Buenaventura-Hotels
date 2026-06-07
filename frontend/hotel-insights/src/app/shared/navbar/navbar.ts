@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { AuthModalService } from '../auth-modal/auth-modal.service';
 
 @Component({
   selector: 'app-navbar',
@@ -11,10 +12,18 @@ import { AuthService } from '../../core/auth.service';
   styleUrl: './navbar.scss',
 })
 export class Navbar {
-  constructor(private auth: AuthService, private router: Router) {}
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private authModal = inject(AuthModalService);
+
+  readonly session$ = this.auth.session$;
+
+  openLogin() {
+    this.authModal.open('login');
+  }
 
   async logout() {
     await this.auth.signOut();
-    this.router.navigateByUrl('/login');
+    this.router.navigateByUrl('/');
   }
 }

@@ -128,13 +128,9 @@
           </div>
         </ng-container>
 
-        <a
-          class="btn-primary"
-          [routerLink]="['/register']"
-          [queryParams]="{ redirect: '/hotels/' + h.hotel_name }"
-        >
+        <button class="btn-primary" type="button" (click)="openDetails(h.hotel_name)">
           Ver más detalles
-        </a>
+        </button>
 
       </article>
     </div>

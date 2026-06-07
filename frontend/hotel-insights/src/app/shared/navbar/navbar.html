@@ -34,12 +34,18 @@
       </a>
     </nav>
 
-    <!-- Salir (derecha) -->
-    <button class="logout" type="button" (click)="logout()">
-      <span class="icon" aria-hidden="true">
-        <img src="assets/nav-logout.png" alt="" width="18" height="18" />
-      </span>
-      <span class="label">Salir</span>
-    </button>
+    <!-- Auth action (derecha) -->
+    @if (session$ | async) {
+      <button class="logout" type="button" (click)="logout()">
+        <span class="icon" aria-hidden="true">
+          <img src="assets/nav-logout.png" alt="" width="18" height="18" />
+        </span>
+        <span class="label">Salir</span>
+      </button>
+    } @else {
+      <button class="logout" type="button" (click)="openLogin()">
+        <span class="label">Iniciar sesión</span>
+      </button>
+    }
   </div>
 </header>

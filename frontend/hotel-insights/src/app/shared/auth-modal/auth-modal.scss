@@ -1,0 +1,219 @@
+:host {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
+  animation: backdrop-fade 0.18s ease-out;
+}
+
+.modal-card {
+  position: relative;
+  width: min(440px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+  animation: card-pop 0.2s ease-out;
+
+  h2 {
+    margin: 0 0 18px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  color: #94a3b8;
+  padding: 2px 6px;
+  border-radius: 8px;
+
+  &:hover {
+    color: #1f2937;
+    background: rgba(15, 23, 42, 0.05);
+  }
+}
+
+/* Tabs (segmented control) */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 18px;
+  padding: 4px;
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.tab {
+  flex: 1;
+  padding: 9px 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #64748b;
+  transition: background 120ms ease, color 120ms ease;
+
+  &.active {
+    background: #fff;
+    color: #3b82f6;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+}
+
+/* Form rules (ported from the old auth pages) */
+.label {
+  display: block;
+  font-weight: 600;
+  color: #334155;
+  margin: 12px 0 8px;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+
+  input {
+    border: 0;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    font-family: inherit;
+  }
+}
+
+.icon-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.btn.primary {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.btn.ghost {
+  background: #fff;
+}
+
+.btn.google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  &:hover {
+    background: #f8fafc;
+  }
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 6px;
+  color: #94a3b8;
+
+  &::before,
+  &::after {
+    content: '';
+    height: 1px;
+    background: #e5e7eb;
+    flex: 1;
+  }
+
+  span {
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+.foot {
+  margin: 14px 0 0;
+  text-align: center;
+  color: #64748b;
+
+  a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+/* Mobile: bottom sheet */
+@media (max-width: 480px) {
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 18px 18px 0 0;
+    animation: sheet-up 0.22s ease-out;
+  }
+}
+
+@keyframes backdrop-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes card-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

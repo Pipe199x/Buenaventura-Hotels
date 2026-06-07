@@ -6,7 +6,7 @@ import {
   DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd, RouterLink } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -18,6 +18,7 @@ import {
 } from '../../core/data/home-data.service';
 
 import { SentimentStackedBarComponent } from '../../shared/charts/sentiment-stacked-bar/sentiment-stacked-bar';
+import { AuthModalService } from '../../shared/auth-modal/auth-modal.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
 
@@ -30,7 +31,7 @@ type HotelBadge = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, SentimentStackedBarComponent],
+  imports: [CommonModule, SentimentStackedBarComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -48,6 +49,7 @@ export class Home implements OnInit {
   private homeData = inject(HomeDataService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private authModal = inject(AuthModalService);
 
   // DestroyRef instance used by takeUntilDestroyed.
   private destroyRef = inject(DestroyRef);
@@ -96,6 +98,11 @@ export class Home implements OnInit {
         label: 'Neutral',
       }
     );
+  }
+
+  // Opens the auth modal (register tab), then routes to the hotel after auth.
+  openDetails(hotelName: string): void {
+    this.authModal.open('register', '/hotels/' + hotelName);
   }
 
   private async loadHome(reason: 'init' | 'nav'): Promise<void> {

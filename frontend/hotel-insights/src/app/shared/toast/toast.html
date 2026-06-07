@@ -1,0 +1,20 @@
+<div class="toast-host" aria-live="polite">
+  @for (t of toast.toasts$ | async; track t.id) {
+    <div class="toast toast--{{ t.type }}" role="alert">
+      <span class="toast__icon" aria-hidden="true">
+        @switch (t.type) {
+          @case ('success') { ✓ }
+          @case ('error') { ⚠ }
+          @default { ℹ }
+        }
+      </span>
+      <span class="toast__text">{{ t.text }}</span>
+      <button
+        type="button"
+        class="toast__close"
+        aria-label="Cerrar"
+        (click)="dismiss(t.id)"
+      >×</button>
+    </div>
+  }
+</div>

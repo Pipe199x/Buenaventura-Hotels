@@ -6,12 +6,13 @@ import {
   DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd, RouterModule } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HomeDataService, HotelCardRow } from '../../../core/data/home-data.service';
 import { SchemaService } from '../../../core/seo/schema.service';
+import { AuthModalService } from '../../../shared/auth-modal/auth-modal.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
 
@@ -24,7 +25,7 @@ type HotelBadge = {
 @Component({
   selector: 'app-hotels-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule],
   templateUrl: './hotels-list.html',
   styleUrl: './hotels-list.scss',
 })
@@ -39,6 +40,7 @@ export class HotelsList implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
   private schemaService = inject(SchemaService);
+  private authModal = inject(AuthModalService);
 
   private inFlight = false;
 
@@ -82,6 +84,11 @@ export class HotelsList implements OnInit {
         label: 'Neutral',
       }
     );
+  }
+
+  // Opens the auth modal (register tab), then routes to the hotel after auth.
+  openDetails(hotelName: string): void {
+    this.authModal.open('register', '/hotels/' + hotelName);
   }
 
   private setHotelsCollectionSchema(): void {
