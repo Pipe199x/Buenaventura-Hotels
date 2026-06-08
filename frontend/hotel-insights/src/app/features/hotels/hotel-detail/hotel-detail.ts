@@ -23,7 +23,17 @@ import {
   HomeDataService,
   HotelResponseRateRow,
   NegativeTopicRow,
+  SentimentTrendRow,
 } from '../../../core/data/home-data.service';
+import { PrerenderStateService } from '../../../core/data/prerender-state.service';
+
+// Serializable per-hotel snapshot baked at build time and transferred to the client.
+type HotelSnapshot = {
+  hotel: any;
+  trendRows: SentimentTrendRow[];
+  responseRate: HotelResponseRateRow | null;
+  negativeTopics: NegativeTopicRow[];
+};
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
 
@@ -69,6 +79,7 @@ export class HotelDetail implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
   private homeData = inject(HomeDataService);
+  private prerender = inject(PrerenderStateService);
   private schemaService = inject(SchemaService);
   private title = inject(Title);
   private meta = inject(Meta);
@@ -79,8 +90,53 @@ export class HotelDetail implements OnInit {
       // Base schema + title/meta are set synchronously so they are captured during
       // prerender (Supabase data loads async, outside the zone, and may not be).
       this.setBaseSeo(this.hotelSlug);
-      this.loadHotel();
+
+      // On the client's initial load, reuse this hotel's data baked at build time
+      // (consumed synchronously so the first render matches the server — no refetch).
+      const snapshot = this.prerender.take<HotelSnapshot>('hotel:' + this.hotelSlug);
+      if (snapshot) {
+        this.applyHotel(this.hotelSlug, snapshot);
+      } else {
+        this.loadHotel();
+      }
     });
+  }
+
+  // Applies a resolved/transferred snapshot to the view state.
+  private applyHotel(slug: string, snap: HotelSnapshot): void {
+    this.hotel = snap.hotel;
+    this.trendRows = snap.trendRows ?? [];
+    this.responseRate = snap.responseRate ?? null;
+    this.negativeTopics = snap.negativeTopics ?? [];
+
+    this.computeBadge(this.hotel?.satisfaction_rate_hotel);
+
+    // Re-set the Hotel schema enriched with address + aggregateRating.
+    const meta = getHotelMeta(slug) ?? {
+      slug,
+      displayName: this.hotel?.hotel_display_name ?? slug,
+    };
+    this.setHotelSchema(meta, this.hotel);
+
+    this.error = !this.hotel;
+    this.loading = false;
+  }
+
+  // Fetches every per-hotel view and returns a serializable snapshot.
+  private async fetchHotel(slug: string): Promise<HotelSnapshot> {
+    const { data, error } = await supabase
+      .from('vw_home_hotels_cards_count')
+      .select('*')
+      .eq('hotel_name', slug)
+      .single();
+
+    if (error) throw error;
+
+    const trendRows = await this.homeData.getSentimentTrendByHotel(data.hotel_name);
+    const responseRate = await this.homeData.getHotelResponseRateByHotel(data.hotel_name);
+    const negativeTopics = await this.homeData.getNegativeTopicsByHotel(data.hotel_name);
+
+    return { hotel: data, trendRows, responseRate, negativeTopics };
   }
 
   // Hotel + breadcrumb schema with static fields only (no rating/address yet).
@@ -118,6 +174,8 @@ export class HotelDetail implements OnInit {
   }
 
   async loadHotel(): Promise<void> {
+    const slug = this.hotelSlug;
+
     this.loading = true;
     this.error = false;
     this.hotel = null;
@@ -126,39 +184,18 @@ export class HotelDetail implements OnInit {
     this.negativeTopics = [];
 
     try {
-      const { data, error } = await supabase
-        .from('vw_home_hotels_cards_count')
-        .select('*')
-        .eq('hotel_name', this.hotelSlug)
-        .single();
-
-      if (error) throw error;
-
-      const trend = await this.homeData.getSentimentTrendByHotel(data.hotel_name);
-      const responseRate = await this.homeData.getHotelResponseRateByHotel(data.hotel_name);
-      const negativeTopics = await this.homeData.getNegativeTopicsByHotel(data.hotel_name);
-
-      this.zone.run(() => {
-        this.hotel = data;
-        this.trendRows = trend;
-        this.responseRate = responseRate;
-        this.negativeTopics = negativeTopics;
-
-        this.computeBadge(data?.satisfaction_rate_hotel);
-
-        // Re-set the Hotel schema enriched with address + aggregateRating now that
-        // the data is available (overwrites the base schema set in ngOnInit).
-        const meta = getHotelMeta(this.hotelSlug) ?? {
-          slug: this.hotelSlug,
-          displayName: data?.hotel_display_name ?? this.hotelSlug,
-        };
-        this.setHotelSchema(meta, data);
-
-        this.loading = false;
-        this.error = false;
-
-        this.cdr.detectChanges();
-      });
+      // resolve() blocks prerender stability until the fetch + render complete and, on
+      // the server, stores the snapshot in TransferState for the client to reuse.
+      await this.prerender.resolve(
+        'hotel:' + slug,
+        () => this.fetchHotel(slug),
+        (snap) => {
+          this.zone.run(() => {
+            this.applyHotel(slug, snap);
+            this.cdr.detectChanges();
+          });
+        }
+      );
     } catch (err) {
       console.error('Error loading hotel:', err);
 

@@ -1,5 +1,5 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, OnChanges, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import type { EChartsOption } from 'echarts';
 import type { TopLevelFormatterParams } from 'echarts/types/dist/shared';
@@ -27,7 +27,7 @@ type Row = {
   host: { ngSkipHydration: 'true' },
   imports: [CommonModule, NgxEchartsDirective],
   providers: [provideEchartsCore({ echarts })],
-  template: `<div echarts class="echart" [options]="option"></div>`,
+  template: `<div *ngIf="isBrowser" echarts class="echart" [options]="option"></div>`,
   styles: [
     `
       .echart { width: 100%; height: 360px; }
@@ -37,6 +37,9 @@ type Row = {
 })
 export class SentimentStackedBarComponent implements OnChanges {
   @Input({ required: true }) rows: Row[] = [];
+
+  // ECharts (canvas) only initializes in the browser; never during SSR/prerender.
+  protected readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   option: EChartsOption = {};
 

@@ -1,5 +1,5 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, OnChanges, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import type { EChartsOption } from 'echarts';
 
@@ -36,6 +36,9 @@ type ResponseRate = {
 })
 export class ResponseRateDonut implements OnChanges {
   @Input() responseRate: ResponseRate | null = null;
+
+  // ECharts (canvas) only initializes in the browser; never during SSR/prerender.
+  protected readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   chartOption: EChartsOption = {};
 

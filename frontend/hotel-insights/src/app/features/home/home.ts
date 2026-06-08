@@ -21,6 +21,7 @@ import {
 import { SchemaService } from '../../core/seo/schema.service';
 import { SITE_ORIGIN } from '../../core/seo/hotels.metadata';
 import { buildBreadcrumb } from '../../core/seo/hotel-schema';
+import { PrerenderStateService } from '../../core/data/prerender-state.service';
 
 import { SentimentStackedBarComponent } from '../../shared/charts/sentiment-stacked-bar/sentiment-stacked-bar';
 import { AuthModalService } from '../../shared/auth-modal/auth-modal.service';
@@ -32,6 +33,14 @@ type HotelBadge = {
   pct: number;
   tone: BadgeTone;
   label: 'Positiva' | 'Neutral' | 'Negativa';
+};
+
+// Serializable snapshot baked at build time and transferred to the client.
+type HomeSnapshot = {
+  kpis: HomeOverviewGlobal | null;
+  hotels: HotelCardRow[];
+  sentimentRows: SentimentDistributionRow[];
+  errorMsg: string;
 };
 
 @Component({
@@ -57,6 +66,7 @@ export class Home implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private authModal = inject(AuthModalService);
   private auth = inject(AuthService);
+  private prerender = inject(PrerenderStateService);
   private schemaService = inject(SchemaService);
   private title = inject(Title);
   private meta = inject(Meta);
@@ -65,13 +75,23 @@ export class Home implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   private inFlight = false;
+  // Set when the page is hydrated from a build-time snapshot, so the initial
+  // NavigationEnd (which fires after ngOnInit) doesn't trigger a redundant refetch.
+  private skipNextReload = false;
 
   ngOnInit(): void {
     // SEO set synchronously so it is captured during prerender.
     this.setHomeSeo();
 
-    // Initial data load.
-    this.loadHome('init');
+    // On the client's initial load, reuse the data baked at build time (no refetch);
+    // otherwise (server prerender, or client navigation) fetch normally.
+    const snapshot = this.prerender.take<HomeSnapshot>('home');
+    if (snapshot) {
+      this.applyHome(snapshot);
+      this.skipNextReload = true;
+    } else {
+      this.loadHome('init');
+    }
 
     // Data reload on route revisit.
     this.router.events
@@ -86,6 +106,10 @@ export class Home implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
+        if (this.skipNextReload) {
+          this.skipNextReload = false;
+          return;
+        }
         this.loadHome('nav');
       });
   }
@@ -151,6 +175,58 @@ export class Home implements OnInit {
     }
   }
 
+  // Applies a resolved/transferred snapshot to the view state.
+  private applyHome(snapshot: HomeSnapshot): void {
+    this.kpis = snapshot.kpis;
+    this.hotels = snapshot.hotels ?? [];
+    this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
+    this.sentimentRows = snapshot.sentimentRows ?? [];
+    this.errorMsg = snapshot.errorMsg ?? '';
+    this.loading = false;
+    this.chartLoading = false;
+  }
+
+  // Fetches every home view in parallel (with per-query timeouts) and returns a
+  // serializable snapshot. Runs at build time (prerender) and on client navigations.
+  private async fetchAllHome(): Promise<HomeSnapshot> {
+    const withTimeout = async <T>(
+      p: Promise<T>,
+      ms: number,
+      label: string
+    ): Promise<T> => {
+      let t: any;
+      const timeout = new Promise<never>((_, rej) => {
+        t = setTimeout(() => rej(new Error(`Timeout (${ms}ms) en ${label}`)), ms);
+      });
+      const out = await Promise.race([p, timeout]);
+      clearTimeout(t);
+      return out as T;
+    };
+
+    const results = await Promise.allSettled([
+      withTimeout(this.homeData.getHomeOverviewGlobal(), 12000, 'getHomeOverviewGlobal'),
+      withTimeout(this.homeData.getHotelCards(), 12000, 'getHotelCards'),
+      withTimeout(this.homeData.getSentimentDistribution(), 12000, 'getSentimentDistribution'),
+    ]);
+
+    const errs: string[] = [];
+
+    const kpisR = results[0];
+    const kpis = kpisR.status === 'fulfilled' ? kpisR.value : null;
+    if (kpisR.status === 'rejected') errs.push(kpisR.reason?.message ?? 'Error en KPIs');
+
+    const hotelsR = results[1];
+    const hotels = hotelsR.status === 'fulfilled' ? hotelsR.value ?? [] : [];
+    if (hotelsR.status === 'rejected') errs.push(hotelsR.reason?.message ?? 'Error en hoteles');
+
+    const distR = results[2];
+    const sentimentRows = distR.status === 'fulfilled' ? distR.value ?? [] : [];
+    if (distR.status === 'rejected')
+      errs.push(distR.reason?.message ?? 'Error en distribución de sentimientos');
+
+    return { kpis, hotels, sentimentRows, errorMsg: errs.join(' | ') };
+  }
+
   private async loadHome(reason: 'init' | 'nav'): Promise<void> {
     // Overlapping reload requests are skipped.
     if (this.inFlight) return;
@@ -168,76 +244,16 @@ export class Home implements OnInit {
     this.cdr.detectChanges();
 
     try {
-      // Per-query timeout wrapper.
-      const withTimeout = async <T>(
-        p: Promise<T>,
-        ms: number,
-        label: string
-      ): Promise<T> => {
-        let t: any;
-        const timeout = new Promise<never>((_, rej) => {
-          t = setTimeout(
-            () => rej(new Error(`Timeout (${ms}ms) en ${label}`)),
-            ms
-          );
-        });
-        const out = await Promise.race([p, timeout]);
-        clearTimeout(t);
-        return out as T;
-      };
-
-      const results = await Promise.allSettled([
-        withTimeout(
-          this.homeData.getHomeOverviewGlobal(),
-          12000,
-          'getHomeOverviewGlobal'
-        ),
-        withTimeout(this.homeData.getHotelCards(), 12000, 'getHotelCards'),
-        withTimeout(
-          this.homeData.getSentimentDistribution(),
-          12000,
-          'getSentimentDistribution'
-        ),
-      ]);
-
-      const errs: string[] = [];
-
-      // KPIs.
-      const kpisR = results[0];
-      if (kpisR.status === 'fulfilled') {
-        this.kpis = kpisR.value;
-      } else {
-        this.kpis = null;
-        errs.push(kpisR.reason?.message ?? 'Error en KPIs');
-      }
-
-      // Hotel cards.
-      const hotelsR = results[1];
-      if (hotelsR.status === 'fulfilled') {
-        this.hotels = hotelsR.value ?? [];
-      } else {
-        this.hotels = [];
-        errs.push(hotelsR.reason?.message ?? 'Error en hoteles');
-      }
-
-      // Badge color/label derived from satisfaction_rate_hotel.
-      this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
-
-      // Chart distribution rows.
-      const distR = results[2];
-      if (distR.status === 'fulfilled') {
-        this.sentimentRows = distR.value ?? [];
-      } else {
-        this.sentimentRows = [];
-        errs.push(
-          distR.reason?.message ?? 'Error en distribución de sentimientos'
-        );
-      }
-
-      // Partial errors are displayed while available data still renders.
-      if (errs.length) {
-        this.errorMsg = errs.join(' | ');
-      }
+      // resolve() blocks prerender stability until the fetch + render complete and, on
+      // the server, stores the snapshot in TransferState for the client to reuse.
+      await this.prerender.resolve(
+        'home',
+        () => this.fetchAllHome(),
+        (snapshot) => {
+          this.applyHome(snapshot);
+          this.cdr.detectChanges();
+        }
+      );
 
       console.log('[Home] kpis:', this.kpis);
       console.log('[Home] hotels:', this.hotels.length);

@@ -1,5 +1,5 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, OnChanges, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import type { EChartsOption } from 'echarts';
 import type { TopLevelFormatterParams } from 'echarts/types/dist/shared';
@@ -32,6 +32,9 @@ type Row = {
 })
 export class SentimentTrendLine implements OnChanges {
   @Input() rows: Row[] = [];
+
+  // ECharts (canvas) only initializes in the browser; never during SSR/prerender.
+  protected readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   chartOption: EChartsOption = {};
 

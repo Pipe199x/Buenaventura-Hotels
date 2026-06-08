@@ -17,6 +17,7 @@ import { SITE_ORIGIN, HOTELS } from '../../../core/seo/hotels.metadata';
 import { buildHotelSchema } from '../../../core/seo/hotel-schema';
 import { AuthModalService } from '../../../shared/auth-modal/auth-modal.service';
 import { AuthService } from '../../../core/auth.service';
+import { PrerenderStateService } from '../../../core/data/prerender-state.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
 
@@ -46,15 +47,26 @@ export class HotelsList implements OnInit {
   private schemaService = inject(SchemaService);
   private authModal = inject(AuthModalService);
   private auth = inject(AuthService);
+  private prerender = inject(PrerenderStateService);
   private title = inject(Title);
   private meta = inject(Meta);
 
   private inFlight = false;
+  // Set when hydrated from a build-time snapshot, to skip the initial refetch.
+  private skipNextReload = false;
 
   ngOnInit(): void {
     this.setPageMeta();
     this.setHotelsCollectionSchema();
-    this.loadHotels('init');
+
+    // Reuse the data baked at build time on the client's initial load (no refetch).
+    const snapshot = this.prerender.take<HotelCardRow[]>('hotels-list');
+    if (snapshot) {
+      this.applyHotels(snapshot);
+      this.skipNextReload = true;
+    } else {
+      this.loadHotels('init');
+    }
 
     this.router.events
       .pipe(
@@ -65,6 +77,10 @@ export class HotelsList implements OnInit {
       .subscribe(() => {
         this.setPageMeta();
         this.setHotelsCollectionSchema();
+        if (this.skipNextReload) {
+          this.skipNextReload = false;
+          return;
+        }
         this.loadHotels('nav');
       });
   }
@@ -150,6 +166,15 @@ export class HotelsList implements OnInit {
     });
   }
 
+  // Applies a resolved/transferred snapshot to the view state.
+  private applyHotels(hotels: HotelCardRow[]): void {
+    this.hotels = hotels ?? [];
+    this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
+    // Enrich the ItemList with per-hotel AggregateRating now that data is available.
+    this.setHotelsCollectionSchema(this.hotels);
+    this.loading = false;
+  }
+
   private async loadHotels(reason: 'init' | 'nav'): Promise<void> {
     if (this.inFlight) return;
     this.inFlight = true;
@@ -178,16 +203,16 @@ export class HotelsList implements OnInit {
         return out as T;
       };
 
-      this.hotels = await withTimeout(
-        this.homeData.getHotelCards(),
-        12000,
-        `getHotelCards:${reason}`
+      // resolve() blocks prerender stability until the fetch + render complete and, on
+      // the server, stores the snapshot in TransferState for the client to reuse.
+      await this.prerender.resolve(
+        'hotels-list',
+        () => withTimeout(this.homeData.getHotelCards(), 12000, `getHotelCards:${reason}`),
+        (hotels) => {
+          this.applyHotels(hotels);
+          this.cdr.detectChanges();
+        }
       );
-
-      this.hotelBadge = this.buildBadgesFromSatisfaction(this.hotels);
-
-      // Enrich the ItemList with per-hotel AggregateRating now that data is loaded.
-      this.setHotelsCollectionSchema(this.hotels);
     } catch (e: any) {
       this.hotels = [];
       this.hotelBadge = new Map();
