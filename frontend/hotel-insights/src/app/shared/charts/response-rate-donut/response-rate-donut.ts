@@ -26,6 +26,9 @@ type ResponseRate = {
 @Component({
   selector: 'app-response-rate-donut',
   standalone: true,
+  // ECharts manages its own canvas DOM in the browser; skip hydration so the
+  // server/client DOM never mismatches on this subtree.
+  host: { ngSkipHydration: 'true' },
   imports: [CommonModule, NgxEchartsDirective],
   providers: [provideEchartsCore({ echarts })],
   templateUrl: './response-rate-donut.html',

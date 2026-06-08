@@ -1,5 +1,5 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -29,12 +29,17 @@ export class AuthModalComponent implements OnInit, OnDestroy {
   private openSub?: Subscription;
   private sessionSub?: Subscription;
 
+  private readonly isBrowser: boolean;
+
   constructor(
     private auth: AuthService,
     public authModal: AuthModalService,
     private router: Router,
-    private toast: ToastService
-  ) {}
+    private toast: ToastService,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
     this.openSub = this.authModal.isOpen$.subscribe((open) => {
@@ -143,6 +148,9 @@ export class AuthModalComponent implements OnInit, OnDestroy {
   }
 
   private toggleBodyScroll(lock: boolean): void {
+    // `document` only exists in the browser; this also runs during SSR/prerender
+    // via the isOpen$ subscription, so guard it.
+    if (!this.isBrowser) return;
     document.body.style.overflow = lock ? 'hidden' : '';
   }
 }

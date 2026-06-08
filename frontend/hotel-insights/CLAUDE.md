@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm start                       # Dev server (ng serve) at http://localhost:4200
-npm run build                   # Production build + netlify-postbuild (see Deploy below)
+npm run build                   # Production build = prerender every route to static HTML (see Deploy below)
 npm run watch                   # Rebuild on change (development config)
 npm test                        # Run unit tests (Vitest via @angular/build:unit-test)
 npm run serve:ssr:hotel-insights # Run the built SSR Express server (after a build)
@@ -70,11 +70,19 @@ or it will render blank. Chart components live in `src/app/shared/charts/`.
 tags in the document head by id. Route components set their structured data on init (see
 `hotels-list.ts`).
 
-### Deploy
-`npm run build` runs the production build then `scripts/netlify-postbuild.mjs`, which copies
-`index.csr.html` → `index.html` so Netlify serves the CSR shell. `public/_redirects` provides the
-SPA fallback (`/* /index.html 200`). `src/server.ts` is the Express SSR entry used by
-`serve:ssr:hotel-insights`.
+### Deploy — prerendered (SSG) static hosting
+`npm run build` runs the production build (`outputMode: server`), which **prerenders every
+route** in `app.routes.server.ts` to static HTML under `dist/hotel-insights/browser/`
+(`index.html` = home, `about/index.html`, `hotels/<slug>/index.html`, …). Netlify deploys
+that `browser/` folder as a **static site** — no Node runtime needed. `public/_redirects`
+provides the SPA fallback (`/* /index.html 200`); Netlify serves the prerendered file for
+known routes and only rewrites genuinely unknown paths. Client hydration is enabled
+(`provideClientHydration` in `app.config.ts`), so the prerendered DOM is reused, not
+re-rendered. `src/server.ts` + the `server/` output remain available for optional on-demand
+SSR (`serve:ssr:hotel-insights`) but are not used by the static deploy.
+
+> Do **not** clobber the prerendered `index.html` with `index.csr.html` — that empties the
+> home page for crawlers (the old `netlify-postbuild.mjs` did this; it was removed).
 
 ## Conventions & gotchas
 
@@ -84,8 +92,9 @@ SPA fallback (`/* /index.html 200`). `src/server.ts` is the Express SSR entry us
   (`ToastComponent`, `AuthModalComponent`).
 - **Dead scaffolding — do not edit by mistake**: `src/app/app.ts` (class `App`) with `app.html`/
   `app.scss`, and `src/app/features/hotels/hotels.ts` (class `Hotels`) are leftovers from
-  `ng generate` and are **not wired into routing**. The real root bootstrapped by `main.ts` is
-  `src/app/app.component.ts` (`AppComponent`).
+  `ng generate` and are **not wired into routing**. The real root — bootstrapped by **both**
+  `main.ts` (browser) and `main.server.ts` (SSR/prerender) — is `src/app/app.component.ts`
+  (`AppComponent`). Both entry points must bootstrap the same root or hydration breaks.
 - **Styling**: pure SCSS, component-scoped, no UI framework. Shared design tokens: primary blue
   `#3b82f6`, success `#2e7d32`, neutral/amber `#f9a825`, negative `#c62828`. Reuse these (and the
   toast/modal styles) rather than introducing a component library.

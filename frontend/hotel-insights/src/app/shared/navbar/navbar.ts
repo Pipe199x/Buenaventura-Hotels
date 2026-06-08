@@ -7,6 +7,10 @@ import { AuthModalService } from '../auth-modal/auth-modal.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
+  // The auth button depends on the client-only session (restored from localStorage),
+  // which the server can't know. Skip hydration so a logged-in user's navbar doesn't
+  // mismatch the logged-out server render; this subtree is re-rendered on the client.
+  host: { ngSkipHydration: 'true' },
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',

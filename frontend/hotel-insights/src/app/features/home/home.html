@@ -1,167 +1,162 @@
 <div class="home-page">
-  <!-- LOADING -->
-  <div *ngIf="loading" class="state">
-    <div class="skeleton-loader" aria-label="Cargando contenido principal">
-      <div class="skeleton-line skeleton-line--title"></div>
-      <div class="skeleton-grid">
-        <div class="skeleton-card" *ngFor="let _ of [1, 2, 3]">
-          <div class="skeleton-line skeleton-line--short"></div>
-          <div class="skeleton-line skeleton-line--value"></div>
-        </div>
-      </div>
-      <div class="skeleton-line"></div>
-      <div class="skeleton-line skeleton-line--long"></div>
-    </div>
-  </div>
+  <!-- HERO — static text, always rendered so it is crawlable (prerendered) -->
+  <section class="hero">
+    <h1 class="hero-title">Percepción Turística de Hoteles en Buenaventura</h1>
+    <p class="hero-subtitle">
+      Análisis de sentimientos basado en reseñas de Google de los 5 hoteles más reseñados
+    </p>
+  </section>
 
   <!-- ERROR (no bloquea el contenido) -->
   <div *ngIf="!loading && errorMsg" class="state error">
     <strong>Error:</strong> {{ errorMsg }}
   </div>
 
-  <!-- CONTENT -->
-  <ng-container *ngIf="!loading">
-    <!-- HERO -->
-    <section class="hero">
-      <h1 class="hero-title">Percepción Turística de Hoteles en Buenaventura</h1>
-      <p class="hero-subtitle">
-        Análisis de sentimientos basado en reseñas de Google de los 5 hoteles más reseñados
-      </p>
-    </section>
+  <!-- KPI ROW (data-driven: appears once loaded) -->
+  <section class="kpi-row" *ngIf="kpis">
+    <article class="kpi-card">
+      <div class="kpi-label">Total de reseñas</div>
+      <div class="kpi-value">{{ kpis.total_reviews | number }}</div>
+    </article>
 
-    <!-- KPI ROW -->
-    <section class="kpi-row" *ngIf="kpis">
-      <article class="kpi-card">
-        <div class="kpi-label">Total de reseñas</div>
-        <div class="kpi-value">{{ kpis.total_reviews | number }}</div>
-      </article>
+    <article class="kpi-card">
+      <div class="kpi-label">Puntuación promedio</div>
+      <div class="kpi-value">
+        {{ kpis.avg_star_rating | number:'1.2-2' }} <span class="kpi-unit">/5</span>
+      </div>
+    </article>
 
-      <article class="kpi-card">
-        <div class="kpi-label">Puntuación promedio</div>
-        <div class="kpi-value">
-          {{ kpis.avg_star_rating | number:'1.2-2' }} <span class="kpi-unit">/5</span>
-        </div>
-      </article>
+    <article class="kpi-card kpi-card--success">
+      <div class="kpi-label">Tasa de satisfacción</div>
+      <div class="kpi-value">
+        {{ kpis.tasa_satisfaccion_pct | number:'1.0-0' }} <span class="kpi-unit">%</span>
+      </div>
+    </article>
+  </section>
 
-      <article class="kpi-card kpi-card--success">
-        <div class="kpi-label">Tasa de satisfacción</div>
-        <div class="kpi-value">
-          {{ kpis.tasa_satisfaccion_pct | number:'1.0-0' }} <span class="kpi-unit">%</span>
-        </div>
-      </article>
-    </section>
+  <!-- PANEL (CHART) — heading is static/crawlable; the chart body loads client-side -->
+  <section class="panel panel--chart">
+    <div class="panel-head">
+      <div class="panel-title">
+        <span class="section-icon" aria-hidden="true"></span>
+        Comparación de sentimientos por hotel
+      </div>
+    </div>
 
-    <!-- PANEL (CHART) -->
-    <section class="panel panel--chart">
-      <div class="panel-head">
-        <div class="panel-title">
-          <span class="section-icon" aria-hidden="true"></span>
-          Comparación de sentimientos por hotel
+    <div class="chart-box">
+      <div *ngIf="loading || chartLoading" class="state">
+        <div class="skeleton-loader skeleton-loader--chart" aria-label="Cargando gráfico">
+          <div class="skeleton-line skeleton-line--short"></div>
+          <div class="skeleton-chart-bars">
+            <div class="skeleton-bar" *ngFor="let _ of [1, 2, 3, 4, 5]"></div>
+          </div>
         </div>
       </div>
 
-      <div class="chart-box">
-        <div *ngIf="chartLoading" class="state">
-          <div class="skeleton-loader skeleton-loader--chart" aria-label="Cargando gráfico">
+      <ng-container *ngIf="!loading && !chartLoading">
+        <div *ngIf="sentimentRows.length; else noChartData">
+          <app-sentiment-stacked-bar [rows]="sentimentRows"></app-sentiment-stacked-bar>
+        </div>
+
+        <ng-template #noChartData>
+          <div class="state muted">
+            No hay datos disponibles para la distribución de sentimientos.
+          </div>
+        </ng-template>
+      </ng-container>
+    </div>
+  </section>
+
+  <!-- HOTELS — heading is static/crawlable; the card grid loads client-side -->
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">
+        <span class="section-icon" aria-hidden="true">
+          <img src="assets/nav-hotel.png" alt="" width="22" height="22" />
+        </span>
+        Hoteles Analizados
+      </h2>
+    </div>
+
+    <!-- LOADING placeholder for the hotels data -->
+    <div *ngIf="loading" class="state">
+      <div class="skeleton-loader" aria-label="Cargando contenido principal">
+        <div class="skeleton-line skeleton-line--title"></div>
+        <div class="skeleton-grid">
+          <div class="skeleton-card" *ngFor="let _ of [1, 2, 3]">
             <div class="skeleton-line skeleton-line--short"></div>
-            <div class="skeleton-chart-bars">
-              <div class="skeleton-bar" *ngFor="let _ of [1, 2, 3, 4, 5]"></div>
-            </div>
+            <div class="skeleton-line skeleton-line--value"></div>
           </div>
         </div>
-
-        <ng-container *ngIf="!chartLoading">
-          <div *ngIf="sentimentRows.length; else noChartData">
-            <app-sentiment-stacked-bar [rows]="sentimentRows"></app-sentiment-stacked-bar>
-          </div>
-
-          <ng-template #noChartData>
-            <div class="state muted">
-              No hay datos disponibles para la distribución de sentimientos.
-            </div>
-          </ng-template>
-        </ng-container>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line skeleton-line--long"></div>
       </div>
-    </section>
+    </div>
 
-    <!-- HOTELS -->
-    <section class="section">
-      <div class="section-head">
-        <h2 class="section-title">
-          <span class="section-icon" aria-hidden="true">
-            <img src="assets/nav-hotel.png" alt="" width="22" height="22" />
-          </span>
-          Hoteles Analizados
-        </h2>
-      </div>
-
-      <div class="hotel-grid" *ngIf="hotels.length; else noHotels">
-        <article class="hotel-card" *ngFor="let h of hotels">
-          <div class="hotel-card-header">
-            <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
-
-            <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
-              <div class="badge-circle" [attr.data-tone]="b.tone">
-                <div class="badge-pct">{{ b.pct }}%</div>
-              </div>
-            </ng-container>
-          </div>
+    <div class="hotel-grid" *ngIf="!loading && hotels.length">
+      <article class="hotel-card" *ngFor="let h of hotels">
+        <div class="hotel-card-header">
+          <h3 class="hotel-name">{{ h.hotel_display_name }}</h3>
 
           <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
-            <div class="badge-label" [attr.data-tone]="b.tone">{{ b.label }}</div>
+            <div class="badge-circle" [attr.data-tone]="b.tone">
+              <div class="badge-pct">{{ b.pct }}%</div>
+            </div>
           </ng-container>
+        </div>
 
-          <div class="hotel-meta">
-            <div class="meta-line" *ngIf="h.address">
-              <span class="meta-icon" aria-hidden="true">
-                <img src="assets/location-home.png" alt="Ubicación" width="16" height="16" />
-              </span>
-              <span class="meta-text">{{ h.address }}</span>
-            </div>
+        <ng-container *ngIf="getBadgeForHotel(h.hotel_name) as b">
+          <div class="badge-label" [attr.data-tone]="b.tone">{{ b.label }}</div>
+        </ng-container>
 
-            <div class="meta-stats">
-              <div class="meta-chip">
-                <span class="meta-icon" aria-hidden="true">
-                  <img src="assets/stars-home.png" alt="Estrellas" width="16" height="16" />
-                </span>
-                <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}</span>
-                <span class="meta-muted">/5</span>
-              </div>
-
-              <div class="meta-chip">
-                <span class="meta-icon" aria-hidden="true">
-                  <img src="assets/users-home.png" alt="Usuarios" width="16" height="16" />
-                </span>
-                <span class="meta-strong">{{ h.total_reviews_hotel | number }}</span>
-                <span class="meta-muted">reseñas</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="kw-title">
-            <span class="kw-icon" aria-hidden="true">
-              <img src="assets/trending-home.png" alt="" width="22" height="22" />
+        <div class="hotel-meta">
+          <div class="meta-line" *ngIf="h.address">
+            <span class="meta-icon" aria-hidden="true">
+              <img src="assets/location-home.png" alt="Ubicación" width="16" height="16" />
             </span>
-            Temáticas más discutidas:
+            <span class="meta-text">{{ h.address }}</span>
           </div>
 
-          <ng-container *ngIf="asChips(h.top_words, 6) as c">
-            <div class="chips" *ngIf="c.items.length">
-              <span class="chip" *ngFor="let w of c.items">{{ w }}</span>
-              <span class="chip chip-more" *ngIf="c.more > 0">+{{ c.more }} más</span>
+          <div class="meta-stats">
+            <div class="meta-chip">
+              <span class="meta-icon" aria-hidden="true">
+                <img src="assets/stars-home.png" alt="Estrellas" width="16" height="16" />
+              </span>
+              <span class="meta-strong">{{ h.avg_star_rating_hotel | number:'1.1-2' }}</span>
+              <span class="meta-muted">/5</span>
             </div>
-          </ng-container>
 
-          <!--<a class="btn-primary" routerLink="/hotels">Ver detalles</a>-->
-          <!--<a class="btn-primary" [routerLink]="['/hotels', h.hotel_name]">Ver más detalles</a>-->
-          <button class="btn-primary" type="button" (click)="openDetails(h.hotel_name)">Ver más detalles</button>
+            <div class="meta-chip">
+              <span class="meta-icon" aria-hidden="true">
+                <img src="assets/users-home.png" alt="Usuarios" width="16" height="16" />
+              </span>
+              <span class="meta-strong">{{ h.total_reviews_hotel | number }}</span>
+              <span class="meta-muted">reseñas</span>
+            </div>
+          </div>
+        </div>
 
-        </article>
-      </div>
+        <div class="kw-title">
+          <span class="kw-icon" aria-hidden="true">
+            <img src="assets/trending-home.png" alt="" width="22" height="22" />
+          </span>
+          Temáticas más discutidas:
+        </div>
 
-      <ng-template #noHotels>
-        <div class="state muted">No hay datos para mostrar.</div>
-      </ng-template>
-    </section>
-  </ng-container>
+        <ng-container *ngIf="asChips(h.top_words, 6) as c">
+          <div class="chips" *ngIf="c.items.length">
+            <span class="chip" *ngFor="let w of c.items">{{ w }}</span>
+            <span class="chip chip-more" *ngIf="c.more > 0">+{{ c.more }} más</span>
+          </div>
+        </ng-container>
+
+        <!--<a class="btn-primary" routerLink="/hotels">Ver detalles</a>-->
+        <!--<a class="btn-primary" [routerLink]="['/hotels', h.hotel_name]">Ver más detalles</a>-->
+        <button class="btn-primary" type="button" (click)="openDetails(h.hotel_name)">Ver más detalles</button>
+
+      </article>
+    </div>
+
+    <div class="state muted" *ngIf="!loading && !hotels.length">No hay datos para mostrar.</div>
+  </section>
 </div>

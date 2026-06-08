@@ -22,6 +22,9 @@ type Row = {
 @Component({
   selector: 'app-sentiment-stacked-bar',
   standalone: true,
+  // ECharts manages its own canvas DOM in the browser; skip hydration so the
+  // server/client DOM never mismatches on this subtree.
+  host: { ngSkipHydration: 'true' },
   imports: [CommonModule, NgxEchartsDirective],
   providers: [provideEchartsCore({ echarts })],
   template: `<div echarts class="echart" [options]="option"></div>`,

@@ -1,55 +1,7 @@
 <div class="hotels-page">
+  <section class="section">
 
-  <!-- LOADING (skeleton realista) -->
-  <div *ngIf="loading" class="state">
-    <div class="skeleton-loader" aria-label="Cargando hoteles analizados">
-
-      <div class="skeleton-header">
-        <div class="skeleton-line skeleton-title"></div>
-      </div>
-
-      <div class="skeleton-grid">
-        <article class="skeleton-hotel-card" *ngFor="let _ of [1,2,3,4,5,6]">
-
-          <div class="skeleton-card-header">
-            <div class="skeleton-line skeleton-hotel-name"></div>
-            <div>
-              <div class="skeleton-line skeleton-badge"></div>
-              <div class="skeleton-line skeleton-badge-label"></div>
-            </div>
-          </div>
-
-          <div class="skeleton-line skeleton-address"></div>
-
-          <div class="skeleton-meta-row">
-            <div class="skeleton-line skeleton-rating"></div>
-            <div class="skeleton-line skeleton-reviews"></div>
-          </div>
-
-          <div class="skeleton-line skeleton-keywords-title"></div>
-
-          <div class="skeleton-chips">
-            <div class="skeleton-line skeleton-chip"></div>
-            <div class="skeleton-line skeleton-chip"></div>
-            <div class="skeleton-line skeleton-chip skeleton-chip-short"></div>
-          </div>
-
-          <div class="skeleton-line skeleton-button"></div>
-
-        </article>
-      </div>
-    </div>
-  </div>
-
-  <!-- ERROR -->
-  <div *ngIf="!loading && errorMsg" class="state error">
-    <strong>Error:</strong> {{ errorMsg }}
-  </div>
-
-  <!-- CONTENT -->
-  <section class="section" *ngIf="!loading">
-
-    <!-- HERO (REPLACED) -->
+    <!-- HERO — static text, always rendered so it is crawlable (prerendered) -->
     <div class="hero-copy">
       <h1 class="hero-title">Selecciona un hotel</h1>
       <p class="hero-subtitle">
@@ -57,7 +9,49 @@
       </p>
     </div>
 
-    <div class="hotel-grid" *ngIf="hotels.length; else noHotels">
+    <!-- ERROR -->
+    <div *ngIf="!loading && errorMsg" class="state error">
+      <strong>Error:</strong> {{ errorMsg }}
+    </div>
+
+    <!-- LOADING (skeleton realista) -->
+    <div *ngIf="loading" class="state">
+      <div class="skeleton-loader" aria-label="Cargando hoteles analizados">
+
+        <div class="skeleton-grid">
+          <article class="skeleton-hotel-card" *ngFor="let _ of [1,2,3,4,5,6]">
+
+            <div class="skeleton-card-header">
+              <div class="skeleton-line skeleton-hotel-name"></div>
+              <div>
+                <div class="skeleton-line skeleton-badge"></div>
+                <div class="skeleton-line skeleton-badge-label"></div>
+              </div>
+            </div>
+
+            <div class="skeleton-line skeleton-address"></div>
+
+            <div class="skeleton-meta-row">
+              <div class="skeleton-line skeleton-rating"></div>
+              <div class="skeleton-line skeleton-reviews"></div>
+            </div>
+
+            <div class="skeleton-line skeleton-keywords-title"></div>
+
+            <div class="skeleton-chips">
+              <div class="skeleton-line skeleton-chip"></div>
+              <div class="skeleton-line skeleton-chip"></div>
+              <div class="skeleton-line skeleton-chip skeleton-chip-short"></div>
+            </div>
+
+            <div class="skeleton-line skeleton-button"></div>
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="hotel-grid" *ngIf="!loading && hotels.length">
 
       <article
         class="hotel-card"
@@ -135,11 +129,9 @@
       </article>
     </div>
 
-    <ng-template #noHotels>
-      <div class="state muted">
-        No hay datos para mostrar.
-      </div>
-    </ng-template>
+    <div class="state muted" *ngIf="!loading && !hotels.length">
+      No hay datos para mostrar.
+    </div>
 
   </section>
 </div>

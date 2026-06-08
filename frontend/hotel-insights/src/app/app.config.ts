@@ -1,6 +1,7 @@
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
 import { provideRouter, withRouterConfig } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 import { routes } from './app.routes';
 import { AuthService } from './core/auth.service';
@@ -33,6 +34,10 @@ export const appConfig: ApplicationConfig = {
 
     // HttpClient provider.
     provideHttpClient(),
+
+    // Reuse the server-rendered (prerendered) DOM on the client instead of
+    // re-rendering it — no flicker, no layout shift.
+    provideClientHydration(withEventReplay()),
 
     // ECharts provider at app bootstrap.
     provideEchartsCore({ echarts }),

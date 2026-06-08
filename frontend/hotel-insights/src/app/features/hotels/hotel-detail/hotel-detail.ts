@@ -47,6 +47,9 @@ type SatisfactionBadge = {
 })
 export class HotelDetail implements OnInit {
   hotelSlug = '';
+  // Display name resolved synchronously from the slug (available during prerender,
+  // before the async hotel data loads) so the <h1> is crawlable.
+  hotelName = '';
   hotel: any = null;
 
   loading = true;
@@ -84,6 +87,8 @@ export class HotelDetail implements OnInit {
   private setBaseSeo(slug: string): void {
     const meta = getHotelMeta(slug);
     if (!meta) return;
+
+    this.hotelName = meta.displayName;
 
     this.setHotelSchema(meta);
 
