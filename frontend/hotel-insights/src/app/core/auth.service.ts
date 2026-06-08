@@ -8,6 +8,11 @@ export class AuthService {
   private _session$ = new BehaviorSubject<Session | null>(null);
   readonly session$ = this._session$.asObservable();
 
+  /** Latest session value, read synchronously (e.g. to gate a click without subscribing). */
+  get currentSession(): Session | null {
+    return this._session$.value;
+  }
+
   // Prevent duplicate auth listeners.
   private initialized = false;
 

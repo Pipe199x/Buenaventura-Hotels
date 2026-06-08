@@ -24,6 +24,7 @@ import { buildBreadcrumb } from '../../core/seo/hotel-schema';
 
 import { SentimentStackedBarComponent } from '../../shared/charts/sentiment-stacked-bar/sentiment-stacked-bar';
 import { AuthModalService } from '../../shared/auth-modal/auth-modal.service';
+import { AuthService } from '../../core/auth.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
 
@@ -55,6 +56,7 @@ export class Home implements OnInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private authModal = inject(AuthModalService);
+  private auth = inject(AuthService);
   private schemaService = inject(SchemaService);
   private title = inject(Title);
   private meta = inject(Meta);
@@ -138,9 +140,15 @@ export class Home implements OnInit {
     );
   }
 
-  // Opens the auth modal (register tab), then routes to the hotel after auth.
+  // If already authenticated, go straight to the hotel detail; otherwise prompt to
+  // sign in (register tab) and route there after a successful auth.
   openDetails(hotelName: string): void {
-    this.authModal.open('register', '/hotels/' + hotelName);
+    const target = '/hotels/' + hotelName;
+    if (this.auth.currentSession) {
+      this.router.navigateByUrl(target);
+    } else {
+      this.authModal.open('register', target);
+    }
   }
 
   private async loadHome(reason: 'init' | 'nav'): Promise<void> {

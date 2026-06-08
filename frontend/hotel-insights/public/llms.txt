@@ -1,0 +1,25 @@
+# Buenaventura Datos
+
+> Panel de análisis de percepción turística de los hoteles de Buenaventura (Valle del Cauca, Colombia), construido a partir del análisis de sentimientos de reseñas públicas de Google Reviews.
+
+Buenaventura Datos es un tablero de solo lectura, en español, que presenta calificaciones, análisis de sentimientos, temáticas recurrentes y tendencias de percepción turística de los cinco hoteles con mayor número de reseñas en Buenaventura. Las reseñas se recopilaron de Google Reviews (en español, inglés, alemán y otros idiomas) e incluyen comentarios, calificaciones y fechas de publicación.
+
+Es un proyecto de investigación de la Universidad de Manizales. Autor: Andrés Felipe Duque Caicedo. Director: Andrés A. Osorio Londoño, PhD. Codirector: M.Sc. Edgar Rafael Jiménez López.
+
+## Páginas
+
+- [Inicio](https://buenaventuradatos.com/): Panel global con el resumen de percepción turística y los hoteles analizados.
+- [Hoteles](https://buenaventuradatos.com/hotels): Listado de los hoteles analizados con calificaciones, análisis de sentimientos y tendencias.
+- [Acerca del proyecto](https://buenaventuradatos.com/about): Metodología, fuentes de datos, técnicas de análisis, objetivos y tecnologías utilizadas.
+
+## Hoteles
+
+- [Hotel Torre Mar](https://buenaventuradatos.com/hotels/torre_mar): Análisis de reseñas y sentimientos del Hotel Torre Mar.
+- [Hotel Cosmos Pacífico](https://buenaventuradatos.com/hotels/cosmos_pacifico): Análisis de reseñas y sentimientos del Hotel Cosmos Pacífico.
+- [Hotel Magüipí](https://buenaventuradatos.com/hotels/maguipi): Análisis de reseñas y sentimientos del Hotel Magüipí.
+- [Hotel Steven Buenaventura](https://buenaventuradatos.com/hotels/steven_buenaventura): Análisis de reseñas y sentimientos del Hotel Steven Buenaventura.
+- [Hotel Cordillera](https://buenaventuradatos.com/hotels/cordillera): Análisis de reseñas y sentimientos del Hotel Cordillera.
+
+## Recursos
+
+- [Mapa del sitio](https://buenaventuradatos.com/sitemap.xml): Sitemap XML con todas las URL del sitio.

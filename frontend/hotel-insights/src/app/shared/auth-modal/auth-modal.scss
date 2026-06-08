@@ -23,7 +23,7 @@
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
-  padding: 22px;
+  padding: 34px 22px 22px;
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
   animation: card-pop 0.2s ease-out;
 
@@ -37,8 +37,8 @@
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 10px;
   border: 0;
   background: transparent;
   cursor: pointer;

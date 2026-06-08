@@ -57,8 +57,8 @@ the `Navbar` + layout. The navbar is session-aware (login button vs. logout) via
 ### SSR / prerender — hardcoded hotel slugs
 `src/app/app.routes.server.ts` prerenders the static pages and the hotel detail pages for a
 **hardcoded `HOTEL_SLUGS` array**. When adding/removing a hotel you must update that list, and the
-same slugs/names are duplicated in the JSON-LD `ItemList` in `hotels-list.ts` and in
-`public/sitemap.xml` — keep all three in sync.
+same slugs/names are duplicated in the JSON-LD `ItemList` in `hotels-list.ts`, in
+`public/sitemap.xml`, and in `public/llms.txt` — keep all four in sync.
 
 ### Charts
 Charts use **ngx-echarts**. ECharts is tree-shaken: required pieces are registered with

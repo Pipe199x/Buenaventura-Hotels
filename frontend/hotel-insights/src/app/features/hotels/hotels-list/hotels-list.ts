@@ -16,6 +16,7 @@ import { SchemaService } from '../../../core/seo/schema.service';
 import { SITE_ORIGIN, HOTELS } from '../../../core/seo/hotels.metadata';
 import { buildHotelSchema } from '../../../core/seo/hotel-schema';
 import { AuthModalService } from '../../../shared/auth-modal/auth-modal.service';
+import { AuthService } from '../../../core/auth.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
 
@@ -44,6 +45,7 @@ export class HotelsList implements OnInit {
   private destroyRef = inject(DestroyRef);
   private schemaService = inject(SchemaService);
   private authModal = inject(AuthModalService);
+  private auth = inject(AuthService);
   private title = inject(Title);
   private meta = inject(Meta);
 
@@ -102,9 +104,15 @@ export class HotelsList implements OnInit {
     );
   }
 
-  // Opens the auth modal (register tab), then routes to the hotel after auth.
+  // If already authenticated, go straight to the hotel detail; otherwise prompt to
+  // sign in (register tab) and route there after a successful auth.
   openDetails(hotelName: string): void {
-    this.authModal.open('register', '/hotels/' + hotelName);
+    const target = '/hotels/' + hotelName;
+    if (this.auth.currentSession) {
+      this.router.navigateByUrl(target);
+    } else {
+      this.authModal.open('register', target);
+    }
   }
 
   // Builds the CollectionPage + ItemList schema from the shared HOTELS metadata.
