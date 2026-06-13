@@ -12,6 +12,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { supabase } from '../../../core/supabase/supabase.client';
 
 import { SchemaService } from '../../../core/seo/schema.service';
+import { CanonicalService } from '../../../core/seo/canonical.service';
 import { SITE_ORIGIN, getHotelMeta, HotelMeta } from '../../../core/seo/hotels.metadata';
 import { buildHotelSchema, buildBreadcrumb } from '../../../core/seo/hotel-schema';
 
@@ -81,6 +82,7 @@ export class HotelDetail implements OnInit {
   private homeData = inject(HomeDataService);
   private prerender = inject(PrerenderStateService);
   private schemaService = inject(SchemaService);
+  private canonical = inject(CanonicalService);
   private title = inject(Title);
   private meta = inject(Meta);
 
@@ -149,6 +151,7 @@ export class HotelDetail implements OnInit {
     this.setHotelSchema(meta);
 
     this.title.setTitle(`${meta.displayName} — Reseñas y análisis | Buenaventura Datos`);
+    this.canonical.setCanonical(`${SITE_ORIGIN}/hotels/${meta.slug}`);
     this.meta.updateTag({
       name: 'description',
       content: `Análisis de reseñas, calificación y tendencias de sentimiento de ${meta.displayName} en Buenaventura.`,

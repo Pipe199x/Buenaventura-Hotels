@@ -19,6 +19,7 @@ import {
 } from '../../core/data/home-data.service';
 
 import { SchemaService } from '../../core/seo/schema.service';
+import { CanonicalService } from '../../core/seo/canonical.service';
 import { SITE_ORIGIN } from '../../core/seo/hotels.metadata';
 import { buildBreadcrumb } from '../../core/seo/hotel-schema';
 import { PrerenderStateService } from '../../core/data/prerender-state.service';
@@ -68,6 +69,7 @@ export class Home implements OnInit {
   private auth = inject(AuthService);
   private prerender = inject(PrerenderStateService);
   private schemaService = inject(SchemaService);
+  private canonical = inject(CanonicalService);
   private title = inject(Title);
   private meta = inject(Meta);
 
@@ -115,7 +117,8 @@ export class Home implements OnInit {
   }
 
   private setHomeSeo(): void {
-    this.title.setTitle('Hoteles en Buenaventura: Reseñas y Opiniones | Buenaventura Datos');
+    this.title.setTitle('Hoteles en Buenaventura: Reseñas y Opiniones | Buenaventura');
+    this.canonical.setCanonical(`${SITE_ORIGIN}/`);
     this.meta.updateTag({
       name: 'description',
       content:

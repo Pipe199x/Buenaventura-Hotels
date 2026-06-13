@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 
 import { SchemaService } from '../../core/seo/schema.service';
+import { CanonicalService } from '../../core/seo/canonical.service';
 import { SITE_ORIGIN } from '../../core/seo/hotels.metadata';
 import { buildBreadcrumb } from '../../core/seo/hotel-schema';
 
@@ -21,11 +22,13 @@ type ObjetivoCard = {
 })
 export class About implements OnInit {
   private schemaService = inject(SchemaService);
+  private canonical = inject(CanonicalService);
   private title = inject(Title);
   private meta = inject(Meta);
 
   ngOnInit(): void {
     this.title.setTitle('Acerca del proyecto | Buenaventura Datos');
+    this.canonical.setCanonical(`${SITE_ORIGIN}/about`);
     this.meta.updateTag({
       name: 'description',
       content:

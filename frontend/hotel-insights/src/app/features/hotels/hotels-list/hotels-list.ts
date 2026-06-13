@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HomeDataService, HotelCardRow } from '../../../core/data/home-data.service';
 import { SchemaService } from '../../../core/seo/schema.service';
+import { CanonicalService } from '../../../core/seo/canonical.service';
 import { SITE_ORIGIN, HOTELS } from '../../../core/seo/hotels.metadata';
 import { buildHotelSchema } from '../../../core/seo/hotel-schema';
 import { AuthModalService } from '../../../shared/auth-modal/auth-modal.service';
@@ -45,6 +46,7 @@ export class HotelsList implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
   private schemaService = inject(SchemaService);
+  private canonical = inject(CanonicalService);
   private authModal = inject(AuthModalService);
   private auth = inject(AuthService);
   private prerender = inject(PrerenderStateService);
@@ -87,6 +89,7 @@ export class HotelsList implements OnInit {
 
   private setPageMeta(): void {
     this.title.setTitle('Hoteles analizados en Buenaventura | Buenaventura Datos');
+    this.canonical.setCanonical(`${SITE_ORIGIN}/hotels`);
     this.meta.updateTag({
       name: 'description',
       content:
