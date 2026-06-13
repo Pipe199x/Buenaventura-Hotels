@@ -20,4 +20,4 @@ Datasets/
 Datasets_csv/
 *.xlsx
 *.csv
-*.docx
+*.docx.mcp.json
