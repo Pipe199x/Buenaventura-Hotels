@@ -18,6 +18,7 @@ import { SITE_ORIGIN, HOTELS } from '../../../core/seo/hotels.metadata';
 import { buildHotelSchema } from '../../../core/seo/hotel-schema';
 import { AuthModalService } from '../../../shared/auth-modal/auth-modal.service';
 import { AuthService } from '../../../core/auth.service';
+import { environment } from '../../../../environments/environment';
 import { PrerenderStateService } from '../../../core/data/prerender-state.service';
 
 type BadgeTone = 'positive' | 'neutral' | 'negative';
@@ -123,11 +124,12 @@ export class HotelsList implements OnInit {
     );
   }
 
-  // If already authenticated, go straight to the hotel detail; otherwise prompt to
-  // sign in (register tab) and route there after a successful auth.
+  // Navigate to the hotel detail. When environment.requireAuthForDetails is on and the
+  // visitor is not authenticated, prompt to sign in (register tab) and route there after
+  // a successful auth. The flag is off by default so details are publicly browsable.
   openDetails(hotelName: string): void {
     const target = '/hotels/' + hotelName;
-    if (this.auth.currentSession) {
+    if (!environment.requireAuthForDetails || this.auth.currentSession) {
       this.router.navigateByUrl(target);
     } else {
       this.authModal.open('register', target);
