@@ -102,7 +102,19 @@
   <section class="panel panel--footer">
     <div class="research-box">
       <h3 class="research-title">Proyecto de investigación</h3>
-      <p class="research-text">Universidad de Manizales</p>
+      <p class="research-text">
+        Universidad de Manizales, Ingeniería en Analítica de Datos, 2026
+      </p>
+      <p class="research-text">
+        Trabajo de grado aprobado, publicado en RIDUM, el repositorio institucional de la
+        Universidad de Manizales.
+      </p>
+
+      <div class="research-links">
+        <a [href]="research.handleUrl" target="_blank" rel="noopener">Ver en RIDUM</a>
+        <a [href]="research.pdfUrl" target="_blank" rel="noopener">Descargar el documento (PDF)</a>
+        <a routerLink="/investigacion">Ver la investigación completa</a>
+      </div>
 
       <div class="research-advisors-grid">
         <div class="advisor-card">

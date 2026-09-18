@@ -6,11 +6,14 @@ Buenaventura Datos es un tablero de solo lectura, en español, que presenta cali
 
 Es un proyecto de investigación de la Universidad de Manizales. Autor: Andrés Felipe Duque Caicedo. Director: Andrés A. Osorio Londoño, PhD. Codirector: M.Sc. Edgar Rafael Jiménez López.
 
+La fuente primaria es el trabajo de grado "Análisis de sentimientos en reseñas hoteleras de Buenaventura mediante minería de texto" (Duque Caicedo, 2026), aprobado y publicado en RIDUM, el repositorio institucional de la Universidad de Manizales: https://ridum.umanizales.edu.co/handle/20.500.12746/8174
+
 ## Páginas
 
 - [Inicio](https://buenaventuradatos.com/): Panel global con el resumen de percepción turística y los hoteles analizados.
 - [Hoteles](https://buenaventuradatos.com/hotels): Listado de los hoteles analizados con calificaciones, análisis de sentimientos y tendencias.
 - [Acerca del proyecto](https://buenaventuradatos.com/about): Metodología, fuentes de datos, técnicas de análisis, objetivos y tecnologías utilizadas.
+- [Investigación](https://buenaventuradatos.com/investigacion): Trabajo de grado del que proviene el sitio: alcance, metodología (CRISP-DM, Apify, Azure Cognitive Services, Power BI), cifras clave, ficha bibliográfica y enlaces al documento completo en RIDUM.
 
 ## Hoteles
 
@@ -23,3 +26,6 @@ Es un proyecto de investigación de la Universidad de Manizales. Autor: Andrés 
 ## Recursos
 
 - [Mapa del sitio](https://buenaventuradatos.com/sitemap.xml): Sitemap XML con todas las URL del sitio.
+- [Trabajo de grado en RIDUM](https://ridum.umanizales.edu.co/handle/20.500.12746/8174): Registro oficial del documento en el repositorio institucional de la Universidad de Manizales.
+- [Documento completo en PDF](https://ridum.umanizales.edu.co/bitstreams/f6fa7b19-82c9-470a-a845-44e9d00b8047/download): Texto completo del trabajo de grado (licencia CC BY-NC-ND 4.0).
+- [Código en GitHub](https://github.com/Pipe199x/Buenaventura-Hotels): Repositorio con los scripts y el flujo de procesamiento del análisis.

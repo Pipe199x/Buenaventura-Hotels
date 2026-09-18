@@ -1,0 +1,378 @@
+/* Visual language mirrors about.scss (panels, tokens, breakpoints). Styles are
+   component-scoped, so the shared tokens are redeclared here. */
+
+:host {
+  display: block;
+}
+
+.research-page {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
+  --panel: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --primary: #3b82f6;
+  --border: rgba(15, 23, 42, 0.10);
+  --shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  margin: 0 0 10px 0;
+  color: rgba(59, 130, 246, 0.95);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.hero-title {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 40px);
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.hero-subtitle {
+  margin: 12px auto 0 auto;
+  max-width: 860px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ---------- ACTION BUTTONS ---------- */
+.actions {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 11px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  background: #ffffff;
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn:hover {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.btn--primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.btn--primary:hover {
+  background: #2f6fd0;
+}
+
+/* ---------- READING MODE ---------- */
+/* Opening the document turns the page into a reader: the navbar lives in the shell
+   so it stays, and here only the close bar, the document and the citation remain. */
+.research-page--reading > *:not(.reading-bar):not(.viewer):not(.panel--cite) {
+  display: none;
+}
+
+.reading-bar {
+  max-width: 1100px;
+  margin: 0 auto 12px auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------- INLINE PDF VIEWER ---------- */
+/* The open height is a fixed cap rather than the content height so the collapse
+   animates; it is set above the tallest the content can get (1000px frame plus
+   footer), so it never clips. */
+.viewer {
+  max-width: 1100px;
+  margin: 0 auto;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease;
+}
+
+.viewer--open {
+  max-height: 1200px;
+  opacity: 1;
+  margin-bottom: 22px;
+}
+
+.viewer-frame {
+  display: block;
+  width: 100%;
+  height: min(82vh, 1000px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.viewer-foot {
+  margin: 12px 0 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  font-size: 14px;
+}
+
+.viewer-foot a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.viewer-foot a:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewer {
+    transition: none;
+  }
+}
+
+/* ---------- STATS ---------- */
+.stats {
+  max-width: 1100px;
+  margin: 0 auto 22px auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.stat-value {
+  margin: 0 0 6px 0;
+  font-size: clamp(22px, 2.2vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+}
+
+.stat-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ---------- PANEL ---------- */
+.panel {
+  max-width: 1100px;
+  margin: 0 auto 22px auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.panel--footer {
+  margin-bottom: 28px;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.text {
+  margin: 0 0 12px 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.text--muted {
+  font-size: 14px;
+  margin-top: 14px;
+  margin-bottom: 0;
+}
+
+.text a,
+.cite a {
+  color: var(--primary);
+  word-break: break-word;
+}
+
+/* ---------- RESULTS TABLE ---------- */
+.table-wrap {
+  margin: 4px 0 16px 0;
+  overflow-x: auto;
+}
+
+.results {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.results th,
+.results td {
+  padding: 12px 14px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.results thead th {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.results th:first-child,
+.results td:first-child {
+  text-align: left;
+}
+
+.results tbody th {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.results tbody th a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.results tbody th a:hover {
+  color: var(--primary);
+}
+
+.results tbody tr:hover {
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.results tbody td {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- FICHA ---------- */
+.ficha {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+}
+
+.ficha-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ficha dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.ficha dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* ---------- CITATION ---------- */
+.cite-title {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cite {
+  margin: 0;
+  padding: 14px 16px;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 12px 12px 0;
+  background: rgba(59, 130, 246, 0.05);
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ficha {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .research-page {
+    padding: 16px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 26px;
+  }
+
+  .hero-subtitle,
+  .text {
+    font-size: 15px;
+  }
+
+  .panel-title {
+    font-size: 22px;
+  }
+}

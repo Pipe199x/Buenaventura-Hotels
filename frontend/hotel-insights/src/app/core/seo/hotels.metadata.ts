@@ -7,6 +7,25 @@
 
 export const SITE_ORIGIN = 'https://buenaventuradatos.com';
 
+// Published thesis this project comes from. Canonical URLs taken from the RIDUM
+// record's own citation_* meta tags. Never use a URL carrying an
+// `authentication-token` query param, that is a personal session credential and
+// the PDF is public without it.
+export const RESEARCH = {
+  handleUrl: 'https://ridum.umanizales.edu.co/handle/20.500.12746/8174',
+  pdfUrl:
+    'https://ridum.umanizales.edu.co/bitstreams/f6fa7b19-82c9-470a-a845-44e9d00b8047/download',
+  // Reading copy served from our own origin: RIDUM sends X-Frame-Options: DENY,
+  // so its PDF cannot be embedded here. Marked noindex in public/_headers; the
+  // record of version stays the RIDUM one, which is what the JSON-LD points at.
+  localPdfPath: '/tesis-analisis-sentimientos-buenaventura-2026.pdf',
+  repoUrl: 'https://github.com/Pipe199x/Buenaventura-Hotels',
+  authorGithubUrl: 'https://github.com/Pipe199x',
+  licenseUrl: 'https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es',
+  title: 'Análisis de sentimientos en reseñas hoteleras de Buenaventura mediante minería de texto',
+  year: '2026',
+} as const;
+
 export type HotelMeta = {
   slug: string;
   displayName: string;

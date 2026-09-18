@@ -6,6 +6,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Prerender },
   { path: 'home', renderMode: RenderMode.Prerender },
   { path: 'about', renderMode: RenderMode.Prerender },
+  { path: 'investigacion', renderMode: RenderMode.Prerender },
   { path: 'hotels', renderMode: RenderMode.Prerender },
 
   // Pre-render hotel detail pages for known slugs.

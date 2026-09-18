@@ -1,10 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 
 import { SchemaService } from '../../core/seo/schema.service';
 import { CanonicalService } from '../../core/seo/canonical.service';
-import { SITE_ORIGIN } from '../../core/seo/hotels.metadata';
+import { RESEARCH, SITE_ORIGIN } from '../../core/seo/hotels.metadata';
 import { buildBreadcrumb } from '../../core/seo/hotel-schema';
 
 type ObjetivoCard = {
@@ -16,7 +17,7 @@ type ObjetivoCard = {
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './about.html',
   styleUrl: './about.scss',
 })
@@ -25,6 +26,8 @@ export class About implements OnInit {
   private canonical = inject(CanonicalService);
   private title = inject(Title);
   private meta = inject(Meta);
+
+  research = RESEARCH;
 
   ngOnInit(): void {
     this.title.setTitle('Acerca del proyecto | Buenaventura Datos');
@@ -47,6 +50,7 @@ export class About implements OnInit {
       isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
       about: { '@id': `${SITE_ORIGIN}/#dataset` },
       mainEntity: { '@id': `${SITE_ORIGIN}/#author` },
+      relatedLink: [`${SITE_ORIGIN}/investigacion`, RESEARCH.handleUrl],
     });
 
     this.schemaService.setSchema(

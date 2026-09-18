@@ -1,0 +1,190 @@
+<div class="research-page" [class.research-page--reading]="viewerOpen">
+  <!-- BARRA DE LECTURA: la única salida del modo lectura -->
+  @if (viewerOpen) {
+    <div class="reading-bar">
+      <button class="btn" type="button" (click)="toggleViewer()">
+        Cerrar el documento
+      </button>
+    </div>
+  }
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">Trabajo de grado, Universidad de Manizales, 2026</p>
+    <h1 class="hero-title">
+      Análisis de sentimientos en reseñas hoteleras de Buenaventura mediante minería de texto
+    </h1>
+    <p class="hero-subtitle">
+      Los tableros de este sitio salen de una investigación académica aprobada, ya publicada en el
+      repositorio institucional de la Universidad de Manizales. Aquí está el documento completo,
+      cómo citarlo, qué encontró.
+    </p>
+
+    <div class="actions">
+      <a class="btn btn--primary" [href]="research.handleUrl" target="_blank" rel="noopener">
+        Ver en el repositorio (RIDUM)
+      </a>
+      <button
+        class="btn"
+        type="button"
+        (click)="toggleViewer()"
+        [attr.aria-expanded]="viewerOpen"
+        aria-controls="visor-documento"
+      >
+        Leer el documento aquí
+      </button>
+      <a class="btn" [href]="research.repoUrl" target="_blank" rel="noopener">
+        Código en GitHub
+      </a>
+    </div>
+  </section>
+
+  <!-- VISOR -->
+  <section class="viewer" [class.viewer--open]="viewerOpen" id="visor-documento">
+    @if (viewerOpen) {
+      <iframe
+        class="viewer-frame"
+        src="/tesis-analisis-sentimientos-buenaventura-2026.pdf#view=FitH"
+        title="Trabajo de grado completo en PDF"
+      ></iframe>
+      <p class="viewer-foot">
+        <a [href]="research.localPdfPath" target="_blank" rel="noopener">Abrir en otra pestaña</a>
+        <a [href]="research.handleUrl" target="_blank" rel="noopener">Ver la ficha en RIDUM</a>
+      </p>
+    }
+  </section>
+
+  <!-- CIFRAS -->
+  <section class="stats">
+    <article class="stat" *ngFor="let cifra of cifras">
+      <p class="stat-value">{{ cifra.valor }}</p>
+      <p class="stat-label">{{ cifra.etiqueta }}</p>
+    </article>
+  </section>
+
+  <!-- POR QUÉ -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">El vacío que llenó</h2>
+    </div>
+
+    <p class="text">
+      Buenaventura se proyecta como destino turístico: solo entre enero y febrero de 2025 recibió
+      más de 31.000 visitantes, atraídos por el avistamiento de ballenas jorobadas, por las playas
+      de Juanchaco o Ladrilleros, por los carnavales de San Buenaventura. Al mismo tiempo carga
+      con una imagen pública marcada por la violencia, reforzada por el estigma mediático, que
+      pesa sobre la confianza de quien evalúa si viajar.
+    </p>
+
+    <p class="text">
+      Miles de esos visitantes ya dejaron escrita su experiencia, pero nadie la había ordenado.
+      Antes de este trabajo no existía ningún estudio que sistematizara de forma rigurosa las
+      opiniones publicadas sobre la hotelería de la ciudad, así que la evidencia sobre aciertos o
+      fallas seguía dispersa en comentarios sueltos. Esta investigación construyó ese corpus,
+      luego lo convirtió en indicadores comparables.
+    </p>
+  </section>
+
+  <!-- RESULTADOS -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">Resultados por hotel</h2>
+    </div>
+
+    <p class="text">
+      Indicadores de reputación digital reportados en el documento para el periodo 2020 a 2025.
+      Cada hotel tiene su ficha con el detalle temático, además de la evolución año por año.
+    </p>
+
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th scope="col">Hotel</th>
+            <th scope="col">Reseñas</th>
+            <th scope="col">Puntuación</th>
+            <th scope="col">Positivas</th>
+            <th scope="col">Negativas</th>
+            <th scope="col">Neutras</th>
+            <th scope="col">Respondidas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fila of resultados">
+            <th scope="row">
+              <a [routerLink]="['/hotels', fila.slug]">{{ fila.nombre }}</a>
+            </th>
+            <td>{{ fila.resenas }}</td>
+            <td>{{ fila.puntuacion }}</td>
+            <td>{{ fila.positivas }}</td>
+            <td>{{ fila.negativas }}</td>
+            <td>{{ fila.neutras }}</td>
+            <td>{{ fila.respondidas }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text">
+      El contraste más fuerte no está en la calificación sino en la respuesta. Magüipí contesta el
+      57,25 % de las reseñas, a la vez que encabeza la satisfacción con 4,70. Ni Cosmos Pacífico
+      ni Torre Mar respondieron una sola en todo el periodo. Cordillera, el hotel con más
+      opiniones acumuladas, apenas llegó al 0,92 %; es también el único donde las reseñas
+      negativas superan un tercio del total.
+    </p>
+  </section>
+
+  <!-- CONFIABILIDAD -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">Qué tan confiables son estas cifras</h2>
+    </div>
+
+    <p class="text">
+      La clasificación automática no se dio por buena sin verificar. Se tomó una muestra aleatoria
+      del 3 % del corpus con texto, 51 reseñas, para leerlas y etiquetarlas a mano. En 46 casos la
+      etiqueta humana coincidió con la del modelo; 4 resultaron opiniones mixtas donde ambos
+      llegaron igual a la misma categoría; hubo 1 divergencia real: una reseña que enumeraba
+      fallas del cuarto, pero cerraba elogiando la ubicación, así que el modelo se quedó con la
+      última frase.
+    </p>
+
+    <p class="text">
+      Eso deja una concordancia del 90,2 %, el margen con el que conviene leer cualquier cifra
+      publicada aquí. El proceso quedó trazable de punta a punta: el dato crudo, el dato limpio,
+      el dato listo para consumo se conservan en capas separadas, siguiendo el modelo CRISP-DM,
+      de modo que cualquier número de la tabla se puede rastrear hasta la reseña que lo originó.
+    </p>
+  </section>
+
+  <!-- FICHA BIBLIOGRÁFICA -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">Ficha bibliográfica</h2>
+    </div>
+
+    <dl class="ficha">
+      <div class="ficha-row" *ngFor="let item of ficha">
+        <dt>{{ item.campo }}</dt>
+        <dd>{{ item.valor }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- CÓMO CITAR: el único bloque que acompaña al documento en modo lectura -->
+  <section class="panel panel--footer panel--cite">
+    <h2 class="cite-title">Cómo citar este trabajo (APA 7)</h2>
+    <blockquote class="cite">
+      Duque Caicedo, A. F. (2026). <cite>Análisis de sentimientos en reseñas hoteleras de
+      Buenaventura mediante minería de texto</cite> [Trabajo de grado profesional]. Universidad de
+      Manizales. RIDUM: Repositorio Institucional Universidad de Manizales.
+      <a [href]="research.handleUrl" target="_blank" rel="noopener">{{ research.handleUrl }}</a>
+    </blockquote>
+
+    <p class="text text--muted">
+      Publicado bajo licencia
+      <a [href]="research.licenseUrl" target="_blank" rel="noopener">Creative Commons BY-NC-ND 4.0</a>.
+      La versión de registro es la depositada en RIDUM.
+    </p>
+  </section>
+</div>

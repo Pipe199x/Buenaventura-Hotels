@@ -4,6 +4,7 @@ import { ShellComponent } from './shared/shell/shell';
 // Main app pages.
 import { Home } from './features/home/home';
 import { About } from './features/about/about';
+import { Research } from './features/research/research';
 
 // Hotel feature pages.
 import { HotelsList } from './features/hotels/hotels-list/hotels-list';
@@ -29,6 +30,7 @@ export const routes: Routes = [
       },
 
       { path: 'about', component: About },
+      { path: 'investigacion', component: Research },
     ],
   },
 

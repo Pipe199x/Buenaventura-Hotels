@@ -1,0 +1,7 @@
+# Copia de lectura del trabajo de grado. La version de registro es la de RIDUM,
+# asi que esta no debe indexarse: evitamos que compita con la copia .edu.co y que
+# desplace a /investigacion en los resultados. No bloquear en robots.txt, o Google
+# nunca leeria este noindex.
+/tesis-analisis-sentimientos-buenaventura-2026.pdf
+  X-Robots-Tag: noindex
+  Cache-Control: public, max-age=31536000, immutable
