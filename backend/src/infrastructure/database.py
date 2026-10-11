@@ -7,7 +7,7 @@ from typing import Final
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 load_dotenv(ROOT / ".env")
 
 ENV_KEYS: Final = ("DATABASE_URL", "SUPABASE_DB_URL")
