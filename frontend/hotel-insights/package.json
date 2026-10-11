@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "prebuild": "node -e \"const s=require('fs').readFileSync('src/environments/environment.ts','utf8');const u=s.match(/supabaseUrl: '([^']+)'/)[1],k=s.match(/supabaseAnonKey: '([^']+)'/)[1];fetch(u+'/rest/v1/vw_home_overview_global_count?select=total_reviews',{headers:{apikey:k},signal:AbortSignal.timeout(15000)}).then(r=>{if(!r.ok)throw Error('Supabase answered HTTP '+r.status+' (project paused?): build aborted so Netlify keeps the last good deploy')})\"",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
